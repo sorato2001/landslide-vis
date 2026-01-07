@@ -1,0 +1,506 @@
+size,path,id,color,name,coordinates,description,type
+5000,landslide,landslide,"rgb(255, 136, 0)",landslide,,,root
+1000,landslide/landslide.0,landslide.0,#5728AE,landslide.landslide.0,"['101.3431', '24.4752']",10 km from the VII isobar of the Gengma,Spot
+1000,landslide/landslide.0/MED,landslide.0.MED,#45B34D,landslide.landslide.0.MED,"['101.3431', '24.4752']",,MED
+1000,landslide/landslide.0/FAC,landslide.0.FAC,#F2A737,landslide.landslide.0.FAC,"['101.3431', '24.4752']",,FAC
+1000,landslide/landslide.0/LOC,landslide.0.LOC,#2579E8,landslide.landslide.0.LOC,"['101.3431', '24.4752']",,LOC
+1000,landslide/landslide.1,landslide.1,#5728AE,landslide.landslide.1,"['50.5253', '25.2744']",41 - km rail that crosses the Serra do Mar mountain range,Spot
+1000,landslide/landslide.1/MED,landslide.1.MED,#45B34D,landslide.landslide.1.MED,"['50.5253', '25.2744']",,MED
+1000,landslide/landslide.1/FAC,landslide.1.FAC,#F2A737,landslide.landslide.1.FAC,"['50.5253', '25.2744']",,FAC
+1000,landslide/landslide.1/LOC,landslide.1.LOC,#2579E8,landslide.landslide.1.LOC,"['50.5253', '25.2744']",,LOC
+1000,landslide/landslide.2,landslide.2,#5728AE,landslide.landslide.2,"['3.0857', '36.7372']",70 km southeast of the Algerian capital,Spot
+1000,landslide/landslide.2/MED,landslide.2.MED,#45B34D,landslide.landslide.2.MED,"['3.0857', '36.7372']",,MED
+1000,landslide/landslide.2/FAC,landslide.2.FAC,#F2A737,landslide.landslide.2.FAC,"['3.0857', '36.7372']",,FAC
+1000,landslide/landslide.2/LOC,landslide.2.LOC,#2579E8,landslide.landslide.2.LOC,"['3.0857', '36.7372']",,LOC
+1000,landslide/landslide.3,landslide.3,#5728AE,landslide.landslide.3,"['78.4322', '30.3090']",a famous tourist destination in the Indian State of Uttarakhand,Spot
+1000,landslide/landslide.3/MED,landslide.3.MED,#45B34D,landslide.landslide.3.MED,"['78.4322', '30.3090']",,MED
+1000,landslide/landslide.3/FAC,landslide.3.FAC,#F2A737,landslide.landslide.3.FAC,"['78.4322', '30.3090']",,FAC
+1000,landslide/landslide.3/LOC,landslide.3.LOC,#2579E8,landslide.landslide.3.LOC,"['78.4322', '30.3090']",,LOC
+1000,landslide/landslide.4,landslide.4,#5728AE,landslide.landslide.4,"['6.8481', '49.3727']",A lagou,Spot
+1000,landslide/landslide.4/MED,landslide.4.MED,#45B34D,landslide.landslide.4.MED,"['6.8481', '49.3727']",,MED
+1000,landslide/landslide.4/FAC,landslide.4.FAC,#F2A737,landslide.landslide.4.FAC,"['6.8481', '49.3727']",,FAC
+1000,landslide/landslide.4/LOC,landslide.4.LOC,#2579E8,landslide.landslide.4.LOC,"['6.8481', '49.3727']",,LOC
+1000,landslide/landslide.5,landslide.5,#5728AE,landslide.landslide.5,"['38.1317', '9.9378']",Aba Libanos area in Northwestern Ethiopia,Spot
+1000,landslide/landslide.5/MED,landslide.5.MED,#45B34D,landslide.landslide.5.MED,"['38.1317', '9.9378']",,MED
+1000,landslide/landslide.5/FAC,landslide.5.FAC,#F2A737,landslide.landslide.5.FAC,"['38.1317', '9.9378']",,FAC
+1000,landslide/landslide.5/LOC,landslide.5.LOC,#2579E8,landslide.landslide.5.LOC,"['38.1317', '9.9378']",,LOC
+1000,landslide/landslide.6,landslide.6,#5728AE,landslide.landslide.6,"['37.4031', '11.7990']",Abay Gorge near Dejen,Spot
+1000,landslide/landslide.6/MED,landslide.6.MED,#45B34D,landslide.landslide.6.MED,"['37.4031', '11.7990']",,MED
+1000,landslide/landslide.6/FAC,landslide.6.FAC,#F2A737,landslide.landslide.6.FAC,"['37.4031', '11.7990']",,FAC
+1000,landslide/landslide.6/LOC,landslide.6.LOC,#2579E8,landslide.landslide.6.LOC,"['37.4031', '11.7990']",,LOC
+1000,landslide/landslide.7,landslide.7,#5728AE,landslide.landslide.7,"['73.2407', '34.1688']",Abbottabad,Spot
+1000,landslide/landslide.7/MED,landslide.7.MED,#45B34D,landslide.landslide.7.MED,"['73.2407', '34.1688']",,MED
+1000,landslide/landslide.7/FAC,landslide.7.FAC,#F2A737,landslide.landslide.7.FAC,"['73.2407', '34.1688']",,FAC
+1000,landslide/landslide.7/LOC,landslide.7.LOC,#2579E8,landslide.landslide.7.LOC,"['73.2407', '34.1688']",,LOC
+1000,landslide/landslide.8,landslide.8,#5728AE,landslide.landslide.8,"['34.9967', '14.4105']",Abe Barek,Spot
+1000,landslide/landslide.8/MED,landslide.8.MED,#45B34D,landslide.landslide.8.MED,"['34.9967', '14.4105']",,MED
+1000,landslide/landslide.8/FAC,landslide.8.FAC,#F2A737,landslide.landslide.8.FAC,"['34.9967', '14.4105']",,FAC
+1000,landslide/landslide.8/LOC,landslide.8.LOC,#2579E8,landslide.landslide.8.LOC,"['34.9967', '14.4105']",,LOC
+1000,landslide/landslide.9,landslide.9,#5728AE,landslide.landslide.9,"['13.6747', '42.3512']",Abruzzo,Spot
+1000,landslide/landslide.9/MED,landslide.9.MED,#45B34D,landslide.landslide.9.MED,"['13.6747', '42.3512']",,MED
+1000,landslide/landslide.9/FAC,landslide.9.FAC,#F2A737,landslide.landslide.9.FAC,"['13.6747', '42.3512']",,FAC
+1000,landslide/landslide.9/LOC,landslide.9.LOC,#2579E8,landslide.landslide.9.LOC,"['13.6747', '42.3512']",,LOC
+1000,landslide/landslide.10,landslide.10,#5728AE,landslide.landslide.10,"['21.6536', '38.1313']",Achaia Regional Unit located in Northern Peloponnese,Spot
+1000,landslide/landslide.10/MED,landslide.10.MED,#45B34D,landslide.landslide.10.MED,"['21.6536', '38.1313']",,MED
+1000,landslide/landslide.10/FAC,landslide.10.FAC,#F2A737,landslide.landslide.10.FAC,"['21.6536', '38.1313']",,FAC
+1000,landslide/landslide.10/LOC,landslide.10.LOC,#2579E8,landslide.landslide.10.LOC,"['21.6536', '38.1313']",,LOC
+1000,landslide/landslide.11,landslide.11,#5728AE,landslide.landslide.11,"['77.1025', '28.7041']",adjacent to the National Highways,Spot
+1000,landslide/landslide.11/MED,landslide.11.MED,#45B34D,landslide.landslide.11.MED,"['77.1025', '28.7041']",,MED
+1000,landslide/landslide.11/FAC,landslide.11.FAC,#F2A737,landslide.landslide.11.FAC,"['77.1025', '28.7041']",,FAC
+1000,landslide/landslide.11/LOC,landslide.11.LOC,#2579E8,landslide.landslide.11.LOC,"['77.1025', '28.7041']",,LOC
+1000,landslide/landslide.12,landslide.12,#5728AE,landslide.landslide.12,"['16.7187', '42.2596']",Adriatic coast,Spot
+1000,landslide/landslide.12/MED,landslide.12.MED,#45B34D,landslide.landslide.12.MED,"['16.7187', '42.2596']",,MED
+1000,landslide/landslide.12/FAC,landslide.12.FAC,#F2A737,landslide.landslide.12.FAC,"['16.7187', '42.2596']",,FAC
+1000,landslide/landslide.12/LOC,landslide.12.LOC,#2579E8,landslide.landslide.12.LOC,"['16.7187', '42.2596']",,LOC
+1000,landslide/landslide.13,landslide.13,#5728AE,landslide.landslide.13,"['17.1232', '40.6395']",Adriatic Coast of south Italy,Spot
+1000,landslide/landslide.13/MED,landslide.13.MED,#45B34D,landslide.landslide.13.MED,"['17.1232', '40.6395']",,MED
+1000,landslide/landslide.13/FAC,landslide.13.FAC,#F2A737,landslide.landslide.13.FAC,"['17.1232', '40.6395']",,FAC
+1000,landslide/landslide.13/LOC,landslide.13.LOC,#2579E8,landslide.landslide.13.LOC,"['17.1232', '40.6395']",,LOC
+1000,landslide/landslide.14,landslide.14,#5728AE,landslide.landslide.14,"['14.8498', '38.4693']",Aeolian Archipelago,Spot
+1000,landslide/landslide.14/MED,landslide.14.MED,#45B34D,landslide.landslide.14.MED,"['14.8498', '38.4693']",,MED
+1000,landslide/landslide.14/FAC,landslide.14.FAC,#F2A737,landslide.landslide.14.FAC,"['14.8498', '38.4693']",,FAC
+1000,landslide/landslide.14/LOC,landslide.14.LOC,#2579E8,landslide.landslide.14.LOC,"['14.8498', '38.4693']",,LOC
+1000,landslide/landslide.15,landslide.15,#5728AE,landslide.landslide.15,"['21.2911', '38.7205']",Aetolia - Acarnania and Evritania prefectures,Spot
+1000,landslide/landslide.15/MED,landslide.15.MED,#45B34D,landslide.landslide.15.MED,"['21.2911', '38.7205']",,MED
+1000,landslide/landslide.15/FAC,landslide.15.FAC,#F2A737,landslide.landslide.15.FAC,"['21.2911', '38.7205']",,FAC
+1000,landslide/landslide.15/LOC,landslide.15.LOC,#2579E8,landslide.landslide.15.LOC,"['21.2911', '38.7205']",,LOC
+1000,landslide/landslide.16,landslide.16,#5728AE,landslide.landslide.16,"['14.9333', '37.8219']",affluent of the Alcantara River,Spot
+1000,landslide/landslide.16/MED,landslide.16.MED,#45B34D,landslide.landslide.16.MED,"['14.9333', '37.8219']",,MED
+1000,landslide/landslide.16/FAC,landslide.16.FAC,#F2A737,landslide.landslide.16.FAC,"['14.9333', '37.8219']",,FAC
+1000,landslide/landslide.16/LOC,landslide.16.LOC,#2579E8,landslide.landslide.16.LOC,"['14.9333', '37.8219']",,LOC
+1000,landslide/landslide.17,landslide.17,#5728AE,landslide.landslide.17,"['66.2385', '33.9391']",Afghanistan,Spot
+1000,landslide/landslide.17/MED,landslide.17.MED,#45B34D,landslide.landslide.17.MED,"['66.2385', '33.9391']",,MED
+1000,landslide/landslide.17/FAC,landslide.17.FAC,#F2A737,landslide.landslide.17.FAC,"['66.2385', '33.9391']",,FAC
+1000,landslide/landslide.17/LOC,landslide.17.LOC,#2579E8,landslide.landslide.17.LOC,"['66.2385', '33.9391']",,LOC
+1000,landslide/landslide.18,landslide.18,#5728AE,landslide.landslide.18,"['17.3660', '8.7832']",Africa,Spot
+1000,landslide/landslide.18/MED,landslide.18.MED,#45B34D,landslide.landslide.18.MED,"['17.3660', '8.7832']",,MED
+1000,landslide/landslide.18/FAC,landslide.18.FAC,#F2A737,landslide.landslide.18.FAC,"['17.3660', '8.7832']",,FAC
+1000,landslide/landslide.18/LOC,landslide.18.LOC,#2579E8,landslide.landslide.18.LOC,"['17.3660', '8.7832']",,LOC
+1000,landslide/landslide.19,landslide.19,#5728AE,landslide.landslide.19,"['9.6304', '30.4202']",Agadir Ida - Ou - Tanane province,Spot
+1000,landslide/landslide.19/MED,landslide.19.MED,#45B34D,landslide.landslide.19.MED,"['9.6304', '30.4202']",,MED
+1000,landslide/landslide.19/FAC,landslide.19.FAC,#F2A737,landslide.landslide.19.FAC,"['9.6304', '30.4202']",,FAC
+1000,landslide/landslide.19/LOC,landslide.19.LOC,#2579E8,landslide.landslide.19.LOC,"['9.6304', '30.4202']",,LOC
+1000,landslide/landslide.20,landslide.20,#5728AE,landslide.landslide.20,"['14.5233', '41.5833']",Agnone,Spot
+1000,landslide/landslide.20/MED,landslide.20.MED,#45B34D,landslide.landslide.20.MED,"['14.5233', '41.5833']",,MED
+1000,landslide/landslide.20/FAC,landslide.20.FAC,#F2A737,landslide.landslide.20.FAC,"['14.5233', '41.5833']",,FAC
+1000,landslide/landslide.20/LOC,landslide.20.LOC,#2579E8,landslide.landslide.20.LOC,"['14.5233', '41.5833']",,LOC
+1000,landslide/landslide.21,landslide.21,#5728AE,landslide.landslide.21,"['146.7265', '-41.1211']",Agnus Creek valley,Spot
+1000,landslide/landslide.21/MED,landslide.21.MED,#45B34D,landslide.landslide.21.MED,"['146.7265', '-41.1211']",,MED
+1000,landslide/landslide.21/FAC,landslide.21.FAC,#F2A737,landslide.landslide.21.FAC,"['146.7265', '-41.1211']",,FAC
+1000,landslide/landslide.21/LOC,landslide.21.LOC,#2579E8,landslide.landslide.21.LOC,"['146.7265', '-41.1211']",,LOC
+1000,landslide/landslide.22,landslide.22,#5728AE,landslide.landslide.22,"['5.5311', '5.5060']",Ago District,Spot
+1000,landslide/landslide.22/MED,landslide.22.MED,#45B34D,landslide.landslide.22.MED,"['5.5311', '5.5060']",,MED
+1000,landslide/landslide.22/FAC,landslide.22.FAC,#F2A737,landslide.landslide.22.FAC,"['5.5311', '5.5060']",,FAC
+1000,landslide/landslide.22/LOC,landslide.22.LOC,#2579E8,landslide.landslide.22.LOC,"['5.5311', '5.5060']",,LOC
+1000,landslide/landslide.23,landslide.23,#5728AE,landslide.landslide.23,"['72.7833', '34.0192']",AH - 1,Spot
+1000,landslide/landslide.23/MED,landslide.23.MED,#45B34D,landslide.landslide.23.MED,"['72.7833', '34.0192']",,MED
+1000,landslide/landslide.23/FAC,landslide.23.FAC,#F2A737,landslide.landslide.23.FAC,"['72.7833', '34.0192']",,FAC
+1000,landslide/landslide.23/LOC,landslide.23.LOC,#2579E8,landslide.landslide.23.LOC,"['72.7833', '34.0192']",,LOC
+1000,landslide/landslide.24,landslide.24,#5728AE,landslide.landslide.24,"['74.1280', '34.1271']",AH - 2,Spot
+1000,landslide/landslide.24/MED,landslide.24.MED,#45B34D,landslide.landslide.24.MED,"['74.1280', '34.1271']",,MED
+1000,landslide/landslide.24/FAC,landslide.24.FAC,#F2A737,landslide.landslide.24.FAC,"['74.1280', '34.1271']",,FAC
+1000,landslide/landslide.24/LOC,landslide.24.LOC,#2579E8,landslide.landslide.24.LOC,"['74.1280', '34.1271']",,LOC
+1000,landslide/landslide.25,landslide.25,#5728AE,landslide.landslide.25,"['72.7833', '34.0192']",AH48,Spot
+1000,landslide/landslide.25/MED,landslide.25.MED,#45B34D,landslide.landslide.25.MED,"['72.7833', '34.0192']",,MED
+1000,landslide/landslide.25/FAC,landslide.25.FAC,#F2A737,landslide.landslide.25.FAC,"['72.7833', '34.0192']",,FAC
+1000,landslide/landslide.25/LOC,landslide.25.LOC,#2579E8,landslide.landslide.25.LOC,"['72.7833', '34.0192']",,LOC
+1000,landslide/landslide.26,landslide.26,#5728AE,landslide.landslide.26,"['35.7516', '32.3335']",Ajloun and Jerash governorates in Jordan,Spot
+1000,landslide/landslide.26/MED,landslide.26.MED,#45B34D,landslide.landslide.26.MED,"['35.7516', '32.3335']",,MED
+1000,landslide/landslide.26/FAC,landslide.26.FAC,#F2A737,landslide.landslide.26.FAC,"['35.7516', '32.3335']",,FAC
+1000,landslide/landslide.26/LOC,landslide.26.LOC,#2579E8,landslide.landslide.26.LOC,"['35.7516', '32.3335']",,LOC
+1000,landslide/landslide.27,landslide.27,#5728AE,landslide.landslide.27,"['138.1875', '35.6595']",Akaishi Mountains,Spot
+1000,landslide/landslide.27/MED,landslide.27.MED,#45B34D,landslide.landslide.27.MED,"['138.1875', '35.6595']",,MED
+1000,landslide/landslide.27/FAC,landslide.27.FAC,#F2A737,landslide.landslide.27.FAC,"['138.1875', '35.6595']",,FAC
+1000,landslide/landslide.27/LOC,landslide.27.LOC,#2579E8,landslide.landslide.27.LOC,"['138.1875', '35.6595']",,LOC
+1000,landslide/landslide.28,landslide.28,#5728AE,landslide.landslide.28,"['-3.9492', '35.0527']",Aknoul region in the Rif,Spot
+1000,landslide/landslide.28/MED,landslide.28.MED,#45B34D,landslide.landslide.28.MED,"['-3.9492', '35.0527']",,MED
+1000,landslide/landslide.28/FAC,landslide.28.FAC,#F2A737,landslide.landslide.28.FAC,"['-3.9492', '35.0527']",,FAC
+1000,landslide/landslide.28/LOC,landslide.28.LOC,#2579E8,landslide.landslide.28.LOC,"['-3.9492', '35.0527']",,LOC
+1000,landslide/landslide.29,landslide.29,#5728AE,landslide.landslide.29,"['35.1400', '32.0986']",Al - Hasher,Spot
+1000,landslide/landslide.29/MED,landslide.29.MED,#45B34D,landslide.landslide.29.MED,"['35.1400', '32.0986']",,MED
+1000,landslide/landslide.29/FAC,landslide.29.FAC,#F2A737,landslide.landslide.29.FAC,"['35.1400', '32.0986']",,FAC
+1000,landslide/landslide.29/LOC,landslide.29.LOC,#2579E8,landslide.landslide.29.LOC,"['35.1400', '32.0986']",,LOC
+1000,landslide/landslide.30,landslide.30,#5728AE,landslide.landslide.30,"['-84.0926', '10.0159']",Alajuela,Spot
+1000,landslide/landslide.30/MED,landslide.30.MED,#45B34D,landslide.landslide.30.MED,"['-84.0926', '10.0159']",,MED
+1000,landslide/landslide.30/FAC,landslide.30.FAC,#F2A737,landslide.landslide.30.FAC,"['-84.0926', '10.0159']",,FAC
+1000,landslide/landslide.30/LOC,landslide.30.LOC,#2579E8,landslide.landslide.30.LOC,"['-84.0926', '10.0159']",,LOC
+1000,landslide/landslide.31,landslide.31,#5728AE,landslide.landslide.31,"['106.7290', '32.9829']",Alamout basin,Spot
+1000,landslide/landslide.31/MED,landslide.31.MED,#45B34D,landslide.landslide.31.MED,"['106.7290', '32.9829']",,MED
+1000,landslide/landslide.31/FAC,landslide.31.FAC,#F2A737,landslide.landslide.31.FAC,"['106.7290', '32.9829']",,FAC
+1000,landslide/landslide.31/LOC,landslide.31.LOC,#2579E8,landslide.landslide.31.LOC,"['106.7290', '32.9829']",,LOC
+1000,landslide/landslide.32,landslide.32,#5728AE,landslide.landslide.32,"['50.2201', '36.5486']",Alamut watershed,Spot
+1000,landslide/landslide.32/MED,landslide.32.MED,#45B34D,landslide.landslide.32.MED,"['50.2201', '36.5486']",,MED
+1000,landslide/landslide.32/FAC,landslide.32.FAC,#F2A737,landslide.landslide.32.FAC,"['50.2201', '36.5486']",,FAC
+1000,landslide/landslide.32/LOC,landslide.32.LOC,#2579E8,landslide.landslide.32.LOC,"['50.2201', '36.5486']",,LOC
+1000,landslide/landslide.33,landslide.33,#5728AE,landslide.landslide.33,"['51.4667', '35.9931']",Alborz Mountain Belt,Spot
+1000,landslide/landslide.33/MED,landslide.33.MED,#45B34D,landslide.landslide.33.MED,"['51.4667', '35.9931']",,MED
+1000,landslide/landslide.33/FAC,landslide.33.FAC,#F2A737,landslide.landslide.33.FAC,"['51.4667', '35.9931']",,FAC
+1000,landslide/landslide.33/LOC,landslide.33.LOC,#2579E8,landslide.landslide.33.LOC,"['51.4667', '35.9931']",,LOC
+1000,landslide/landslide.34,landslide.34,#5728AE,landslide.landslide.34,"['-0.6171', '38.6910']",Alcoy,Spot
+1000,landslide/landslide.34/MED,landslide.34.MED,#45B34D,landslide.landslide.34.MED,"['-0.6171', '38.6910']",,MED
+1000,landslide/landslide.34/FAC,landslide.34.FAC,#F2A737,landslide.landslide.34.FAC,"['-0.6171', '38.6910']",,FAC
+1000,landslide/landslide.34/LOC,landslide.34.LOC,#2579E8,landslide.landslide.34.LOC,"['-0.6171', '38.6910']",,LOC
+1000,landslide/landslide.35,landslide.35,#5728AE,landslide.landslide.35,"['2.6329', '28.0339']",Algeria,Spot
+1000,landslide/landslide.35/MED,landslide.35.MED,#45B34D,landslide.landslide.35.MED,"['2.6329', '28.0339']",,MED
+1000,landslide/landslide.35/FAC,landslide.35.FAC,#F2A737,landslide.landslide.35.FAC,"['2.6329', '28.0339']",,FAC
+1000,landslide/landslide.35/LOC,landslide.35.LOC,#2579E8,landslide.landslide.35.LOC,"['2.6329', '28.0339']",,LOC
+1000,landslide/landslide.36,landslide.36,#5728AE,landslide.landslide.36,"['3.0588', '36.7372']",Algiers,Spot
+1000,landslide/landslide.36/MED,landslide.36.MED,#45B34D,landslide.landslide.36.MED,"['3.0588', '36.7372']",,MED
+1000,landslide/landslide.36/FAC,landslide.36.FAC,#F2A737,landslide.landslide.36.FAC,"['3.0588', '36.7372']",,FAC
+1000,landslide/landslide.36/LOC,landslide.36.LOC,#2579E8,landslide.landslide.36.LOC,"['3.0588', '36.7372']",,LOC
+1000,landslide/landslide.37,landslide.37,#5728AE,landslide.landslide.37,"['3.2935', '36.8402']",Algiers Sahel,Spot
+1000,landslide/landslide.37/MED,landslide.37.MED,#45B34D,landslide.landslide.37.MED,"['3.2935', '36.8402']",,MED
+1000,landslide/landslide.37/FAC,landslide.37.FAC,#F2A737,landslide.landslide.37.FAC,"['3.2935', '36.8402']",,FAC
+1000,landslide/landslide.37/LOC,landslide.37.LOC,#2579E8,landslide.landslide.37.LOC,"['3.2935', '36.8402']",,LOC
+1000,landslide/landslide.38,landslide.38,#5728AE,landslide.landslide.38,"['-0.4907', '38.3452']",Alicante,Spot
+1000,landslide/landslide.38/MED,landslide.38.MED,#45B34D,landslide.landslide.38.MED,"['-0.4907', '38.3452']",,MED
+1000,landslide/landslide.38/FAC,landslide.38.FAC,#F2A737,landslide.landslide.38.FAC,"['-0.4907', '38.3452']",,FAC
+1000,landslide/landslide.38/LOC,landslide.38.LOC,#2579E8,landslide.landslide.38.LOC,"['-0.4907', '38.3452']",,LOC
+1000,landslide/landslide.39,landslide.39,#5728AE,landslide.landslide.39,"['120.7184', '23.5116']",Alishan D098 sub-basin,Spot
+1000,landslide/landslide.39/MED,landslide.39.MED,#45B34D,landslide.landslide.39.MED,"['120.7184', '23.5116']",,MED
+1000,landslide/landslide.39/FAC,landslide.39.FAC,#F2A737,landslide.landslide.39.FAC,"['120.7184', '23.5116']",,FAC
+1000,landslide/landslide.39/LOC,landslide.39.LOC,#2579E8,landslide.landslide.39.LOC,"['120.7184', '23.5116']",,LOC
+1000,landslide/landslide.40,landslide.40,#5728AE,landslide.landslide.40,"['120.7879', '23.4973']",Alishan River in southern Taiwan,Spot
+1000,landslide/landslide.40/MED,landslide.40.MED,#45B34D,landslide.landslide.40.MED,"['120.7879', '23.4973']",,MED
+1000,landslide/landslide.40/FAC,landslide.40.FAC,#F2A737,landslide.landslide.40.FAC,"['120.7879', '23.4973']",,FAC
+1000,landslide/landslide.40/LOC,landslide.40.LOC,#2579E8,landslide.landslide.40.LOC,"['120.7879', '23.4973']",,LOC
+1000,landslide/landslide.41,landslide.41,#5728AE,landslide.landslide.41,"['79.6667', '29.6000']",Almora district,Spot
+1000,landslide/landslide.41/MED,landslide.41.MED,#45B34D,landslide.landslide.41.MED,"['79.6667', '29.6000']",,MED
+1000,landslide/landslide.41/FAC,landslide.41.FAC,#F2A737,landslide.landslide.41.FAC,"['79.6667', '29.6000']",,FAC
+1000,landslide/landslide.41/LOC,landslide.41.LOC,#2579E8,landslide.landslide.41.LOC,"['79.6667', '29.6000']",,LOC
+1000,landslide/landslide.42,landslide.42,#5728AE,landslide.landslide.42,"['79.0193', '30.0668']",along road corridors in the Indian Himalayas,Spot
+1000,landslide/landslide.42/MED,landslide.42.MED,#45B34D,landslide.landslide.42.MED,"['79.0193', '30.0668']",,MED
+1000,landslide/landslide.42/FAC,landslide.42.FAC,#F2A737,landslide.landslide.42.FAC,"['79.0193', '30.0668']",,FAC
+1000,landslide/landslide.42/LOC,landslide.42.LOC,#2579E8,landslide.landslide.42.LOC,"['79.0193', '30.0668']",,LOC
+1000,landslide/landslide.43,landslide.43,#5728AE,landslide.landslide.43,"['104.3586', '33.7856']",alpine - canyon region of Zhouqu,Spot
+1000,landslide/landslide.43/MED,landslide.43.MED,#45B34D,landslide.landslide.43.MED,"['104.3586', '33.7856']",,MED
+1000,landslide/landslide.43/FAC,landslide.43.FAC,#F2A737,landslide.landslide.43.FAC,"['104.3586', '33.7856']",,FAC
+1000,landslide/landslide.43/LOC,landslide.43.LOC,#2579E8,landslide.landslide.43.LOC,"['104.3586', '33.7856']",,LOC
+1000,landslide/landslide.44,landslide.44,#5728AE,landslide.landslide.44,"['10.4515', '46.2322']",Alpine regions of northern Italy,Spot
+1000,landslide/landslide.44/MED,landslide.44.MED,#45B34D,landslide.landslide.44.MED,"['10.4515', '46.2322']",,MED
+1000,landslide/landslide.44/FAC,landslide.44.FAC,#F2A737,landslide.landslide.44.FAC,"['10.4515', '46.2322']",,FAC
+1000,landslide/landslide.44/LOC,landslide.44.LOC,#2579E8,landslide.landslide.44.LOC,"['10.4515', '46.2322']",,LOC
+1000,landslide/landslide.45,landslide.45,#5728AE,landslide.landslide.45,"['10.0', '45.0']",Alpine sector,Spot
+1000,landslide/landslide.45/MED,landslide.45.MED,#45B34D,landslide.landslide.45.MED,"['10.0', '45.0']",,MED
+1000,landslide/landslide.45/FAC,landslide.45.FAC,#F2A737,landslide.landslide.45.FAC,"['10.0', '45.0']",,FAC
+1000,landslide/landslide.45/LOC,landslide.45.LOC,#2579E8,landslide.landslide.45.LOC,"['10.0', '45.0']",,LOC
+1000,landslide/landslide.46,landslide.46,#5728AE,landslide.landslide.46,"['7.7964', '45.9458']",Alps,Spot
+1000,landslide/landslide.46/MED,landslide.46.MED,#45B34D,landslide.landslide.46.MED,"['7.7964', '45.9458']",,MED
+1000,landslide/landslide.46/FAC,landslide.46.FAC,#F2A737,landslide.landslide.46.FAC,"['7.7964', '45.9458']",,FAC
+1000,landslide/landslide.46/LOC,landslide.46.LOC,#2579E8,landslide.landslide.46.LOC,"['7.7964', '45.9458']",,LOC
+1000,landslide/landslide.47,landslide.47,#5728AE,landslide.landslide.47,"['128.1816', '3.6956']",Ambon,Spot
+1000,landslide/landslide.47/MED,landslide.47.MED,#45B34D,landslide.landslide.47.MED,"['128.1816', '3.6956']",,MED
+1000,landslide/landslide.47/FAC,landslide.47.FAC,#F2A737,landslide.landslide.47.FAC,"['128.1816', '3.6956']",,FAC
+1000,landslide/landslide.47/LOC,landslide.47.LOC,#2579E8,landslide.landslide.47.LOC,"['128.1816', '3.6956']",,LOC
+1000,landslide/landslide.48,landslide.48,#5728AE,landslide.landslide.48,"['113.5', '-0.5']",Ampel,Spot
+1000,landslide/landslide.48/MED,landslide.48.MED,#45B34D,landslide.landslide.48.MED,"['113.5', '-0.5']",,MED
+1000,landslide/landslide.48/FAC,landslide.48.FAC,#F2A737,landslide.landslide.48.FAC,"['113.5', '-0.5']",,FAC
+1000,landslide/landslide.48/LOC,landslide.48.LOC,#2579E8,landslide.landslide.48.LOC,"['113.5', '-0.5']",,LOC
+1000,landslide/landslide.49,landslide.49,#5728AE,landslide.landslide.49,"['33.4597', '38.5414']",Anatolian Fault Zone of Turkey,Spot
+1000,landslide/landslide.49/MED,landslide.49.MED,#45B34D,landslide.landslide.49.MED,"['33.4597', '38.5414']",,MED
+1000,landslide/landslide.49/FAC,landslide.49.FAC,#F2A737,landslide.landslide.49.FAC,"['33.4597', '38.5414']",,FAC
+1000,landslide/landslide.49/LOC,landslide.49.LOC,#2579E8,landslide.landslide.49.LOC,"['33.4597', '38.5414']",,LOC
+1000,landslide/landslide.50,landslide.50,#5728AE,landslide.landslide.50,"['149.9003', '61.2181']",Anchorage,Spot
+1000,landslide/landslide.50/MED,landslide.50.MED,#45B34D,landslide.landslide.50.MED,"['149.9003', '61.2181']",,MED
+1000,landslide/landslide.50/FAC,landslide.50.FAC,#F2A737,landslide.landslide.50.FAC,"['149.9003', '61.2181']",,FAC
+1000,landslide/landslide.50/LOC,landslide.50.LOC,#2579E8,landslide.landslide.50.LOC,"['149.9003', '61.2181']",,LOC
+1000,landslide/landslide.51,landslide.51,#5728AE,landslide.landslide.51,"['13.5189', '43.6158']",Ancona,Spot
+1000,landslide/landslide.51/MED,landslide.51.MED,#45B34D,landslide.landslide.51.MED,"['13.5189', '43.6158']",,MED
+1000,landslide/landslide.51/FAC,landslide.51.FAC,#F2A737,landslide.landslide.51.FAC,"['13.5189', '43.6158']",,FAC
+1000,landslide/landslide.51/LOC,landslide.51.LOC,#2579E8,landslide.landslide.51.LOC,"['13.5189', '43.6158']",,LOC
+1000,landslide/landslide.52,landslide.52,#5728AE,landslide.landslide.52,"['13.5189', '43.6158']",Ancona municipality on the Adriatic coast of central Italy,Spot
+1000,landslide/landslide.52/MED,landslide.52.MED,#45B34D,landslide.landslide.52.MED,"['13.5189', '43.6158']",,MED
+1000,landslide/landslide.52/FAC,landslide.52.FAC,#F2A737,landslide.landslide.52.FAC,"['13.5189', '43.6158']",,FAC
+1000,landslide/landslide.52/LOC,landslide.52.LOC,#2579E8,landslide.landslide.52.LOC,"['13.5189', '43.6158']",,LOC
+1000,landslide/landslide.53,landslide.53,#5728AE,landslide.landslide.53,"['4.7130', '37.5443']",Andalusia,Spot
+1000,landslide/landslide.53/MED,landslide.53.MED,#45B34D,landslide.landslide.53.MED,"['4.7130', '37.5443']",,MED
+1000,landslide/landslide.53/FAC,landslide.53.FAC,#F2A737,landslide.landslide.53.FAC,"['4.7130', '37.5443']",,FAC
+1000,landslide/landslide.53/LOC,landslide.53.LOC,#2579E8,landslide.landslide.53.LOC,"['4.7130', '37.5443']",,LOC
+1000,landslide/landslide.54,landslide.54,#5728AE,landslide.landslide.54,"['-75.0', '-3.5']",Andean mountain range,Spot
+1000,landslide/landslide.54/MED,landslide.54.MED,#45B34D,landslide.landslide.54.MED,"['-75.0', '-3.5']",,MED
+1000,landslide/landslide.54/FAC,landslide.54.FAC,#F2A737,landslide.landslide.54.FAC,"['-75.0', '-3.5']",,FAC
+1000,landslide/landslide.54/LOC,landslide.54.LOC,#2579E8,landslide.landslide.54.LOC,"['-75.0', '-3.5']",,LOC
+1000,landslide/landslide.55,landslide.55,#5728AE,landslide.landslide.55,"['77.6560', '0.0774']",Andean tropics close to the volcano Reventador,Spot
+1000,landslide/landslide.55/MED,landslide.55.MED,#45B34D,landslide.landslide.55.MED,"['77.6560', '0.0774']",,MED
+1000,landslide/landslide.55/FAC,landslide.55.FAC,#F2A737,landslide.landslide.55.FAC,"['77.6560', '0.0774']",,FAC
+1000,landslide/landslide.55/LOC,landslide.55.LOC,#2579E8,landslide.landslide.55.LOC,"['77.6560', '0.0774']",,LOC
+1000,landslide/landslide.56,landslide.56,#5728AE,landslide.landslide.56,"['71.1177', '19.4969']",Andes,Spot
+1000,landslide/landslide.56/MED,landslide.56.MED,#45B34D,landslide.landslide.56.MED,"['71.1177', '19.4969']",,MED
+1000,landslide/landslide.56/FAC,landslide.56.FAC,#F2A737,landslide.landslide.56.FAC,"['71.1177', '19.4969']",,FAC
+1000,landslide/landslide.56/LOC,landslide.56.LOC,#2579E8,landslide.landslide.56.LOC,"['71.1177', '19.4969']",,LOC
+1000,landslide/landslide.57,landslide.57,#5728AE,landslide.landslide.57,"['115.1900', '27.4288']",Anfu County,Spot
+1000,landslide/landslide.57/MED,landslide.57.MED,#45B34D,landslide.landslide.57.MED,"['115.1900', '27.4288']",,MED
+1000,landslide/landslide.57/FAC,landslide.57.FAC,#F2A737,landslide.landslide.57.FAC,"['115.1900', '27.4288']",,FAC
+1000,landslide/landslide.57/LOC,landslide.57.LOC,#2579E8,landslide.landslide.57.LOC,"['115.1900', '27.4288']",,LOC
+1000,landslide/landslide.58,landslide.58,#5728AE,landslide.landslide.58,"['111.2270', '28.9701']",Anhua County,Spot
+1000,landslide/landslide.58/MED,landslide.58.MED,#45B34D,landslide.landslide.58.MED,"['111.2270', '28.9701']",,MED
+1000,landslide/landslide.58/FAC,landslide.58.FAC,#F2A737,landslide.landslide.58.FAC,"['111.2270', '28.9701']",,FAC
+1000,landslide/landslide.58/LOC,landslide.58.LOC,#2579E8,landslide.landslide.58.LOC,"['111.2270', '28.9701']",,LOC
+1000,landslide/landslide.59,landslide.59,#5728AE,landslide.landslide.59,"['111.2270', '28.9701']",Anhua County in China,Spot
+1000,landslide/landslide.59/MED,landslide.59.MED,#45B34D,landslide.landslide.59.MED,"['111.2270', '28.9701']",,MED
+1000,landslide/landslide.59/FAC,landslide.59.FAC,#F2A737,landslide.landslide.59.FAC,"['111.2270', '28.9701']",,FAC
+1000,landslide/landslide.59/LOC,landslide.59.LOC,#2579E8,landslide.landslide.59.LOC,"['111.2270', '28.9701']",,LOC
+1000,landslide/landslide.60,landslide.60,#5728AE,landslide.landslide.60,"['83.8207', '28.5953']",Annapurna,Spot
+1000,landslide/landslide.60/MED,landslide.60.MED,#45B34D,landslide.landslide.60.MED,"['83.8207', '28.5953']",,MED
+1000,landslide/landslide.60/FAC,landslide.60.FAC,#F2A737,landslide.landslide.60.FAC,"['83.8207', '28.5953']",,FAC
+1000,landslide/landslide.60/LOC,landslide.60.LOC,#2579E8,landslide.landslide.60.LOC,"['83.8207', '28.5953']",,LOC
+1000,landslide/landslide.61,landslide.61,#5728AE,landslide.landslide.61,"['115.0588', '25.4279']",Anyuan County,Spot
+1000,landslide/landslide.61/MED,landslide.61.MED,#45B34D,landslide.landslide.61.MED,"['115.0588', '25.4279']",,MED
+1000,landslide/landslide.61/FAC,landslide.61.FAC,#F2A737,landslide.landslide.61.FAC,"['115.0588', '25.4279']",,FAC
+1000,landslide/landslide.61/LOC,landslide.61.LOC,#2579E8,landslide.landslide.61.LOC,"['115.0588', '25.4279']",,LOC
+1000,landslide/landslide.62,landslide.62,#5728AE,landslide.landslide.62,"['13.7633', '42.6266']",Apennines of central Italy,Spot
+1000,landslide/landslide.62/MED,landslide.62.MED,#45B34D,landslide.landslide.62.MED,"['13.7633', '42.6266']",,MED
+1000,landslide/landslide.62/FAC,landslide.62.FAC,#F2A737,landslide.landslide.62.FAC,"['13.7633', '42.6266']",,FAC
+1000,landslide/landslide.62/LOC,landslide.62.LOC,#2579E8,landslide.landslide.62.LOC,"['13.7633', '42.6266']",,LOC
+1000,landslide/landslide.63,landslide.63,#5728AE,landslide.landslide.63,"['83.8239', '35.7382']",Appalachian Mountains,Spot
+1000,landslide/landslide.63/MED,landslide.63.MED,#45B34D,landslide.landslide.63.MED,"['83.8239', '35.7382']",,MED
+1000,landslide/landslide.63/FAC,landslide.63.FAC,#F2A737,landslide.landslide.63.FAC,"['83.8239', '35.7382']",,FAC
+1000,landslide/landslide.63/LOC,landslide.63.LOC,#2579E8,landslide.landslide.63.LOC,"['83.8239', '35.7382']",,LOC
+1000,landslide/landslide.64,landslide.64,#5728AE,landslide.landslide.64,"['16.6126', '40.9581']",Apulia,Spot
+1000,landslide/landslide.64/MED,landslide.64.MED,#45B34D,landslide.landslide.64.MED,"['16.6126', '40.9581']",,MED
+1000,landslide/landslide.64/FAC,landslide.64.FAC,#F2A737,landslide.landslide.64.FAC,"['16.6126', '40.9581']",,FAC
+1000,landslide/landslide.64/LOC,landslide.64.LOC,#2579E8,landslide.landslide.64.LOC,"['16.6126', '40.9581']",,LOC
+1000,landslide/landslide.65,landslide.65,#5728AE,landslide.landslide.65,"['41.6170', '19.2163']",Aqabat,Spot
+1000,landslide/landslide.65/MED,landslide.65.MED,#45B34D,landslide.landslide.65.MED,"['41.6170', '19.2163']",,MED
+1000,landslide/landslide.65/FAC,landslide.65.FAC,#F2A737,landslide.landslide.65.FAC,"['41.6170', '19.2163']",,FAC
+1000,landslide/landslide.65/LOC,landslide.65.LOC,#2579E8,landslide.landslide.65.LOC,"['41.6170', '19.2163']",,LOC
+1000,landslide/landslide.66,landslide.66,#5728AE,landslide.landslide.66,"['44.1266', '18.2096']",Aqabat Al - Sulbat,Spot
+1000,landslide/landslide.66/MED,landslide.66.MED,#45B34D,landslide.landslide.66.MED,"['44.1266', '18.2096']",,MED
+1000,landslide/landslide.66/FAC,landslide.66.FAC,#F2A737,landslide.landslide.66.FAC,"['44.1266', '18.2096']",,FAC
+1000,landslide/landslide.66/LOC,landslide.66.LOC,#2579E8,landslide.landslide.66.LOC,"['44.1266', '18.2096']",,LOC
+1000,landslide/landslide.67,landslide.67,#5728AE,landslide.landslide.67,"['42.8266', '18.5073']",Aqabat Al - Sulbat Asir region of Saudi Arabia,Spot
+1000,landslide/landslide.67/MED,landslide.67.MED,#45B34D,landslide.landslide.67.MED,"['42.8266', '18.5073']",,MED
+1000,landslide/landslide.67/FAC,landslide.67.FAC,#F2A737,landslide.landslide.67.FAC,"['42.8266', '18.5073']",,FAC
+1000,landslide/landslide.67/LOC,landslide.67.LOC,#2579E8,landslide.landslide.67.LOC,"['42.8266', '18.5073']",,LOC
+1000,landslide/landslide.68,landslide.68,#5728AE,landslide.landslide.68,"['80.2894', '7.3397']",Aranayaka and Kurukudegama,Spot
+1000,landslide/landslide.68/MED,landslide.68.MED,#45B34D,landslide.landslide.68.MED,"['80.2894', '7.3397']",,MED
+1000,landslide/landslide.68/FAC,landslide.68.FAC,#F2A737,landslide.landslide.68.FAC,"['80.2894', '7.3397']",,FAC
+1000,landslide/landslide.68/LOC,landslide.68.LOC,#2579E8,landslide.landslide.68.LOC,"['80.2894', '7.3397']",,LOC
+1000,landslide/landslide.69,landslide.69,#5728AE,landslide.landslide.69,"['48.1184', '38.4853']",Ardabil province,Spot
+1000,landslide/landslide.69/MED,landslide.69.MED,#45B34D,landslide.landslide.69.MED,"['48.1184', '38.4853']",,MED
+1000,landslide/landslide.69/FAC,landslide.69.FAC,#F2A737,landslide.landslide.69.FAC,"['48.1184', '38.4853']",,FAC
+1000,landslide/landslide.69/LOC,landslide.69.LOC,#2579E8,landslide.landslide.69.LOC,"['48.1184', '38.4853']",,LOC
+1000,landslide/landslide.70,landslide.70,#5728AE,landslide.landslide.70,"['48.2953', '38.2511']",Ardabil province of Iran,Spot
+1000,landslide/landslide.70/MED,landslide.70.MED,#45B34D,landslide.landslide.70.MED,"['48.2953', '38.2511']",,MED
+1000,landslide/landslide.70/FAC,landslide.70.FAC,#F2A737,landslide.landslide.70.FAC,"['48.2953', '38.2511']",,FAC
+1000,landslide/landslide.70/LOC,landslide.70.LOC,#2579E8,landslide.landslide.70.LOC,"['48.2953', '38.2511']",,LOC
+1000,landslide/landslide.71,landslide.71,#5728AE,landslide.landslide.71,"['48.1184', '38.4853']",Ardebil province,Spot
+1000,landslide/landslide.71/MED,landslide.71.MED,#45B34D,landslide.landslide.71.MED,"['48.1184', '38.4853']",,MED
+1000,landslide/landslide.71/FAC,landslide.71.FAC,#F2A737,landslide.landslide.71.FAC,"['48.1184', '38.4853']",,FAC
+1000,landslide/landslide.71/LOC,landslide.71.LOC,#2579E8,landslide.landslide.71.LOC,"['48.1184', '38.4853']",,LOC
+1000,landslide/landslide.72,landslide.72,#5728AE,landslide.landslide.72,"['40.9625', '41.1911']",Ardesen,Spot
+1000,landslide/landslide.72/MED,landslide.72.MED,#45B34D,landslide.landslide.72.MED,"['40.9625', '41.1911']",,MED
+1000,landslide/landslide.72/FAC,landslide.72.FAC,#F2A737,landslide.landslide.72.FAC,"['40.9625', '41.1911']",,FAC
+1000,landslide/landslide.72/LOC,landslide.72.LOC,#2579E8,landslide.landslide.72.LOC,"['40.9625', '41.1911']",,LOC
+1000,landslide/landslide.73,landslide.73,#5728AE,landslide.landslide.73,"['40.9530', '41.0353']",Ardesen and Findikli districts of Rize Province,Spot
+1000,landslide/landslide.73/MED,landslide.73.MED,#45B34D,landslide.landslide.73.MED,"['40.9530', '41.0353']",,MED
+1000,landslide/landslide.73/FAC,landslide.73.FAC,#F2A737,landslide.landslide.73.FAC,"['40.9530', '41.0353']",,FAC
+1000,landslide/landslide.73/LOC,landslide.73.LOC,#2579E8,landslide.landslide.73.LOC,"['40.9530', '41.0353']",,LOC
+1000,landslide/landslide.74,landslide.74,#5728AE,landslide.landslide.74,"['9.1393', '38.7223']",area north of Lisbon,Spot
+1000,landslide/landslide.74/MED,landslide.74.MED,#45B34D,landslide.landslide.74.MED,"['9.1393', '38.7223']",,MED
+1000,landslide/landslide.74/FAC,landslide.74.FAC,#F2A737,landslide.landslide.74.FAC,"['9.1393', '38.7223']",,FAC
+1000,landslide/landslide.74/LOC,landslide.74.LOC,#2579E8,landslide.landslide.74.LOC,"['9.1393', '38.7223']",,LOC
+1000,landslide/landslide.75,landslide.75,#5728AE,landslide.landslide.75,"['49.7306', '36.2133']",Argo and Yaftali Sufla,Spot
+1000,landslide/landslide.75/MED,landslide.75.MED,#45B34D,landslide.landslide.75.MED,"['49.7306', '36.2133']",,MED
+1000,landslide/landslide.75/FAC,landslide.75.FAC,#F2A737,landslide.landslide.75.FAC,"['49.7306', '36.2133']",,FAC
+1000,landslide/landslide.75/LOC,landslide.75.LOC,#2579E8,landslide.landslide.75.LOC,"['49.7306', '36.2133']",,LOC
+1000,landslide/landslide.76,landslide.76,#5728AE,landslide.landslide.76,"['41.5736', '41.2344']",Arhavi,Spot
+1000,landslide/landslide.76/MED,landslide.76.MED,#45B34D,landslide.landslide.76.MED,"['41.5736', '41.2344']",,MED
+1000,landslide/landslide.76/FAC,landslide.76.FAC,#F2A737,landslide.landslide.76.FAC,"['41.5736', '41.2344']",,FAC
+1000,landslide/landslide.76/LOC,landslide.76.LOC,#2579E8,landslide.landslide.76.LOC,"['41.5736', '41.2344']",,LOC
+1000,landslide/landslide.77,landslide.77,#5728AE,landslide.landslide.77,"['41.5116', '41.3206']",Arhavi - Kabisre river basin,Spot
+1000,landslide/landslide.77/MED,landslide.77.MED,#45B34D,landslide.landslide.77.MED,"['41.5116', '41.3206']",,MED
+1000,landslide/landslide.77/FAC,landslide.77.FAC,#F2A737,landslide.landslide.77.FAC,"['41.5116', '41.3206']",,FAC
+1000,landslide/landslide.77/LOC,landslide.77.LOC,#2579E8,landslide.landslide.77.LOC,"['41.5116', '41.3206']",,LOC
+1000,landslide/landslide.78,landslide.78,#5728AE,landslide.landslide.78,"['11.9176', '43.7711']",Arno basin,Spot
+1000,landslide/landslide.78/MED,landslide.78.MED,#45B34D,landslide.landslide.78.MED,"['11.9176', '43.7711']",,MED
+1000,landslide/landslide.78/FAC,landslide.78.FAC,#F2A737,landslide.landslide.78.FAC,"['11.9176', '43.7711']",,FAC
+1000,landslide/landslide.78/LOC,landslide.78.LOC,#2579E8,landslide.landslide.78.LOC,"['11.9176', '43.7711']",,LOC
+1000,landslide/landslide.79,landslide.79,#5728AE,landslide.landslide.79,"['103.8198', '34.0479']",Asia,Spot
+1000,landslide/landslide.79/MED,landslide.79.MED,#45B34D,landslide.landslide.79.MED,"['103.8198', '34.0479']",,MED
+1000,landslide/landslide.79/FAC,landslide.79.FAC,#F2A737,landslide.landslide.79.FAC,"['103.8198', '34.0479']",,FAC
+1000,landslide/landslide.79/LOC,landslide.79.LOC,#2579E8,landslide.landslide.79.LOC,"['103.8198', '34.0479']",,LOC
+1000,landslide/landslide.80,landslide.80,#5728AE,landslide.landslide.80,"['100.0', '30.0']",Asian Highway,Spot
+1000,landslide/landslide.80/MED,landslide.80.MED,#45B34D,landslide.landslide.80.MED,"['100.0', '30.0']",,MED
+1000,landslide/landslide.80/FAC,landslide.80.FAC,#F2A737,landslide.landslide.80.FAC,"['100.0', '30.0']",,FAC
+1000,landslide/landslide.80/LOC,landslide.80.LOC,#2579E8,landslide.landslide.80.LOC,"['100.0', '30.0']",,LOC
+1000,landslide/landslide.81,landslide.81,#5728AE,landslide.landslide.81,"['105.0', '20.0']",Asian Highway - 1,Spot
+1000,landslide/landslide.81/MED,landslide.81.MED,#45B34D,landslide.landslide.81.MED,"['105.0', '20.0']",,MED
+1000,landslide/landslide.81/FAC,landslide.81.FAC,#F2A737,landslide.landslide.81.FAC,"['105.0', '20.0']",,FAC
+1000,landslide/landslide.81/LOC,landslide.81.LOC,#2579E8,landslide.landslide.81.LOC,"['105.0', '20.0']",,LOC
+1000,landslide/landslide.82,landslide.82,#5728AE,landslide.landslide.82,"['42.5325', '19.1390']",Asir,Spot
+1000,landslide/landslide.82/MED,landslide.82.MED,#45B34D,landslide.landslide.82.MED,"['42.5325', '19.1390']",,MED
+1000,landslide/landslide.82/FAC,landslide.82.FAC,#F2A737,landslide.landslide.82.FAC,"['42.5325', '19.1390']",,FAC
+1000,landslide/landslide.82/LOC,landslide.82.LOC,#2579E8,landslide.landslide.82.LOC,"['42.5325', '19.1390']",,LOC
+1000,landslide/landslide.83,landslide.83,#5728AE,landslide.landslide.83,"['142.9833', '43.5399']",Atsuma,Spot
+1000,landslide/landslide.83/MED,landslide.83.MED,#45B34D,landslide.landslide.83.MED,"['142.9833', '43.5399']",,MED
+1000,landslide/landslide.83/FAC,landslide.83.FAC,#F2A737,landslide.landslide.83.FAC,"['142.9833', '43.5399']",,FAC
+1000,landslide/landslide.83/LOC,landslide.83.LOC,#2579E8,landslide.landslide.83.LOC,"['142.9833', '43.5399']",,LOC
+1000,landslide/landslide.84,landslide.84,#5728AE,landslide.landslide.84,"['142.9855', '43.5494']",Atsuma Town,Spot
+1000,landslide/landslide.84/MED,landslide.84.MED,#45B34D,landslide.landslide.84.MED,"['142.9855', '43.5494']",,MED
+1000,landslide/landslide.84/FAC,landslide.84.FAC,#F2A737,landslide.landslide.84.FAC,"['142.9855', '43.5494']",,FAC
+1000,landslide/landslide.84/LOC,landslide.84.LOC,#2579E8,landslide.landslide.84.LOC,"['142.9855', '43.5494']",,LOC
+1000,landslide/landslide.85,landslide.85,#5728AE,landslide.landslide.85,"['23.7294', '37.9838']",Attica,Spot
+1000,landslide/landslide.85/MED,landslide.85.MED,#45B34D,landslide.landslide.85.MED,"['23.7294', '37.9838']",,MED
+1000,landslide/landslide.85/FAC,landslide.85.FAC,#F2A737,landslide.landslide.85.FAC,"['23.7294', '37.9838']",,FAC
+1000,landslide/landslide.85/LOC,landslide.85.LOC,#2579E8,landslide.landslide.85.LOC,"['23.7294', '37.9838']",,LOC
+1000,landslide/landslide.86,landslide.86,#5728AE,landslide.landslide.86,"['23.7428', '37.9838']",Attica region in Greece,Spot
+1000,landslide/landslide.86/MED,landslide.86.MED,#45B34D,landslide.landslide.86.MED,"['23.7428', '37.9838']",,MED
+1000,landslide/landslide.86/FAC,landslide.86.FAC,#F2A737,landslide.landslide.86.FAC,"['23.7428', '37.9838']",,FAC
+1000,landslide/landslide.86/LOC,landslide.86.LOC,#2579E8,landslide.landslide.86.LOC,"['23.7428', '37.9838']",,LOC
+1000,landslide/landslide.87,landslide.87,#5728AE,landslide.landslide.87,"['4.0017', '48.0999']",Aube department,Spot
+1000,landslide/landslide.87/MED,landslide.87.MED,#45B34D,landslide.landslide.87.MED,"['4.0017', '48.0999']",,MED
+1000,landslide/landslide.87/FAC,landslide.87.FAC,#F2A737,landslide.landslide.87.FAC,"['4.0017', '48.0999']",,FAC
+1000,landslide/landslide.87/LOC,landslide.87.LOC,#2579E8,landslide.landslide.87.LOC,"['4.0017', '48.0999']",,LOC
+1000,landslide/landslide.88,landslide.88,#5728AE,landslide.landslide.88,"['14.5501', '47.5162']",Austria,Spot
+1000,landslide/landslide.88/MED,landslide.88.MED,#45B34D,landslide.landslide.88.MED,"['14.5501', '47.5162']",,MED
+1000,landslide/landslide.88/FAC,landslide.88.FAC,#F2A737,landslide.landslide.88.FAC,"['14.5501', '47.5162']",,FAC
+1000,landslide/landslide.88/LOC,landslide.88.LOC,#2579E8,landslide.landslide.88.LOC,"['14.5501', '47.5162']",,LOC
+1000,landslide/landslide.89,landslide.89,#5728AE,landslide.landslide.89,"['13.3333', '47.3333']",Austrian municipalities,Spot
+1000,landslide/landslide.89/MED,landslide.89.MED,#45B34D,landslide.landslide.89.MED,"['13.3333', '47.3333']",,MED
+1000,landslide/landslide.89/FAC,landslide.89.FAC,#F2A737,landslide.landslide.89.FAC,"['13.3333', '47.3333']",,FAC
+1000,landslide/landslide.89/LOC,landslide.89.LOC,#2579E8,landslide.landslide.89.LOC,"['13.3333', '47.3333']",,LOC
+1000,landslide/landslide.90,landslide.90,#5728AE,landslide.landslide.90,"['13.3333', '47.3333']",Austrian territory,Spot
+1000,landslide/landslide.90/MED,landslide.90.MED,#45B34D,landslide.landslide.90.MED,"['13.3333', '47.3333']",,MED
+1000,landslide/landslide.90/FAC,landslide.90.FAC,#F2A737,landslide.landslide.90.FAC,"['13.3333', '47.3333']",,FAC
+1000,landslide/landslide.90/LOC,landslide.90.LOC,#2579E8,landslide.landslide.90.LOC,"['13.3333', '47.3333']",,LOC
+1000,landslide/landslide.91,landslide.91,#5728AE,landslide.landslide.91,"['38.4687', '40.8933']",Avutmus district of Sebinkarahisar,Spot
+1000,landslide/landslide.91/MED,landslide.91.MED,#45B34D,landslide.landslide.91.MED,"['38.4687', '40.8933']",,MED
+1000,landslide/landslide.91/FAC,landslide.91.FAC,#F2A737,landslide.landslide.91.FAC,"['38.4687', '40.8933']",,FAC
+1000,landslide/landslide.91/LOC,landslide.91.LOC,#2579E8,landslide.landslide.91.LOC,"['38.4687', '40.8933']",,LOC
+1000,landslide/landslide.92,landslide.92,#5728AE,landslide.landslide.92,"['7.4188', '6.1978']",Awgu,Spot
+1000,landslide/landslide.92/MED,landslide.92.MED,#45B34D,landslide.landslide.92.MED,"['7.4188', '6.1978']",,MED
+1000,landslide/landslide.92/FAC,landslide.92.FAC,#F2A737,landslide.landslide.92.FAC,"['7.4188', '6.1978']",,FAC
+1000,landslide/landslide.92/LOC,landslide.92.LOC,#2579E8,landslide.landslide.92.LOC,"['7.4188', '6.1978']",,LOC
+1000,landslide/landslide.93,landslide.93,#5728AE,landslide.landslide.93,"['73.7674', '33.6007']",Azad Jammu,Spot
+1000,landslide/landslide.93/MED,landslide.93.MED,#45B34D,landslide.landslide.93.MED,"['73.7674', '33.6007']",,MED
+1000,landslide/landslide.93/FAC,landslide.93.FAC,#F2A737,landslide.landslide.93.FAC,"['73.7674', '33.6007']",,FAC
+1000,landslide/landslide.93/LOC,landslide.93.LOC,#2579E8,landslide.landslide.93.LOC,"['73.7674', '33.6007']",,LOC
+1000,landslide/landslide.94,landslide.94,#5728AE,landslide.landslide.94,"['74.3926', '33.7878']",Azad Jammu and Kashmir region of Pakistan,Spot
+1000,landslide/landslide.94/MED,landslide.94.MED,#45B34D,landslide.landslide.94.MED,"['74.3926', '33.7878']",,MED
+1000,landslide/landslide.94/FAC,landslide.94.FAC,#F2A737,landslide.landslide.94.FAC,"['74.3926', '33.7878']",,FAC
+1000,landslide/landslide.94/LOC,landslide.94.LOC,#2579E8,landslide.landslide.94.LOC,"['74.3926', '33.7878']",,LOC
+1000,landslide/landslide.95,landslide.95,#5728AE,landslide.landslide.95,"['74.3926', '33.7878']",Azad Kashmir,Spot
+1000,landslide/landslide.95/MED,landslide.95.MED,#45B34D,landslide.landslide.95.MED,"['74.3926', '33.7878']",,MED
+1000,landslide/landslide.95/FAC,landslide.95.FAC,#F2A737,landslide.landslide.95.FAC,"['74.3926', '33.7878']",,FAC
+1000,landslide/landslide.95/LOC,landslide.95.LOC,#2579E8,landslide.landslide.95.LOC,"['74.3926', '33.7878']",,LOC
+1000,landslide/landslide.96,landslide.96,#5728AE,landslide.landslide.96,"['64.2439', '31.6244']",Azad River,Spot
+1000,landslide/landslide.96/MED,landslide.96.MED,#45B34D,landslide.landslide.96.MED,"['64.2439', '31.6244']",,MED
+1000,landslide/landslide.96/FAC,landslide.96.FAC,#F2A737,landslide.landslide.96.FAC,"['64.2439', '31.6244']",,FAC
+1000,landslide/landslide.96/LOC,landslide.96.LOC,#2579E8,landslide.landslide.96.LOC,"['64.2439', '31.6244']",,LOC
+1000,landslide/landslide.97,landslide.97,#5728AE,landslide.landslide.97,"['25.6833', '37.7412']",Azores,Spot
+1000,landslide/landslide.97/MED,landslide.97.MED,#45B34D,landslide.landslide.97.MED,"['25.6833', '37.7412']",,MED
+1000,landslide/landslide.97/FAC,landslide.97.FAC,#F2A737,landslide.landslide.97.FAC,"['25.6833', '37.7412']",,FAC
+1000,landslide/landslide.97/LOC,landslide.97.LOC,#2579E8,landslide.landslide.97.LOC,"['25.6833', '37.7412']",,LOC
+1000,landslide/landslide.98,landslide.98,#5728AE,landslide.landslide.98,"['71.6874', '36.4325']",Badakhshan Province,Spot
+1000,landslide/landslide.98/MED,landslide.98.MED,#45B34D,landslide.landslide.98.MED,"['71.6874', '36.4325']",,MED
+1000,landslide/landslide.98/FAC,landslide.98.FAC,#F2A737,landslide.landslide.98.FAC,"['71.6874', '36.4325']",,FAC
+1000,landslide/landslide.98/LOC,landslide.98.LOC,#2579E8,landslide.landslide.98.LOC,"['71.6874', '36.4325']",,LOC
+1000,landslide/landslide.99,landslide.99,#5728AE,landslide.landslide.99,"['71.1062', '36.7389']",Badakhshan province of Afghanistan,Spot
+1000,landslide/landslide.99/MED,landslide.99.MED,#45B34D,landslide.landslide.99.MED,"['71.1062', '36.7389']",,MED
+1000,landslide/landslide.99/FAC,landslide.99.FAC,#F2A737,landslide.landslide.99.FAC,"['71.1062', '36.7389']",,FAC
+1000,landslide/landslide.99/LOC,landslide.99.LOC,#2579E8,landslide.landslide.99.LOC,"['71.1062', '36.7389']",,LOC
+1000,landslide/landslide.100,landslide.100,#5728AE,landslide.landslide.100,"['111.3586', '31.0444']",Badong,Spot
+1000,landslide/landslide.100/MED,landslide.100.MED,#45B34D,landslide.landslide.100.MED,"['111.3586', '31.0444']",,MED
+1000,landslide/landslide.100/FAC,landslide.100.FAC,#F2A737,landslide.landslide.100.FAC,"['111.3586', '31.0444']",,FAC
+1000,landslide/landslide.100/LOC,landslide.100.LOC,#2579E8,landslide.landslide.100.LOC,"['111.3586', '31.0444']",,LOC
+1000,landslide/landslide.101,landslide.101,#5728AE,landslide.landslide.101,"['111.7078', '31.0025']",Badong Country,Spot
+1000,landslide/landslide.101/MED,landslide.101.MED,#45B34D,landslide.landslide.101.MED,"['111.7078', '31.0025']",,MED
+1000,landslide/landslide.101/FAC,landslide.101.FAC,#F2A737,landslide.landslide.101.FAC,"['111.7078', '31.0025']",,FAC
+1000,landslide/landslide.101/LOC,landslide.101.LOC,#2579E8,landslide.landslide.101.LOC,"['111.7078', '31.0025']",,LOC
+1000,landslide/landslide.102,landslide.102,#5728AE,landslide.landslide.102,"['81.0846', '6.9934']",Badulla District,Spot
+1000,landslide/landslide.102/MED,landslide.102.MED,#45B34D,landslide.landslide.102.MED,"['81.0846', '6.9934']",,MED
+1000,landslide/landslide.102/FAC,landslide.102.FAC,#F2A737,landslide.landslide.102.FAC,"['81.0846', '6.9934']",,FAC
+1000,landslide/landslide.102/LOC,landslide.102.LOC,#2579E8,landslide.landslide.102.LOC,"['81.0846', '6.9934']",,LOC
+1000,landslide/landslide.103,landslide.103,#5728AE,landslide.landslide.103,"['99.8348', '33.9788']",Baige,Spot
+1000,landslide/landslide.103/MED,landslide.103.MED,#45B34D,landslide.landslide.103.MED,"['99.8348', '33.9788']",,MED
+1000,landslide/landslide.103/FAC,landslide.103.FAC,#F2A737,landslide.landslide.103.FAC,"['99.8348', '33.9788']",,FAC
+1000,landslide/landslide.103/LOC,landslide.103.LOC,#2579E8,landslide.landslide.103.LOC,"['99.8348', '33.9788']",,LOC
+1000,landslide/landslide.104,landslide.104,#5728AE,landslide.landslide.104,"['81.4525', '40.1375']",Baige Village,Spot
+1000,landslide/landslide.104/MED,landslide.104.MED,#45B34D,landslide.landslide.104.MED,"['81.4525', '40.1375']",,MED
+1000,landslide/landslide.104/FAC,landslide.104.FAC,#F2A737,landslide.landslide.104.FAC,"['81.4525', '40.1375']",,FAC
+1000,landslide/landslide.104/LOC,landslide.104.LOC,#2579E8,landslide.landslide.104.LOC,"['81.4525', '40.1375']",,LOC
+1000,landslide/landslide.105,landslide.105,#5728AE,landslide.landslide.105,"['103.5095', '35.0698']",Bailong River Basin,Spot
+1000,landslide/landslide.105/MED,landslide.105.MED,#45B34D,landslide.landslide.105.MED,"['103.5095', '35.0698']",,MED
+1000,landslide/landslide.105/FAC,landslide.105.FAC,#F2A737,landslide.landslide.105.FAC,"['103.5095', '35.0698']",,FAC
+1000,landslide/landslide.105/LOC,landslide.105.LOC,#2579E8,landslide.landslide.105.LOC,"['103.5095', '35.0698']",,LOC
+1000,landslide/landslide.106,landslide.106,#5728AE,landslide.landslide.106,"['102.7069', '34.6093']",Bailongjiang River,Spot
+1000,landslide/landslide.106/MED,landslide.106.MED,#45B34D,landslide.landslide.106.MED,"['102.7069', '34.6093']",,MED
+1000,landslide/landslide.106/FAC,landslide.106.FAC,#F2A737,landslide.landslide.106.FAC,"['102.7069', '34.6093']",,FAC
+1000,landslide/landslide.106/LOC,landslide.106.LOC,#2579E8,landslide.landslide.106.LOC,"['102.7069', '34.6093']",,LOC
+1000,landslide/landslide.107,landslide.107,#5728AE,landslide.landslide.107,"['102.7390', '34.5964']",Bailongjiang watershed in southern Gansu province,Spot
+1000,landslide/landslide.107/MED,landslide.107.MED,#45B34D,landslide.landslide.107.MED,"['102.7390', '34.5964']",,MED
+1000,landslide/landslide.107/FAC,landslide.107.FAC,#F2A737,landslide.landslide.107.FAC,"['102.7390', '34.5964']",,FAC
+1000,landslide/landslide.107/LOC,landslide.107.LOC,#2579E8,landslide.landslide.107.LOC,"['102.7390', '34.5964']",,LOC
+1000,landslide/landslide.108,landslide.108,#5728AE,landslide.landslide.108,"['120.0093', '30.3423']",Baiyuzui,Spot
+1000,landslide/landslide.108/MED,landslide.108.MED,#45B34D,landslide.landslide.108.MED,"['120.0093', '30.3423']",,MED
+1000,landslide/landslide.108/FAC,landslide.108.FAC,#F2A737,landslide.landslide.108.FAC,"['120.0093', '30.3423']",,FAC
+1000,landslide/landslide.108/LOC,landslide.108.LOC,#2579E8,landslide.landslide.108.LOC,"['120.0093', '30.3423']",,LOC
+1000,landslide/landslide.109,landslide.109,#5728AE,landslide.landslide.109,"['88.9724', '28.0540']",Balason River basin,Spot
+1000,landslide/landslide.109/MED,landslide.109.MED,#45B34D,landslide.landslide.109.MED,"['88.9724', '28.0540']",,MED
+1000,landslide/landslide.109/FAC,landslide.109.FAC,#F2A737,landslide.landslide.109.FAC,"['88.9724', '28.0540']",,FAC
+1000,landslide/landslide.109/LOC,landslide.109.LOC,#2579E8,landslide.landslide.109.LOC,"['88.9724', '28.0540']",,LOC
+1000,landslide/landslide.110,landslide.110,#5728AE,landslide.landslide.110,"['100.2190', '5.3528']",Balik Pulau area in Penang Island,Spot
+1000,landslide/landslide.110/MED,landslide.110.MED,#45B34D,landslide.landslide.110.MED,"['100.2190', '5.3528']",,MED
+1000,landslide/landslide.110/FAC,landslide.110.FAC,#F2A737,landslide.landslide.110.FAC,"['100.2190', '5.3528']",,FAC
+1000,landslide/landslide.110/LOC,landslide.110.LOC,#2579E8,landslide.landslide.110.LOC,"['100.2190', '5.3528']",,LOC
+1000,landslide/landslide.111,landslide.111,#5728AE,landslide.landslide.111,"['103.9482', '22.8861']",Ban Khoang,Spot
+1000,landslide/landslide.111/MED,landslide.111.MED,#45B34D,landslide.landslide.111.MED,"['103.9482', '22.8861']",,MED
+1000,landslide/landslide.111/FAC,landslide.111.FAC,#F2A737,landslide.landslide.111.FAC,"['103.9482', '22.8861']",,FAC
+1000,landslide/landslide.111/LOC,landslide.111.LOC,#2579E8,landslide.landslide.111.LOC,"['103.9482', '22.8861']",,LOC
+1000,landslide/landslide.112,landslide.112,#5728AE,landslide.landslide.112,"['99.8642', '20.4864']",Ban Pha Duea at Mae Salong Nai,Spot
+1000,landslide/landslide.112/MED,landslide.112.MED,#45B34D,landslide.landslide.112.MED,"['99.8642', '20.4864']",,MED
+1000,landslide/landslide.112/FAC,landslide.112.FAC,#F2A737,landslide.landslide.112.FAC,"['99.8642', '20.4864']",,FAC
+1000,landslide/landslide.112/LOC,landslide.112.LOC,#2579E8,landslide.landslide.112.LOC,"['99.8642', '20.4864']",,LOC
+1000,landslide/landslide.113,landslide.113,#5728AE,landslide.landslide.113,"['112.6610', '0.7966']",Banaran,Spot
+1000,landslide/landslide.113/MED,landslide.113.MED,#45B34D,landslide.landslide.113.MED,"['112.6610', '0.7966']",,MED
+1000,landslide/landslide.113/FAC,landslide.113.FAC,#F2A737,landslide.landslide.113.FAC,"['112.6610', '0.7966']",,FAC
+1000,landslide/landslide.113/LOC,landslide.113.LOC,#2579E8,landslide.landslide.113.LOC,"['112.6610', '0.7966']",,LOC
+1000,landslide/landslide.114,landslide.114,#5728AE,landslide.landslide.114,"['54.7294', '36.8452']",Bandar Torkaman in northern Iran,Spot
+1000,landslide/landslide.114/MED,landslide.114.MED,#45B34D,landslide.landslide.114.MED,"['54.7294', '36.8452']",,MED
+1000,landslide/landslide.114/FAC,landslide.114.FAC,#F2A737,landslide.landslide.114.FAC,"['54.7294', '36.8452']",,FAC
+1000,landslide/landslide.114/LOC,landslide.114.LOC,#2579E8,landslide.landslide.114.LOC,"['54.7294', '36.8452']",,LOC
+1000,landslide/landslide.115,landslide.115,#5728AE,landslide.landslide.115,"['82.0718', '29.8600']",Bangesimal and Manma towns,Spot
+1000,landslide/landslide.115/MED,landslide.115.MED,#45B34D,landslide.landslide.115.MED,"['82.0718', '29.8600']",,MED
+1000,landslide/landslide.115/FAC,landslide.115.FAC,#F2A737,landslide.landslide.115.FAC,"['82.0718', '29.8600']",,FAC
+1000,landslide/landslide.115/LOC,landslide.115.LOC,#2579E8,landslide.landslide.115.LOC,"['82.0718', '29.8600']",,LOC
+1000,landslide/landslide.116,landslide.116,#5728AE,landslide.landslide.116,"['90.3563', '23.6850']",Bangladesh,Spot
+1000,landslide/landslide.116/MED,landslide.116.MED,#45B34D,landslide.landslide.116.MED,"['90.3563', '23.6850']",,MED
+1000,landslide/landslide.116/FAC,landslide.116.FAC,#F2A737,landslide.landslide.116.FAC,"['90.3563', '23.6850']",,FAC
+1000,landslide/landslide.116/LOC,landslide.116.LOC,#2579E8,landslide.landslide.116.LOC,"['90.3563', '23.6850']",,LOC
+1000,landslide/landslide.117,landslide.117,#5728AE,landslide.landslide.117,"['112.2661', '28.7105']",bank of Yangtze and its major tributaries,Spot
+1000,landslide/landslide.117/MED,landslide.117.MED,#45B34D,landslide.landslide.117.MED,"['112.2661', '28.7105']",,MED
+1000,landslide/landslide.117/FAC,landslide.117.FAC,#F2A737,landslide.landslide.117.FAC,"['112.2661', '28.7105']",,FAC
+1000,landslide/landslide.117/LOC,landslide.117.LOC,#2579E8,landslide.landslide.117.LOC,"['112.2661', '28.7105']",,LOC
+1000,landslide/landslide.118,landslide.118,#5728AE,landslide.landslide.118,"['81.2696', '29.2767']",banks of the Karnali River,Spot
+1000,landslide/landslide.118/MED,landslide.118.MED,#45B34D,landslide.landslide.118.MED,"['81.2696', '29.2767']",,MED
+1000,landslide/landslide.118/FAC,landslide.118.FAC,#F2A737,landslide.landslide.118.FAC,"['81.2696', '29.2767']",,FAC
+1000,landslide/landslide.118/LOC,landslide.118.LOC,#2579E8,landslide.landslide.118.LOC,"['81.2696', '29.2767']",,LOC
+1000,landslide/landslide.119,landslide.119,#5728AE,landslide.landslide.119,"['106.1092', '-6.4058']",Banten,Spot
+1000,landslide/landslide.119/MED,landslide.119.MED,#45B34D,landslide.landslide.119.MED,"['106.1092', '-6.4058']",,MED
+1000,landslide/landslide.119/FAC,landslide.119.FAC,#F2A737,landslide.landslide.119.FAC,"['106.1092', '-6.4058']",,FAC
+1000,landslide/landslide.119/LOC,landslide.119.LOC,#2579E8,landslide.landslide.119.LOC,"['106.1092', '-6.4058']",,LOC
+1000,landslide/landslide.120,landslide.120,#5728AE,landslide.landslide.120,"['110.2766', '35.0127']",Baota District,Spot
+1000,landslide/landslide.120/MED,landslide.120.MED,#45B34D,landslide.landslide.120.MED,"['110.2766', '35.0127']",,MED
+1000,landslide/landslide.120/FAC,landslide.120.FAC,#F2A737,landslide.landslide.120.FAC,"['110.2766', '35.0127']",,FAC
+1000,landslide/landslide.120/LOC,landslide.120.LOC,#2579E8,landslide.landslide.120.LOC,"['110.2766', '35.0127']",,LOC
+1000,landslide/landslide.121,landslide.121,#5728AE,landslide.landslide.121,"['6.6647', '44.3867']",Barcelonnette Basin,Spot
+1000,landslide/landslide.121/MED,landslide.121.MED,#45B34D,landslide.landslide.121.MED,"['6.6647', '44.3867']",,MED
+1000,landslide/landslide.121/FAC,landslide.121.FAC,#F2A737,landslide.landslide.121.FAC,"['6.6647', '44.3867']",,FAC
+1000,landslide/landslide.121/LOC,landslide.121.LOC,#2579E8,landslide.landslide.121.LOC,"['6.6647', '44.3867']",,LOC
+1000,landslide/landslide.122,landslide.122,#5728AE,landslide.landslide.122,"['32.4610', '41.8387']",Bartin Province of Western Black Sea,Spot
+1000,landslide/landslide.122/MED,landslide.122.MED,#45B34D,landslide.landslide.122.MED,"['32.4610', '41.8387']",,MED
+1000,landslide/landslide.122/FAC,landslide.122.FAC,#F2A737,landslide.landslide.122.FAC,"['32.4610', '41.8387']",,FAC
+1000,landslide/landslide.122/LOC,landslide.122.LOC,#2579E8,landslide.landslide.122.LOC,"['32.4610', '41.8387']",,LOC
+1000,landslide/landslide.123,landslide.123,#5728AE,landslide.landslide.123,"['16.5559', '40.6395']",Basilicata,Spot
+1000,landslide/landslide.123/MED,landslide.123.MED,#45B34D,landslide.landslide.123.MED,"['16.5559', '40.6395']",,MED
+1000,landslide/landslide.123/FAC,landslide.123.FAC,#F2A737,landslide.landslide.123.FAC,"['16.5559', '40.6395']",,FAC
+1000,landslide/landslide.123/LOC,landslide.123.LOC,#2579E8,landslide.landslide.123.LOC,"['16.5559', '40.6395']",,LOC
+1000,landslide/landslide.124,landslide.124,#5728AE,landslide.landslide.124,"['10.1096', '43.7711']",basin of the Arno River,Spot
+1000,landslide/landslide.124/MED,landslide.124.MED,#45B34D,landslide.landslide.124.MED,"['10.1096', '43.7711']",,MED
+1000,landslide/landslide.124/FAC,landslide.124.FAC,#F2A737,landslide.landslide.124.FAC,"['10.1096', '43.7711']",,FAC
+1000,landslide/landslide.124/LOC,landslide.124.LOC,#2579E8,landslide.landslide.124.LOC,"['10.1096', '43.7711']",,LOC
+1000,landslide/landslide.125,landslide.125,#5728AE,landslide.landslide.125,"['104.0319', '1.1301']",Batam Island,Spot
+1000,landslide/landslide.125/MED,landslide.125.MED,#45B34D,landslide.landslide.125.MED,"['104.0319', '1.1301']",,MED
+1000,landslide/landslide.125/FAC,landslide.125.FAC,#F2A737,landslide.landslide.125.FAC,"['104.0319', '1.1301']",,FAC
+1000,landslide/landslide.125/LOC,landslide.125.LOC,#2579E8,landslide.landslide.125.LOC,"['104.0319', '1.1301']",,LOC

@@ -1,0 +1,5088 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6滑坡危险性评价集成化决策支持系统</title>
+
+    <!-- 使用type="module"引入main.js -->
+    <script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
+    <script src="Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="Cesium/Widgets/widgets.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+
+    <!-- 引入 shpjs (指定版本并验证) -->
+    <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+
+    <script>
+      // 验证 shp 对象是否存在
+      if (typeof shp === 'undefined') {
+        alert('shpjs 库加载失败！请检查网络连接和加载路径。')
+      }
+    </script>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+      /* 之前的 CSS 样式 */
+      :root {
+        --main-bg-color: rgba(2, 13, 33, 0.85);
+        --secondary-bg-color: rgba(6, 32, 65, 0.9);
+        --border-color: rgba(0, 149, 255, 0.7);
+        --border-glow: 0 0 10px rgba(0, 174, 255, 0.5);
+        --text-color: #e0f7ff;
+        --accent-color: #00c8ff;
+        --highlight-color: #5fb8ff;
+        --control-bg: rgba(10, 46, 78, 0.7);
+        --font-family: 'Rajdhani', 'Orbitron', sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: var(--font-family);
+      }
+
+      body {
+        color: var(--text-color);
+        background: #000;
+      }
+
+      #cesiumContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+      }
+
+      .title-container {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        z-index: 1000;
+        pointer-events: none;
+      }
+
+      .sci-fi-title {
+        position: relative;
+        color: rgba(238, 242, 246, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 28px;
+        font-weight: 700;
+        padding: 15px 35px;
+        text-shadow: 0 0 5px rgba(64, 224, 208, 0.8);
+      }
+
+      /* 创建不规则几何背景 */
+      .sci-fi-title::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 10, 20, 0.7);
+        clip-path: polygon(
+          0% 40%,
+          10% 30%,
+          15% 0%,
+          85% 0%,
+          90% 30%,
+          100% 40%,
+          95% 70%,
+          100% 100%,
+          75% 90%,
+          40% 100%,
+          0% 80%,
+          5% 60%
+        );
+        box-shadow: 0 0 15px rgba(28, 113, 198, 0.5);
+        z-index: -1;
+      }
+
+      /* 创建发光边框效果 */
+      .sci-fi-title::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: transparent;
+        border: 2px solid rgba(64, 224, 208, 0.7);
+        clip-path: polygon(
+          0% 40%,
+          10% 30%,
+          15% 0%,
+          85% 0%,
+          90% 30%,
+          100% 40%,
+          95% 70%,
+          100% 100%,
+          75% 90%,
+          40% 100%,
+          0% 80%,
+          5% 60%
+        );
+        box-shadow:
+          0 0 10px rgba(64, 224, 208, 0.7),
+          inset 0 0 5px rgba(64, 224, 208, 0.5);
+        z-index: -1;
+        filter: blur(1px);
+      }
+
+      .sci-fi-title .highlight {
+        color: white;
+        font-weight: 700;
+      }
+
+      .blinking {
+        animation: blink 3s infinite alternate;
+      }
+
+      @keyframes blink {
+        0% {
+          opacity: 0.8;
+        }
+        30% {
+          opacity: 1;
+        }
+        40% {
+          opacity: 0.9;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.8;
+        }
+      }
+
+      /* 添加装饰几何线条 */
+      .geometric-decorations {
+        position: absolute;
+        height: 2px;
+        background-color: rgba(64, 224, 208, 0.6);
+      }
+
+      .geo-line-1 {
+        width: 60px;
+        left: -70px;
+        top: 30%;
+        transform: rotate(-20deg);
+      }
+
+      .geo-line-2 {
+        width: 40px;
+        left: -50px;
+        top: 60%;
+        transform: rotate(30deg);
+      }
+
+      .geo-line-3 {
+        width: 60px;
+        right: -70px;
+        top: 30%;
+        transform: rotate(20deg);
+      }
+
+      .geo-line-4 {
+        width: 40px;
+        right: -50px;
+        top: 60%;
+        transform: rotate(-30deg);
+      }
+
+      /* 添加角落装饰 */
+      .corner-decoration {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border: 1px solid rgba(64, 224, 208, 0.8);
+        box-shadow: 0 0 5px rgba(64, 224, 208, 0.5);
+      }
+
+      .top-left {
+        top: -5px;
+        left: 15px;
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+      }
+
+      .top-right {
+        top: -5px;
+        right: 15px;
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+      }
+
+      .bottom-left {
+        bottom: -5px;
+        left: 15px;
+        clip-path: polygon(0 0, 100% 100%, 0 100%);
+      }
+
+      .bottom-right {
+        bottom: -5px;
+        right: 15px;
+        clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      }
+
+      /* 添加扫描线动画 */
+      .scanning-line {
+        position: absolute;
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(to right, transparent, rgba(64, 224, 208, 0.9), transparent);
+        top: 50%;
+        left: 0;
+        opacity: 0;
+        animation: scan 3s ease-in-out infinite;
+        z-index: 1;
+      }
+
+      @keyframes scan {
+        0%,
+        100% {
+          opacity: 0;
+          top: 0;
+        }
+        50% {
+          opacity: 1;
+          top: 100%;
+        }
+      }
+
+      /* 添加圆形装饰元素 */
+      .circle-decoration {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: rgba(64, 224, 208, 0.8);
+        box-shadow: 0 0 5px rgba(64, 224, 208, 0.8);
+      }
+
+      .circle-1 {
+        left: -20px;
+        top: 20%;
+      }
+      .circle-2 {
+        left: -30px;
+        top: 70%;
+      }
+      .circle-3 {
+        right: -20px;
+        top: 20%;
+      }
+      .circle-4 {
+        right: -30px;
+        top: 70%;
+      }
+
+      /* 通用面板样式 */
+      .table,
+      .top-right-box,
+      .description-box,
+      .dialog,
+      .box {
+        background-color: var(--main-bg-color);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--border-glow);
+        backdrop-filter: blur(5px);
+        color: var(--text-color);
+        z-index: 1;
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* 添加格面板装饰 */
+      .table::before,
+      .top-right-box::before,
+      .description-box::before,
+      .dialog::before,
+      .box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+      }
+
+      .table::after,
+      .top-right-box::after,
+      .description-box::after,
+      .dialog::after,
+      .box::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 30%;
+        height: 1px;
+        background: var(--accent-color);
+      }
+
+      .table {
+        width: 300px;
+        height: 650px;
+        margin: 10px;
+        margin-top: 30px;
+        position: relative;
+      }
+      .legends {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1;
+      }
+      .legends-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .legends-color {
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+        margin-right: 5px;
+      }
+
+      #legendz {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+      }
+      .legendz-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .legendz-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border: 1px solid #000;
+      }
+
+      #adjustment-box .sample-row {
+        display: flex;
+        align-items: center; /* 垂直居中 */
+        padding: 8px 0;
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      #adjustment-box .sample-row:last-child {
+        border-bottom: none;
+      }
+
+      #adjustment-box .sample-row > div {
+        /* 包含 span 标签的 div */
+        flex-basis: 120px; /* 固定标签部分的宽度 */
+        margin-right: 15px; /* 标签和控件之间的间距 */
+        flex-shrink: 0; /* 防止标签宽度被压缩 */
+      }
+
+      #adjustment-box .span-highlight {
+        display: block;
+        font-weight: bold;
+        color: var(--accent-color);
+        font-size: 0.95em;
+      }
+
+      #adjustment-box .sbutton,
+      #adjustment-box input[type='file'] {
+        margin-left: 5px;
+      }
+
+      /* 长按钮独占一行 */
+      #adjustment-box .sample-row.long-button-row {
+        display: block; /* 使长按钮占据整行 */
+      }
+
+      #adjustment-box .long-button-row .long-button {
+        width: 100%; /* 长按钮宽度撑满 */
+        margin-left: 0; /* 移除左边距 */
+        margin-top: 8px; /* 与上方元素分隔 */
+      }
+
+      /* 内部盒子统一样式 */
+      .boxquyufanwei,
+      .boxyingxiangshuju,
+      .boxyangbenshuju,
+      .boxhuanijngyinzi,
+      .boxshenduxuexi,
+      .boxjiqixuexi,
+      .boxzaixianshuju {
+        width: 240px;
+        margin: 0 auto;
+        margin-top: 8px;
+        border: 1px dashed var(--border-color);
+        border-radius: 2px;
+        background-color: var(--secondary-bg-color);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* 内部盒子尺寸保持不变 */
+      .boxquyufanwei,
+      .boxyingxiangshuju {
+        height: 40px;
+      }
+
+      .boxyangbenshuju {
+        height: 110px;
+      }
+
+      .boxhuanijngyinzi {
+        height: 150px;
+        overflow-y: auto;
+      }
+      .boxzaixianshuju {
+        height: 150px;
+        max-height: 500px; /* 设置最大高度为 500 像素，你可以根据需要调整 */
+        overflow-y: auto; /* 当内容超出 max-height 时，显示垂直滚动条 */
+      }
+      .boxshenduxuexi {
+        height: 140px;
+        max-height: 500px; /* 设置最大高度为 500 像素，你可以根据需要调整 */
+        overflow-y: auto; /* 当内容超出 max-height 时，显示垂直滚动条 */
+      }
+      .boxjiqixuexi {
+        height: 180px;
+        max-height: 500px; /* 设置最大高度为 500 像素，你可以根据需要调整 */
+        overflow-y: auto; /* 当内容超出 max-height 时，显示垂直滚动条 */
+      }
+
+      /* 自定义滚动条 */
+      .boxhuanijngyinzi::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .boxhuanijngyinzi::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .boxhuanijngyinzi::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 3px;
+      }
+
+      /* 自定义滚动条 */
+      .boxzaixianshuju::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .boxzaixianshuju::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .boxzaixianshuju::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 3px;
+      }
+
+      .online-data-list {
+        max-height: 300px; /* 设置一个你希望的最大高度 */
+        overflow-y: auto; /* 当内容超出 max-height 时显示垂直滚动条 */
+      }
+
+      .online-data-list::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .online-data-list::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      .online-data-list::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 3px;
+      }
+
+      .top-right-box {
+        position: absolute;
+        top: 50px;
+        right: 10px;
+        width: 300px;
+        height: 200px;
+        display: flex;
+        padding: 10px;
+      }
+
+      .left-section,
+      .right-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .new-project,
+      .current-project {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .new-project button {
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 3px 8px;
+        border-radius: 2px;
+      }
+
+      .new-project button:hover {
+        background: var(--highlight-color);
+        color: #000;
+      }
+
+      .existing-projects {
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        padding: 5px;
+        text-align: center;
+        height: 100%;
+        background-color: var(--secondary-bg-color);
+      }
+
+      .description-box {
+        position: absolute;
+        top: 290px;
+        right: 10px;
+        width: 300px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .cesium-baseLayerPicker-dropDown {
+        z-index: 2 !important;
+      }
+
+      .dialog {
+        position: absolute;
+        top: 430px;
+        right: 10px;
+        width: 300px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .dialog button {
+        margin-top: 10px;
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 5px 12px;
+        cursor: pointer;
+        border-radius: 2px;
+      }
+
+      .dialog button:hover {
+        background: var(--highlight-color);
+        color: #000;
+      }
+
+      .sample-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .sample-row span {
+        flex: 1;
+      }
+
+      .sample-row button {
+        margin-left: 5px;
+        padding: 5px 10px;
+        background-color: var(--control-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        border-radius: 2px;
+      }
+
+      .sample-row button:hover {
+        background: rgba(0, 174, 255, 0.3);
+      }
+
+      .sample-row button.active {
+        background-color: var(--accent-color);
+        color: #000;
+      }
+
+      .box-container {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .box {
+        display: none;
+        width: 270px;
+        height: 500px;
+        margin: 10px;
+        padding: 10px;
+      }
+
+      .box.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+      }
+
+      /* 添加动画效果 */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 添加科幻风格的标题和文本效果 */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 ，span {
+        color: var(--accent-color);
+        text-shadow: 0 0 5px rgba(0, 200, 255, 0.5);
+        letter-spacing: 1px;
+        font-size: 20px; /* 设置字体大小，可以根据需要调整 */
+      }
+      span {
+        font-family: var(--font-family); /* 使用你已定义的科幻字体 */
+        font-size: 14px; /* 设置字体大小，可以根据需要调整 */
+        color: var(--text-color); /* 使用你已定义的文本颜色 */
+        letter-spacing: 0.5px; /* 增加字母间距，提升科幻感 */
+      }
+      .span-highlight {
+        color: var(--highlight-color); /* 高亮颜色 */
+        font-weight: bold; /* 加粗 */
+        font-size: 12px; /* 设置字体大小，可以根据需要调整 */
+        text-shadow: 0 0 3px rgba(108, 186, 246, 0.5); /* 添加文字阴影效果 */
+      }
+
+      .button-row {
+        display: flex; /* 启用 Flexbox 布局 */
+        justify-content: center; /* 水平居中 */
+        width: 100%; /* 占据一行全部宽度 */
+      }
+
+      .icon-button {
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--border-glow);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 8px 5px;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        width: 88px;
+        margin: 0 4px; /* 添加左右外边距，用于按钮间隔 */
+        top: 10px;
+      }
+
+      .icon-button:hover {
+        background: rgba(0, 174, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .icon-button:active {
+        transform: translateY(1px);
+        background: var(--accent-color);
+      }
+
+      .icon-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        animation: scanline 2s linear infinite;
+      }
+
+      .button-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .icon-button img {
+        width: 30px;
+        height: auto;
+        /* 移除或调整这个滤镜效果 */
+        /* filter: drop-shadow(0 0 2px var(--accent-color)); */
+        filter: brightness(0) invert(1);
+        transition: filter 0.3s ease;
+        margin-bottom: 5px; /* 图片与文字间的间距 */
+      }
+
+      .icon-button:hover img {
+        /* 修改悬停效果，确保亮度合适 */
+        filter: brightness(1) drop-shadow(0 0 5px var(--accent-color));
+      }
+
+      .button-text {
+        font-size: 12px;
+        color: var(--text-color);
+        text-align: center;
+        font-family: var(--font-family);
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 3px rgba(0, 174, 255, 0.3);
+      }
+
+      .icons-button {
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--border-glow);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 8px 5px;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        min-width: 96px; /* 确保按钮宽度足够 */
+      }
+
+      .icons-button:hover {
+        background: rgba(0, 174, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .icons-button:active {
+        transform: translateY(1px);
+        background: var(--accent-color);
+      }
+
+      .icons-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        animation: scanline 2s linear infinite;
+      }
+
+      .button-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .icons-button img {
+        width: 10px;
+        height: auto;
+        filter: brightness(0) invert(1);
+        transition: filter 0.3s ease;
+        margin-bottom: 5px; /* 图片与文字间的间距 */
+      }
+
+      .icons-button:hover img {
+        filter: brightness(0) invert(1);
+      }
+
+      .button-text {
+        font-size: 12px;
+        color: var(--text-color);
+        text-align: center;
+        font-family: var(--font-family);
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 3px rgba(0, 174, 255, 0.3);
+      }
+
+      .separator {
+        width: 90%; /* 设置横杠宽度 */
+        height: 2px; /* 设置横杠高度 */
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-color),
+          transparent
+        ); /* 添加线性渐变背景 */
+        margin: 10px auto; /* 设置外边距，使其居中 */
+        position: relative; /* 设置相对定位，以便添加动画 */
+        overflow: hidden; /* 隐藏超出横杠宽度的部分 */
+      }
+
+      .separator::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, white, transparent); /* 添加白色扫描线 */
+        animation: scanline 3s linear infinite; /* 添加扫描线动画 */
+      }
+
+      .sbutton {
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--border-glow);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 8px 5px;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        min-width: 50px; /* 确保按钮宽度足够 */
+        height: 30px;
+      }
+      .sbutton img {
+        filter: brightness(0) invert(1);
+      }
+
+      .dbutton.alternative {
+        background-color: #f8f9fa; /* 浅灰色背景 */
+        border: 1px solid #ced4da; /* 浅灰色边框 */
+        color: #495057; /* 深灰色文字颜色 (如果按钮有文字) */
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s ease-in-out;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: auto;
+        line-height: 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 轻微的阴影 */
+      }
+
+      .dbutton.alternative img {
+        filter: brightness(0.8); /* 稍微降低图片亮度 */
+        max-width: 60%;
+        max-height: 60%;
+      }
+
+      .dbutton.alternative:hover {
+        background-color: #e9ecef; /* 鼠标悬停时更浅的灰色 */
+        border-color: #adb5bd;
+        transform: translateY(-2px); /* 鼠标悬停时轻微向上移动 */
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2); /* 更强的阴影 */
+      }
+
+      .dbutton.alternative:active {
+        background-color: #dee2e6; /* 鼠标按下时的颜色 */
+        transform: translateY(0); /* 恢复原始位置 */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 恢复原始阴影 */
+      }
+
+      .sbuttons-container {
+        display: flex; /* 启用 Flexbox 布局 */
+        justify-content: flex-end; /* 靠右对齐 */
+        margin-right: 5px; /* 与右边界相距 5px */
+      }
+
+      .sbuttons {
+        background: var(--control-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--border-glow);
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 8px 5px;
+        border-radius: 3px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        min-width: 5px;
+        height: 30px;
+        margin-left: 20px; /* 添加左外边距，设置按钮间距 */
+      }
+
+      /* 移除第一个按钮的左外边距 */
+      .sbuttons:first-child {
+        margin-left: 0;
+      }
+      .sbuttons img {
+        filter: brightness(0) invert(1);
+      }
+
+      .header-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 80px; /* 标题框高度 */
+        z-index: 0;
+      }
+      #base {
+        width: 100%;
+        height: 80px;
+        /* position: absolute; */
+        /* top: 0; */
+        /* left: 50%; */
+        /* transform: translateX(-50%); */
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        /* 以下属性可用于调整标题框的位置 */
+        position: absolute; /* 启用绝对定位 */
+        top: 0; /* 距离顶部的位置 (例如: 10px) */
+        left: 50%; /* 距离左侧的位置 (通常设置为 50%) */
+        transform: translateX(-50%); /* 水平居中 (如果需要) */
+      }
+
+      .header-title {
+        text-align: center;
+      }
+
+      .title-text {
+        color: #ecf0f1;
+        font-size: 2em;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-shadow:
+          0 0 10px #3498db,
+          0 0 20px #3498db;
+        letter-spacing: 2px;
+      }
+      #legend {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+        border-radius: 5px;
+      }
+      #legend div {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      #legend span {
+        width: 30px;
+        height: 20px;
+        margin-right: 5px;
+      }
+
+      @keyframes scanline {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      #base {
+        width: 100%;
+        height: 80px;
+        /* position: absolute; */
+        /* top: 0; */
+        /* left: 50%; */
+        /* transform: translateX(-50%); */
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #u367 {
+        /* 你可以根据需要设置一个最大宽度，让标题区域在较大屏幕下不会过宽 */
+        /* max-width: 1922px;  */
+        width: 100%; /* 让 u367 也占据其父元素的全部宽度，以便内部元素可以相对于它居中 */
+        display: flex;
+        justify-content: center; /* 水平居中其子元素 */
+        align-items: center; /* 垂直居中其子元素（如果需要） */
+        position: absolute;
+        left: 50%; /* 距离左侧的位置 (通常设置为 50%) */
+        transform: translateX(-50%) scale(0.7); /* 缩小为原来的 80% */
+      }
+
+      #u394 {
+        text-align: center; /* 确保标题文字本身居中 */
+        font-size: 24px; /* 增大字体大小 */
+      }
+
+      #u394_div {
+        /* 有些 Axure 生成的空 div 可能会影响布局，可以尝试移除或设置样式 */
+        display: inline-block; /* 让 div 像行内块级元素一样，宽度自适应内容 */
+      }
+
+      #u394_text {
+        text-align: center; /* 再次确保文本内容居中 */
+        width: 100px; /* 让文本内容占据整个父元素的宽度 */
+        font-size: 50px; /* 增大字体大小 */
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>大标题样式一</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet" />
+    <link href="data/styles.css" type="text/css" rel="stylesheet" />
+    <link href="files/大标题样式一/styles.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      @font-face {
+        font-family: 'CustomFont';
+        src:
+          url('resources/fonts/customfont.woff2') format('woff2'),
+          url('resources/fonts/customfont.woff') format('woff');
+      }
+
+      .sidebar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 300px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        z-index: 2;
+        max-height: calc(100% - 40px);
+        overflow-y: auto;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 15px 0;
+        color: #2c3e50;
+        text-align: center;
+      }
+      .file-section {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+      }
+      .file-section h2 {
+        font-size: 16px;
+        margin: 0 0 10px 0;
+        color: #34495e;
+      }
+      .file-input {
+        display: none;
+      }
+      .file-button {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 5px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+      }
+      .file-button:hover {
+        background-color: #2980b9;
+      }
+      .file-name {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+        word-break: break-all;
+      }
+      .action-button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+      }
+      .action-button:hover {
+        background-color: #27ae60;
+      }
+      .action-button.inactive {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+      .action-button.active {
+        background-color: #e74c3c;
+      }
+      #loadingIndicator {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        text-align: center;
+        color: white;
+      }
+      .loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 2s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      #legend {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        z-index: 2;
+        display: none;
+      }
+      #legend h2 {
+        font-size: 14px;
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        text-align: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .legend-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border-radius: 3px;
+      }
+      .file-info {
+        font-size: 12px;
+        margin-top: 5px;
+        color: #34495e;
+      }
+      .box-tech {
+        background-color: #2c3e50; /* 稍亮的深灰色容器 */
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 更强的阴影 */
+        text-align: left;
+        width: 500px; /* 控制容器宽度 */
+      }
+
+      h3.title-tech {
+        color: #6dd5ed; /* 亮蓝色标题 */
+        text-shadow: 0 0 10px rgba(109, 213, 237, 0.8); /* 标题发光 */
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 24px;
+        text-align: center;
+      }
+
+      .input-group-tech {
+        margin-bottom: 15px;
+      }
+
+      label.label-tech {
+        display: block;
+        margin-bottom: 5px;
+        color: #95a5a6; /* 稍暗的文本标签 */
+      }
+
+      input[type='file'].file-input-tech {
+        background-color: #34495e; /* 深蓝色输入框 */
+        color: #ecf0f1; /* 浅色输入框文本 */
+        border: 1px solid #34495e;
+        padding: 10px;
+        border-radius: 5px;
+        width: calc(100% - 22px); /* 占据容器宽度 */
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      input[type='file'].file-input-tech:hover {
+        background-color: #4a6572;
+      }
+
+      button.button-tech {
+        background-color: #00b894; /* 亮绿色按钮 */
+        color: #fff;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition:
+          background-color 0.3s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0 0 5px rgba(0, 184, 148, 0.5); /* 按钮发光 */
+        margin-top: 10px;
+        margin-right: 10px;
+      }
+
+      button.button-tech:hover {
+        background-color: #009478;
+        box-shadow: 0 0 10px rgba(0, 184, 148, 0.7);
+      }
+
+      .toggle-btn-tech {
+        background-color: #3498db; /* 亮蓝色切换按钮 */
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+      }
+
+      .toggle-btn-tech:hover {
+        background-color: #2980b9;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+      }
+
+      .toggle-btn-tech.inactive-tech {
+        background-color: #e74c3c; /* 红色表示非活动状态 */
+        box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+      }
+
+      .toggle-btn-tech.inactive-tech:hover {
+        background-color: #c0392b;
+        box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+      }
+
+      #selectFileButton-tech {
+        background-color: #f39c12; /* 金色按钮 */
+        box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+      }
+
+      #selectFileButton-tech:hover {
+        background-color: #e67e22;
+        box-shadow: 0 0 10px rgba(243, 156, 18, 0.7);
+      }
+
+      #soilTypesLegendContainer {
+        position: absolute;
+        bottom: 20px; /* 或根据你的喜好调整 */
+        right: 20px; /* 或根据你的喜好调整 */
+        background-color: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        max-height: 250px; /* 如果图例项很多，允许滚动 */
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #333;
+        z-index: 1000; /* 确保在Cesium Canvas之上，根据需要调整 */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      /* 如果你在 updateLegend 中没有给子元素写内联样式，可能还需要这些类的样式 */
+      .soil-legend-item {
+        /* 假设你给图例项div添加了这个类 */
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .soil-legend-color-box {
+        /* 假设你给颜色块div添加了这个类 */
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        border: 1px solid #666;
+      }
+    </style>
+
+    <script type="text/javascript" src="//js.users.51.la/20998153.js"></script>
+
+    <style type="text/css"></style>
+    <script src="resources/scripts/jquery-3.2.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/大标题样式一/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function () {
+        return 'resources/images/transparent.gif'
+      }
+      $axure.utils.getOtherPath = function () {
+        return 'resources/Other.html'
+      }
+      $axure.utils.getReloadPath = function () {
+        return 'resources/reload.html'
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="cesiumContainer"></div>
+    <div id="legend"></div>
+    <div id="message"></div>
+    <div id="legends"></div>
+    <div id="loadingIndicator" style="display: none">加载中...</div>
+    <div
+      id="cnnPredictionLegend"
+      style="
+        position: absolute;
+        top: 300px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+      "
+    ></div>
+    <div
+      id="rescuePriorityLegend"
+      style="
+        position: absolute;
+        top: 300px;
+        right: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      "
+    ></div>
+
+    <div id="soilTypesLegendContainer"></div>
+
+    <div id="base" class="base">
+      <!-- Unnamed (组合) -->
+      <div
+        id="u367"
+        class="ax_default"
+        data-top="5"
+        data-width="1922"
+        data-height="94"
+        layer-opacity="1"
+      >
+        <!-- Unnamed (形状) -->
+        <div id="u368" class="ax_default _形状">
+          <img id="u368_img" class="img" src="images/大标题样式一/u368.svg" />
+          <div id="u368_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u369" class="ax_default _形状">
+          <img id="u369_img" class="img" src="images/大标题样式一/u369.svg" />
+          <div id="u369_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u370" class="ax_default _形状">
+          <img id="u370_img" class="img" src="images/大标题样式一/u370.svg" />
+          <div id="u370_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div
+          id="u371"
+          class="compound ax_default _形状"
+          data-height="54"
+          data-width="77"
+          CompoundMode="true"
+        >
+          <img id="u371_img" class="singleImg img" src="images/大标题样式一/u371.svg" />
+          <div
+            id="u371p000"
+            class="ax_vector_shape"
+            WidgetTopLeftX="0.349627168761416"
+            WidgetTopLeftY="9.26091882817707"
+            WidgetTopRightX="-0.46080759677408"
+            WidgetTopRightY="0.0293913904977181"
+            WidgetBottomLeftX="0.93817791449304"
+            WidgetBottomLeftY="3.0089934940461"
+            WidgetBottomRightX="0.127743148957543"
+            WidgetBottomRightY="-6.22253394363326"
+          >
+            <img id="u371p000_img" class="img" src="images/大标题样式一/u371p000.svg" />
+          </div>
+          <div
+            id="u371p001"
+            class="ax_vector_shape"
+            WidgetTopLeftX="0.821428571428571"
+            WidgetTopLeftY="7.33333333333333"
+            WidgetTopRightX="-1.92857142857143"
+            WidgetTopRightY="7.33333333333333"
+            WidgetBottomLeftX="0.821428571428571"
+            WidgetBottomLeftY="-1.66666666666667"
+            WidgetBottomRightX="-1.92857142857143"
+            WidgetBottomRightY="-1.66666666666667"
+          >
+            <img id="u371p001_img" class="img" src="images/大标题样式一/u371p001.svg" />
+          </div>
+          <div
+            id="u371p002"
+            class="ax_vector_shape"
+            WidgetTopLeftX="-1.22557163228217"
+            WidgetTopLeftY="6.69373567077269"
+            WidgetTopRightX="-3.86705516306187"
+            WidgetTopRightY="-1.72568853460549"
+            WidgetBottomLeftX="0.384755075239984"
+            WidgetBottomLeftY="-0.0986505512322576"
+            WidgetBottomRightX="-2.25672845553972"
+            WidgetBottomRightY="-8.51807475661043"
+          >
+            <img id="u371p002_img" class="img" src="images/大标题样式一/u371p002.svg" />
+          </div>
+          <div id="u371_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u372" class="ax_default _形状">
+          <img id="u372_img" class="img" src="images/大标题样式一/u372.svg" />
+          <div id="u372_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (矩形) -->
+        <div id="u373" class="ax_default box_1">
+          <img id="u373_img" class="img" src="images/大标题样式一/u373.svg" />
+          <div id="u373_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u374" class="ax_default box_1">
+          <img id="u374_img" class="img" src="images/大标题样式一/u374.svg" />
+          <div id="u374_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (矩形) -->
+        <div id="u375" class="ax_default box_1">
+          <img id="u375_img" class="img" src="images/大标题样式一/u375.svg" />
+          <div id="u375_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (矩形) -->
+        <div id="u376" class="ax_default box_1">
+          <img id="u376_img" class="img" src="images/大标题样式一/u376.svg" />
+          <div id="u376_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u377" class="ax_default _形状">
+          <img id="u377_img" class="img" src="images/大标题样式一/u377.svg" />
+          <div id="u377_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u378" class="ax_default _形状">
+          <img id="u378_img" class="img" src="images/大标题样式一/u378.svg" />
+          <div id="u378_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u379" class="ax_default _形状">
+          <img id="u379_img" class="img" src="images/大标题样式一/u379.svg" />
+          <div id="u379_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u380" class="ax_default _形状">
+          <img id="u380_img" class="img" src="images/大标题样式一/u380.svg" />
+          <div id="u380_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u381" class="ax_default _形状">
+          <img id="u381_img" class="img" src="images/大标题样式一/u381.svg" />
+          <div id="u381_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u382" class="ax_default _形状">
+          <img id="u382_img" class="img" src="images/大标题样式一/u382.svg" />
+          <div id="u382_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u383" class="ax_default _形状">
+          <img id="u383_img" class="img" src="images/大标题样式一/u383.svg" />
+          <div id="u383_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u384" class="ax_default _形状">
+          <img id="u384_img" class="img" src="images/大标题样式一/u384.svg" />
+          <div id="u384_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u385" class="ax_default _形状">
+          <img id="u385_img" class="img" src="images/大标题样式一/u385.svg" />
+          <div id="u385_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div
+          id="u386"
+          class="compound ax_default _形状"
+          data-height="50"
+          data-width="64"
+          CompoundMode="true"
+        >
+          <img id="u386_img" class="singleImg img" src="images/大标题样式一/u386.svg" />
+          <div
+            id="u386p000"
+            class="ax_vector_shape"
+            WidgetTopLeftX="0.114904851942818"
+            WidgetTopLeftY="4.45477272147528"
+            WidgetTopRightX="-0.45078057300642"
+            WidgetTopRightY="-0.070710678118623"
+            WidgetBottomLeftX="0.55684659018441"
+            WidgetBottomLeftY="0.919238815542544"
+            WidgetBottomRightX="-0.00883883476482778"
+            WidgetBottomRightY="-3.60624458405136"
+          >
+            <img id="u386p000_img" class="img" src="images/大标题样式一/u386p000.svg" />
+          </div>
+          <div
+            id="u386p001"
+            class="ax_vector_shape"
+            WidgetTopLeftX="0.388888888888889"
+            WidgetTopLeftY="8.16666666666667"
+            WidgetTopRightX="-3.16666666666667"
+            WidgetTopRightY="8.16666666666667"
+            WidgetBottomLeftX="0.388888888888889"
+            WidgetBottomLeftY="-0.166666666666667"
+            WidgetBottomRightX="-3.16666666666667"
+            WidgetBottomRightY="-0.166666666666667"
+          >
+            <img id="u386p001_img" class="img" src="images/大标题样式一/u386p001.svg" />
+          </div>
+          <div id="u386_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u387" class="ax_default _形状">
+          <img id="u387_img" class="img" src="images/大标题样式一/u387.svg" />
+          <div id="u387_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u388" class="ax_default _形状">
+          <img id="u388_img" class="img" src="images/大标题样式一/u388.svg" />
+          <div id="u388_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u389" class="ax_default _形状">
+          <img id="u389_img" class="img" src="images/大标题样式一/u389.svg" />
+          <div id="u389_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u390" class="ax_default _形状">
+          <img id="u390_img" class="img" src="images/大标题样式一/u390.svg" />
+          <div id="u390_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u391" class="ax_default _形状">
+          <img id="u391_img" class="img" src="images/大标题样式一/u391.svg" />
+          <div id="u391_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u392" class="ax_default _形状">
+          <img id="u392_img" class="img" src="images/大标题样式一/u392.svg" />
+          <div id="u392_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (形状) -->
+        <div id="u393" class="ax_default _形状">
+          <img id="u393_img" class="img" src="images/大标题样式一/u393.svg" />
+          <div id="u393_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+
+        <!-- Unnamed (矩形) -->
+        <div id="u394" class="ax_default _标题_1">
+          <div id="u394_div" class=""></div>
+          <div
+            id="u394_text"
+            class="text"
+            data-width="1000"
+            data-height="200"
+            style="display: flex; justify-content: center; align-items: center"
+          >
+            <p>
+              <span style="font-size: 30px">滑坡危险性评价集成化决策支持系统</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Unnamed (矩形) -->
+        <div id="u395" class="ax_default box_1">
+          <img id="u395_img" class="img" src="images/大标题样式一/u395.svg" />
+          <div id="u395_text" class="text" style="display: none; visibility: hidden">
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+
+    <div class="table">
+      <button onclick="showBox('data-box')" class="icon-button">
+        <div class="button-content">
+          <img
+            src="7106331_graph_hexagon_data_infographic_element_icon.png"
+            width="67"
+            alt="数据录入"
+          />
+          <span class="button-text">数据录入</span>
+        </div>
+      </button>
+
+      <script>
+        function centerTitle() {
+          const base = document.getElementById('base')
+          const cesiumContainer = document.getElementById('cesiumContainer')
+
+          if (base && cesiumContainer) {
+            const cesiumWidth = cesiumContainer.offsetWidth
+            const baseWidth = base.offsetWidth
+            const left = (cesiumWidth - baseWidth) / 2
+
+            base.style.position = 'absolute'
+            base.style.top = '0'
+            base.style.left = left + 'px'
+          }
+        }
+
+        // 确保在 Cesium 初始化完成后再设置标题位置
+      </script>
+
+      <button onclick="showBox('pyramid-box')" class="icon-button">
+        <div class="button-content">
+          <img src="9044969_model_builder_icon.png" width="67" alt="数据录入" />
+          <span class="button-text">模型集成</span>
+        </div>
+      </button>
+
+      <button onclick="showBox('adjustment-box')" class="icon-button">
+        <div class="button-content">
+          <img src="11121214_fi_rr_calculator_simple_icon.png" width="67" alt="数据录入" />
+          <span class="button-text">决策评估</span>
+        </div>
+      </button>
+
+      <div class="box-container">
+        <div id="data-box" class="box">
+          <div class="boxquyufanwei">
+            <div class="sample-row">
+              <h2>区域范围</h2>
+
+              <button
+                id="loadShpButton"
+                class="sbutton"
+                onclick="document.getElementById('shpFiles').click();"
+              >
+                <div>
+                  <img
+                    src="3844479_add_cloud_computing_data_off_icon.png"
+                    width="20"
+                    alt="数据录入"
+                  />
+                </div>
+              </button>
+              <input
+                type="file"
+                id="shpFiles"
+                multiple
+                accept=".shp,.shx,.dbf,.prj"
+                style="display: none"
+                onchange="loadShapefiles()"
+              />
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="boxyangbenshuju">
+            <h2>样本数据</h2>
+            <div class="sample-row">
+              <span class="span-highlight">滑坡样本</span>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img
+                    src="3844479_add_cloud_computing_data_off_icon.png"
+                    width="20"
+                    alt="数据录入"
+                  />
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+            <div class="sample-row">
+              <span class="span-highlight">非滑样本</span>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img
+                    src="3844479_add_cloud_computing_data_off_icon.png"
+                    width="20"
+                    alt="数据录入"
+                  />
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+          </div>
+          <div class="boxhuanijngyinzi">
+            <h2>滑坡因子</h2>
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>高程</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>坡度</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>坡向</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>平面曲率</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>剖面曲率</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>地形起伏度</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="loadSoilShpButton" class="sbutton">
+                <div>
+                  <span>土壤类型</span>
+                </div>
+              </button>
+              <input
+                type="file"
+                id="shpFilesInput"
+                multiple
+                accept=".shp,.dbf,.prj,.shx,.cpg"
+                style="display: none"
+              />
+
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>断层</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="selectShapefile()" class="sbutton">
+                <div>
+                  <span>道路</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="selectShapefile()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>水系</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="sample-row">
+              <button id="gaocheng" onclick="openFolder()" class="sbutton">
+                <div>
+                  <span>岩性</span>
+                </div>
+              </button>
+              <button id="toggleDEMButton" onclick="toggleDEMVisibility()" class="sbutton">
+                <div>
+                  <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="boxzaixianshuju">
+            <h2>在线数据</h2>
+
+            <span class="span-highlight">高程数据</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a
+                  href="https://portal.opentopography.org/raster?opentopoID=OTALOS.112016.4326.2"
+                  target="_blank"
+                  >AW3D30 DEM</a
+                >
+              </div>
+              <div class="separator"></div>
+
+              <div class="sample-row">
+                <a href="https://glovis.usgs.gov/app" target="_blank">SRTM</a>
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a href="https://asterweb.jpl.nasa.gov/gdem.asp" target="_blank">ATSTER GDEM</a>
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a
+                  href="https://data.europa.eu/data/datasets/5eecdf4c-de57-4624-99e9-60086b032aea?locale=en"
+                  target="_blank"
+                  >TanDEM-X DEM</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+
+            <span class="span-highlight">土壤类型</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a href="https://www.resdc.cn/data.aspx?DATAID=145" target="_blank">CAS</a>
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a href="https://soilgrids.org" target="_blank">ISRIC - SoilGrids</a>
+              </div>
+
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a
+                  href="https://www.fao.org/soils-portal/data-hub/soil-maps-and-databases/faounesco-soil-map-of-the-world/en/"
+                  target="_blank"
+                  >FAO</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+
+            <span class="span-highlight">断层</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a
+                  href="https://github.com/gmt-china/china-geospatial-data/releases"
+                  target="_blank"
+                  >CN-faults</a
+                >
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a href="https://www.usgs.gov/programs/earthquake-hazards/faults" target="_blank"
+                  >USGS Quaternary Fault and Fold Database</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+
+            <span class="span-highlight">道路</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a href="https://www.openstreetmap.org" target="_blank">OSM</a>
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a
+                  href="https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html"
+                  target="_blank"
+                  >Line Shapefiles</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+
+            <span class="span-highlight">水系</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a
+                  href="https://www.geodata.cn/data/datadetails.html?dataguid=21449321754982&docId=4777"
+                  target="_blank"
+                  >中国水系数据集</a
+                >
+              </div>
+              <div class="separator"></div>
+              <div class="sample-row">
+                <a href="https://www.hydrosheds.org/hydrosheds-core-downloads" target="_blank"
+                  >HydroSHEDS</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+
+            <span class="span-highlight">地层岩性</span>
+            <div class="online-data-list">
+              <div class="sample-row">
+                <a
+                  href="http://www.gisrs.cn/shopdata?id=489a0052-6607-477a-949e-a3128341e186"
+                  target="_blank"
+                  >中国地层岩性分布</a
+                >
+              </div>
+            </div>
+            <div class="separator"></div>
+          </div>
+        </div>
+
+        <div id="pyramid-box" class="box">
+          <div class="boxshenduxuexi">
+            <h2>预处理</h2>
+
+            <div class="sample-row long-button-row">
+              <button id="selectFileButton" class="sbutton long-button">重采样</button>
+              <input type="file" id="fileInput" style="display: none" />
+            </div>
+            <div class="sample-row long-button-row">
+              <button id="selectFileButton" class="sbutton long-button">数据转换</button>
+              <input type="file" id="fileInput" style="display: none" />
+            </div>
+
+            <div class="sample-row long-button-row">
+              <button id="selectFileButton" class="sbutton long-button">重分类</button>
+              <input type="file" id="fileInput" style="display: none" />
+            </div>
+          </div>
+
+          <div class="boxshenduxuexi">
+            <h2>深度学习</h2>
+            <div class="model-options">
+              <div>
+                <input type="radio" id="annModelRadio" name="model" value="ann" />
+                <label for="annModelRadio">人工神经网络 </label>
+                <input type="file" id="annModelFile" style="display: none" accept=".csv" />
+              </div>
+              <div id="info"></div>
+              <div id="result"></div>
+
+              <label>
+                <input type="radio" name="deep-learning-model" value="model5" id="卷积神经网络" />
+                卷积神经网络 </label
+              ><br />
+
+              <label>
+                <input type="radio" name="deep-learning-model" value="model1" id="高斯过程回归" />
+                高斯过程回归 </label
+              ><br />
+              <label>
+                <input type="radio" name="deep-learning-model" value="model2" id="极限学习机" />
+                极限学习机 </label
+              ><br />
+              <label>
+                <input type="radio" name="deep-learning-model" value="model3" id="门控循环单元" />
+                门控循环单元 </label
+              ><br />
+              <label>
+                <input type="radio" name="deep-learning-model" value="model4" id="深度置信网络" />
+                深度置信网络 </label
+              ><br />
+              <label>
+                <input type="radio" name="deep-learning-model" value="model6" id="长短期记忆网络" />
+                长短期记忆网络
+              </label>
+
+              <div>
+                <label for="rnnModelRadio">
+                  <input type="radio" name="deep-learning-model" value="rnn" id="rnnModelRadio" />
+                  rnn (点击选择 CSV 数据)
+                </label>
+                <input type="file" id="csvFileInput" style="display: none" accept=".csv" />
+              </div>
+              <div id="rnn-info"></div>
+              <div id="rnn-result"></div>
+              <div id="error-message"></div>
+            </div>
+          </div>
+          <div class="boxjiqixuexi">
+            <h2>机器学习</h2>
+            <div class="model-options">
+              <label>
+                <input type="radio" name="machine-learning-model" value="model7" id="随机森林" />
+                随机森林 </label
+              ><br />
+              <label>
+                <input type="radio" name="machine-learning-model" value="model9" id="支持向量机" />
+                支持向量机 </label
+              ><br />
+
+              <label>
+                <input
+                  type="radio"
+                  name="machine-learning-model"
+                  value="model2"
+                  id="k-均值聚类算法"
+                />
+                k-均值聚类算法 </label
+              ><br />
+              <label>
+                <input type="radio" name="machine-learning-model" value="model3" id="岭回归" />
+                岭回归 </label
+              ><br />
+              <label>
+                <input type="radio" name="machine-learning-model" value="model4" id="逻辑回归" />
+                逻辑回归 </label
+              ><br />
+              <label>
+                <input type="radio" name="machine-learning-model" value="model5" id="朴素贝叶斯" />
+                朴素贝叶斯 </label
+              ><br />
+              <label>
+                <input
+                  type="radio"
+                  name="machine-learning-model"
+                  value="model6"
+                  id="受限波尔兹曼机"
+                />
+                受限波尔兹曼机 </label
+              ><br />
+
+              <label>
+                <input type="radio" name="machine-learning-model" value="model8" id="梯度推进机" />
+                梯度推进机 </label
+              ><br />
+
+              <label>
+                <input type="radio" name="machine-learning-model" value="model10" id="主成分分析" />
+                主成分分析 </label
+              ><br />
+              <label>
+                <input type="radio" name="machine-learning-model" value="model11" id="最邻近算法" />
+                最邻近算法
+              </label>
+            </div>
+          </div>
+        </div>
+        <div id="adjustment-box" class="box boxquyufanwei">
+          <h2>决策评估</h2>
+
+          <div class="sample-row">
+            <div><span class="span-highlight">预测数据</span></div>
+
+            <button id="loadPredictionFileButton" class="sbutton">
+              <div>
+                <img
+                  src="3844479_add_cloud_computing_data_off_icon.png"
+                  width="20"
+                  alt="数据录入"
+                />
+              </div>
+            </button>
+            <input type="file" id="csvFile" style="display: none" accept=".csv" />
+
+            <button id="visualizePredictionBtn" class="sbutton">
+              <div>
+                <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+              </div>
+            </button>
+          </div>
+
+          <div class="sample-row">
+            <div><span class="span-highlight">人口数据</span></div>
+
+            <button id="loadPopulationFileButton" class="sbutton">
+              <div>
+                <img
+                  src="3844479_add_cloud_computing_data_off_icon.png"
+                  width="20"
+                  alt="数据录入"
+                />
+              </div>
+            </button>
+            <input type="file" id="populationFile" accept=".tif" style="display: none" />
+
+            <button id="visualizeGeoDataBtn" class="sbutton">
+              <div>
+                <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+              </div>
+            </button>
+          </div>
+
+          <div class="sample-row">
+            <div><span class="span-highlight">泸定地区建筑物</span></div>
+
+            <button id="loadBuildingsFileButton" class="sbutton">
+              <div>
+                <img
+                  src="3844479_add_cloud_computing_data_off_icon.png"
+                  width="20"
+                  alt="数据录入"
+                />
+              </div>
+            </button>
+            <input
+              type="file"
+              id="ludingBuildingsShp"
+              multiple
+              accept=".shp,.shx,.dbf,.prj"
+              class="file-input-tech"
+              style="display: none"
+            />
+
+            <button id="visualizeGeoDataBtn" class="sbutton">
+              <div>
+                <img src="8666618_eye_icon.png" width="20" alt="数据录入" />
+              </div>
+            </button>
+          </div>
+
+          <div class="sample-row long-button-row">
+            <button onclick="analyzeAndVisualize()" class="sbutton long-button inactive-tech">
+              综合决策分析
+            </button>
+          </div>
+
+          <div class="sample-row long-button-row">
+            <button id="toggleAnalysisResultBtn" class="sbutton long-button inactive-tech">
+              可视化
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 对话框 -->
+
+    <script>
+      // 设置Cesium Ion访问令牌
+      Cesium.Ion.defaultAccessToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxYjkzZGY2NS1iZTkyLTRmYzktYTgxYS04MDZjM2FlOWZlYTIiLCJpZCI6MjY2ODU0LCJpYXQiOjE3NDEwNjk5NTV9.sKke8WkMfa3V4rqmSlk8utHDVv2CIpaqMBUfhTAA9cM' // 请替换为实际有效的token
+
+      // 创建 Cesium Viewer 实例
+      const viewer = new Cesium.Viewer('cesiumContainer', {
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+        imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 })
+      })
+
+      let imageryLayers = []
+      let geoJsonDataSources = [] // 用于存储加载的GeoJSON数据源
+      let selectedDirectoryHandle = null
+      let selectedJsonFile = null
+      let demVisible = true // 初始状态为可见
+      let currentTerrainProvider = null // 用于存储当前 TerrainProvider
+      let demLayer = null // 用于存储 ImageryLayer
+
+      let rkcsvFile = null
+      let shpFilesData = []
+      let populationFile = null
+      let predictionDataSource = null
+      let geoDataSource = null
+      let analysisDataSource = null
+      let ludingBuildingsShpFiles = []
+
+      //土壤类型
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('脚本开始执行：土壤SHP加载功能 (v5 - DL值1-5优化)')
+
+        // --- 关键依赖检查 ---
+        if (typeof Cesium === 'undefined' || typeof Cesium.Viewer === 'undefined') {
+          console.error('关键错误：CesiumJS库未加载或不完整！')
+          alert('错误：CesiumJS库缺失，功能无法运行。')
+          return
+        }
+        if (typeof viewer === 'undefined') {
+          // 假设你的Cesium Viewer实例名为 'viewer'
+          console.error("关键错误：Cesium 'viewer' 实例未定义或无法访问！")
+          alert('错误：Cesium Viewer未初始化，功能无法运行。')
+          return
+        }
+        if (typeof shp === 'undefined') {
+          console.error("关键错误：shp.js 库未加载或 'shp' 对象不可用！")
+          alert('错误：shp.js库缺失，功能无法运行。')
+          return
+        }
+        if (typeof proj4 === 'undefined') {
+          console.error("关键错误：proj4.js 库未加载或 'proj4' 对象不可用！")
+          alert('错误：proj4.js库缺失，坐标重投影功能无法运行。')
+          return
+        }
+        console.log('Cesium Viewer, shp.js, 和 proj4.js 库检查通过。')
+
+        // 1. 土壤类型定义 (根据你的信息，简化为DL值1-5)
+        const soilTypes = {
+          '01': '南方水稻土',
+          '02': '鲜血水稻土',
+          '03': '北方水稻土',
+          '04': '黄刚土',
+          '05': '黄堰土'
+          // 如果将来你的数据包含其他类型，可以再加回来，或者保持原样以备不时之需
+        }
+
+        // 使用预定义颜色列表的 getSoilColor 函数 (保持不变，它能很好地处理少量类型)
+        const predefinedColors = [
+          Cesium.Color.fromCssColorString('rgba(230, 25, 75, 0.7)'), // Red
+          Cesium.Color.fromCssColorString('rgba(60, 180, 75, 0.7)'), // Green
+          Cesium.Color.fromCssColorString('rgba(0, 130, 200, 0.7)'), // Blue
+          Cesium.Color.fromCssColorString('rgba(255, 225, 25, 0.7)'), // Yellow
+          Cesium.Color.fromCssColorString('rgba(245, 130, 48, 0.7)'), // Orange
+          Cesium.Color.fromCssColorString('rgba(70, 240, 240, 0.7)'), // Cyan
+          Cesium.Color.fromCssColorString('rgba(240, 50, 230, 0.7)'), // Magenta
+          Cesium.Color.fromCssColorString('rgba(145, 30, 180, 0.7)') // Purple
+          // 可以继续添加更多明显区分的颜色
+        ]
+        let colorAssignIndex = 0
+        const assignedDlColorsCache = {}
+
+        function getSoilColor(dlValue) {
+          if (assignedDlColorsCache[dlValue]) {
+            return assignedDlColorsCache[dlValue]
+          }
+          const color = predefinedColors[colorAssignIndex % predefinedColors.length]
+          colorAssignIndex++
+          assignedDlColorsCache[dlValue] = color
+          return color
+        }
+
+        let currentSoilDataSource = null
+
+        // 2. 获取HTML元素并准备绑定事件
+        console.log('尝试获取HTML元素...')
+        const loadSoilButtonElement = document.getElementById('loadSoilShpButton')
+        const shpFilesInputElement = document.getElementById('shpFilesInput')
+        const soilTypesLegendElement = document.getElementById('soilTypesLegendContainer')
+
+        if (loadSoilButtonElement) console.log("按钮 'loadSoilShpButton' 已找到。")
+        else console.error("错误：未找到按钮 'loadSoilShpButton'！")
+        if (shpFilesInputElement) console.log("文件输入框 'shpFilesInput' 已找到。")
+        else console.error("错误：未找到文件输入框 'shpFilesInput'！")
+        if (soilTypesLegendElement) console.log("图例容器 'soilTypesLegendContainer' 已找到。")
+        else console.error("错误：未找到图例容器 'soilTypesLegendContainer'！")
+
+        if (loadSoilButtonElement && shpFilesInputElement && soilTypesLegendElement) {
+          console.log('所有必需的HTML元素均已找到，准备绑定事件监听器...')
+          loadSoilButtonElement.addEventListener('click', () => {
+            console.log("按钮 'loadSoilShpButton' 被点击，触发文件输入框。")
+            shpFilesInputElement.click()
+          })
+          console.log("按钮 'loadSoilShpButton' 的点击事件监听器已尝试添加。")
+
+          shpFilesInputElement.addEventListener('change', (event) => {
+            console.log('====== 文件选择变更事件触发 ======')
+            const files = event.target.files
+            console.log('选择的文件列表:', files)
+
+            if (!files || files.length === 0) {
+              console.warn('没有选择任何文件。')
+              event.target.value = null
+              return
+            }
+            let hasShp = false,
+              hasDbf = false
+            for (let i = 0; i < files.length; i++) {
+              if (files[i].name.toLowerCase().endsWith('.shp')) hasShp = true
+              if (files[i].name.toLowerCase().endsWith('.dbf')) hasDbf = true
+            }
+            if (!hasShp || !hasDbf) {
+              alert('请确保至少选择了 .shp 和 .dbf 文件。')
+              console.warn('选择的文件中缺少 .shp 或 .dbf 文件。')
+              event.target.value = null
+              return
+            }
+
+            let shpBuffer,
+              dbfBuffer,
+              prjData = null
+            console.log('准备开始读取文件...')
+
+            const fileReadPromises = Array.from(files).map((file) => {
+              return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                const fileNameLower = file.name.toLowerCase()
+                console.log(`为文件设置读取器: ${file.name}`)
+                if (fileNameLower.endsWith('.prj')) {
+                  reader.onload = (e) => {
+                    prjData = e.target.result
+                    console.log(`PRJ 文件内容读取完成: ${file.name}`)
+                    resolve({ name: file.name, type: 'prj', success: true })
+                  }
+                  reader.onerror = (err) => {
+                    console.error(`读取 PRJ 文件 ${file.name} 时出错:`, err)
+                    reject({ name: file.name, type: 'prj', success: false, error: err })
+                  }
+                  reader.readAsText(file)
+                } else {
+                  reader.onload = (e) => {
+                    console.log(`ArrayBuffer 文件读取完成: ${file.name}`)
+                    if (fileNameLower.endsWith('.shp')) {
+                      shpBuffer = e.target.result
+                      console.log(
+                        'SHP Buffer 已赋值. 大小:',
+                        shpBuffer ? shpBuffer.byteLength : 'N/A'
+                      )
+                    } else if (fileNameLower.endsWith('.dbf')) {
+                      dbfBuffer = e.target.result
+                      console.log(
+                        'DBF Buffer 已赋值. 大小:',
+                        dbfBuffer ? dbfBuffer.byteLength : 'N/A'
+                      )
+                    }
+                    resolve({ name: file.name, type: 'buffer', success: true })
+                  }
+                  reader.onerror = (err) => {
+                    console.error(`读取 ArrayBuffer 文件 ${file.name} 时出错:`, err)
+                    reject({ name: file.name, type: 'buffer', success: false, error: err })
+                  }
+                  reader.readAsArrayBuffer(file)
+                }
+              })
+            })
+
+            Promise.all(fileReadPromises)
+              .then((results) => {
+                console.log('所有文件读取Promise均已完成. 结果:', results)
+                console.log('检查SHP和DBF Buffers:')
+                console.log(
+                  '  SHP Buffer 是否存在?',
+                  !!shpBuffer,
+                  '大小:',
+                  shpBuffer ? shpBuffer.byteLength : 'N/A'
+                )
+                console.log(
+                  '  DBF Buffer 是否存在?',
+                  !!dbfBuffer,
+                  '大小:',
+                  dbfBuffer ? dbfBuffer.byteLength : 'N/A'
+                )
+
+                if (!shpBuffer || !dbfBuffer) {
+                  alert('必需的 .shp 和 .dbf 文件未被正确读取或未选择。')
+                  console.error('错误：shpBuffer 或 dbfBuffer 未被正确赋值。')
+                  event.target.value = null
+                  return
+                }
+
+                if (prjData) {
+                  console.log('  PRJ 数据内容已捕获:', prjData)
+                } else {
+                  console.warn('警告: 未能读取到 .prj 文件内容。')
+                  alert('警告：未提供.prj投影文件。如果数据不是WGS84，位置会不正确！')
+                }
+
+                console.log('准备使用 shp.js 解析数据...')
+                try {
+                  const shpGeometries = shp.parseShp(shpBuffer)
+                  const dbfRecords = shp.parseDbf(dbfBuffer)
+
+                  if (!shpGeometries || !dbfRecords || shpGeometries.length !== dbfRecords.length) {
+                    console.error('SHP几何或DBF属性解析失败或数量不匹配。')
+                    alert('解析Shapefile几何或属性失败。')
+                    return
+                  }
+                  console.log(
+                    `已解析 ${shpGeometries.length} 个几何要素和 ${dbfRecords.length} 条属性记录。`
+                  )
+
+                  let geojsonData = { type: 'FeatureCollection', features: [] }
+                  for (let i = 0; i < shpGeometries.length; i++) {
+                    if (shpGeometries[i] && dbfRecords[i]) {
+                      geojsonData.features.push({
+                        type: 'Feature',
+                        geometry: shpGeometries[i],
+                        properties: dbfRecords[i]
+                      })
+                    } else {
+                      console.warn(`索引 ${i} 处的几何或属性缺失，已跳过。`)
+                    }
+                  }
+                  console.log('GeoJSON FeatureCollection 构建成功!')
+
+                  if (prjData) {
+                    console.log('准备进行坐标重投影...')
+                    const sourceProjectionName = 'SOURCE_SHP_PROJ_AUTO' // 确保每次定义新的，或检查是否已定义
+                    const destProjection = 'EPSG:4326'
+                    try {
+                      // 如果proj4.defs中已存在同名定义，它可能会报错或使用旧定义。
+                      // 为确保每次都用新的prjData，可以先undefine或用独特的名字。
+                      if (proj4.defs[sourceProjectionName]) {
+                        console.log(
+                          `投影 '${sourceProjectionName}' 已存在，将使用现有定义或尝试覆盖（取决于proj4版本行为）。`
+                        )
+                      }
+                      proj4.defs(sourceProjectionName, prjData)
+                      console.log(`源坐标系 '${sourceProjectionName}' 已使用PRJ数据定义。`)
+
+                      if (proj4.defs[sourceProjectionName] && proj4.defs[destProjection]) {
+                        console.log(`开始从 ${sourceProjectionName} 转换到 ${destProjection}`)
+                        const transformer = proj4(sourceProjectionName, destProjection)
+                        geojsonData.features.forEach((feature) => {
+                          if (feature.geometry && feature.geometry.coordinates) {
+                            try {
+                              function transformCoords(coords) {
+                                if (!coords || coords.length === 0) return coords
+                                if (
+                                  typeof coords[0] === 'number' &&
+                                  typeof coords[1] === 'number'
+                                ) {
+                                  return transformer.forward(coords.slice(0, 2))
+                                }
+                                return coords.map((c) => transformCoords(c))
+                              }
+                              feature.geometry.coordinates = transformCoords(
+                                feature.geometry.coordinates
+                              )
+                            } catch (transformError) {
+                              console.error('坐标转换时发生错误:', transformError, '要素:', feature)
+                            }
+                          }
+                        })
+                        console.log('坐标重投影完成。GeoJSON数据已更新。')
+                      } else {
+                        console.warn(
+                          `源投影 '${sourceProjectionName}' 或目标投影 '${destProjection}' 未能正确初始化，跳过坐标重投影。`
+                        )
+                        alert('警告：投影信息可能无法被识别，坐标转换可能未执行。')
+                      }
+                    } catch (projDefError) {
+                      console.error('定义源投影或创建转换器时出错:', projDefError)
+                      alert('处理投影文件(.prj)内容时出错，无法进行坐标转换。')
+                    }
+                  } else {
+                    console.warn('没有 .prj 文件信息，跳过坐标重投影。')
+                  }
+
+                  if (!geojsonData.features || geojsonData.features.length === 0) {
+                    alert('已构建GeoJSON，但在Shapefile中未找到有效要素。')
+                    console.warn('已构建GeoJSON，但在Shapefile中未找到有效要素。')
+                    return
+                  }
+                  loadSoilDataIntoCesium(geojsonData)
+                } catch (error) {
+                  console.error('使用 shp.js 解析或构建GeoJSON时发生严重错误:', error)
+                  alert('解析Shapefile或构建GeoJSON失败。')
+                }
+              })
+              .catch((error) => {
+                console.error('处理文件读取Promises集合时出错:', error)
+                alert('读取或处理一组文件时发生错误。')
+              })
+            event.target.value = null
+          })
+          console.log("文件输入框 'shpFilesInput' 的 'change' 事件监听器已尝试添加。")
+        } else {
+          console.error('由于未能找到所有必需的HTML元素，事件监听器未被绑定。')
+        }
+
+        // 3. 将GeoJSON加载到Cesium并进行样式化的函数
+        function loadSoilDataIntoCesium(geojsonData) {
+          console.log('进入 loadSoilDataIntoCesium 函数...')
+          if (!viewer) {
+            console.error('Cesium viewer 实例在 loadSoilDataIntoCesium 中未定义!')
+            alert('Cesium viewer 未初始化。')
+            return
+          }
+          if (currentSoilDataSource) {
+            viewer.dataSources.remove(currentSoilDataSource, true)
+            currentSoilDataSource = null
+            console.log('已移除旧的土壤数据源。')
+          }
+
+          console.log('准备使用 Cesium.GeoJsonDataSource.load 加载GeoJSON...')
+          Cesium.GeoJsonDataSource.load(geojsonData, { clampToGround: true })
+            .then((dataSource) => {
+              console.log('GeoJSON成功加载到Cesium数据源中。开始处理实体...')
+              currentSoilDataSource = dataSource
+              const entities = dataSource.entities.values
+              const loadedSoilTypesForLegend = new Set()
+
+              for (let i = 0; i < entities.length; i++) {
+                const entity = entities[i]
+                const properties = entity.properties
+                console.log(`--- [实体 #${i}] 开始处理 ---`)
+                if (!properties) {
+                  console.warn(`[实体 #${i}] 错误：没有属性对象.`)
+                  if (entity.polygon)
+                    entity.polygon.material = Cesium.Color.LIGHTSLATEGRAY.withAlpha(0.5)
+                  continue
+                }
+
+                const propertyNames = properties.propertyNames
+                console.log(`[实体 #${i}] 所有属性名 (DBF Fields):`, propertyNames)
+
+                const fidFieldName = 'FID_' // <<<<< 已根据日志修正为 'FID_'
+                const fidProperty = properties[fidFieldName]
+                const fidValue = fidProperty
+                  ? String(fidProperty.getValue(Cesium.JulianDate.now()))
+                  : `N/A (属性 '${fidFieldName}' 未找到)`
+                console.log(
+                  `[实体 #${i}] FID字段 ('${fidFieldName}'): 原始属性对象:`,
+                  fidProperty,
+                  `提取的值: ${fidValue}`
+                )
+
+                const dlFieldName = 'DL' // 假设DBF中字段名是 'DL'
+                const dlValueProperty = properties[dlFieldName]
+                const rawDlValue = dlValueProperty
+                  ? dlValueProperty.getValue(Cesium.JulianDate.now())
+                  : null
+                let formattedDlValue = null
+                console.log(
+                  `[实体 #${i}] DL字段 ('${dlFieldName}'): 原始属性对象:`,
+                  dlValueProperty,
+                  `原始提取值 (rawDlValue): '${rawDlValue}'`
+                )
+
+                if (rawDlValue !== null && rawDlValue !== undefined) {
+                  let dlStr = String(rawDlValue).trim()
+                  if (dlStr.length === 1 && /^\d$/.test(dlStr)) {
+                    formattedDlValue = '0' + dlStr
+                  } else {
+                    formattedDlValue = dlStr
+                  }
+                  console.log(`[实体 #${i}] DL格式化后 (formattedDlValue): '${formattedDlValue}'`)
+                } else {
+                  console.log(`[实体 #${i}] DL原始值为null/undefined，formattedDlValue保持为null。`)
+                }
+
+                if (formattedDlValue && soilTypes[formattedDlValue]) {
+                  console.log(
+                    `[实体 #${i}] (FID: ${fidValue}) DL值 '${formattedDlValue}' 成功匹配到 soilTypes: ${soilTypes[formattedDlValue]}`
+                  )
+                  loadedSoilTypesForLegend.add(formattedDlValue)
+                  console.log(
+                    `[实体 #${i}] 已将 '${formattedDlValue}' 添加到 loadedSoilTypesForLegend. 当前Set大小: ${loadedSoilTypesForLegend.size}, 内容:`,
+                    new Set(loadedSoilTypesForLegend)
+                  )
+                  if (entity.polygon) {
+                    const colorForDL = getSoilColor(formattedDlValue)
+                    console.log(
+                      `[实体 #${i}] 为 DL '${formattedDlValue}' 获取到的颜色:`,
+                      colorForDL.toCssColorString()
+                    )
+                    entity.polygon.material = colorForDL
+                    entity.polygon.outline = true
+                    entity.polygon.outlineColor = Cesium.Color.BLACK.withAlpha(0.7)
+                    entity.polygon.classificationType = Cesium.ClassificationType.BOTH
+                  }
+                  entity.description = `<div style="font-family: Arial, sans-serif; padding: 10px;"><h4 style="margin-top:0; margin-bottom: 8px; color: #337ab7;">土壤类型详情</h4><table class="cesium-infoBox-defaultTable"><tr><td>区块FID</td><td>${fidValue}</td></tr><tr><td>土壤代码 (DL)</td><td>${formattedDlValue}</td></tr><tr><td>类型名称</td><td>${soilTypes[formattedDlValue]}</td></tr></table></div>`
+                } else {
+                  console.warn(
+                    `[实体 #${i}] (FID: ${fidValue}) 的DL值 (原始: '${rawDlValue}', 格式化后: '${formattedDlValue}') 无效或未在 soilTypes 中定义。将使用默认灰色。`
+                  )
+                  if (entity.polygon) {
+                    entity.polygon.material = Cesium.Color.GRAY.withAlpha(0.4)
+                    entity.polygon.outline = true
+                    entity.polygon.outlineColor = Cesium.Color.DARKGRAY.withAlpha(0.7)
+                    entity.polygon.classificationType = Cesium.ClassificationType.BOTH
+                  }
+                  entity.description = `<p>区块FID: ${fidValue}</p><p>未知的土壤类型或DL值 (原始: '${rawDlValue}', 格式化后: '${formattedDlValue || '空'}') 缺失。</p>`
+                }
+                console.log(`--- [实体 #${i}] 处理完毕 ---`)
+              }
+
+              console.log(
+                '所有实体处理完毕。准备更新图例。 loadedSoilTypesForLegend 内容:',
+                loadedSoilTypesForLegend,
+                '大小:',
+                loadedSoilTypesForLegend.size
+              )
+              viewer.dataSources.add(dataSource)
+              console.log('数据源已添加到viewer。尝试缩放至数据...')
+              viewer
+                .flyTo(dataSource)
+                .then(() => console.log('已成功缩放至加载的数据范围。'))
+                .catch((error) => console.error('缩放至数据时发生错误:', error))
+              updateLegend(loadedSoilTypesForLegend)
+              if (loadedSoilTypesForLegend.size > 0) {
+                alert('土壤数据加载并可视化成功！颜色和图例已应用。')
+              } else {
+                alert(
+                  '土壤数据已加载，但未能匹配到任何已定义的土壤类型进行着色或生成图例。请检查DBF文件的DL字段和代码中的soilTypes定义。'
+                )
+              }
+              console.log('土壤数据已添加到Cesium，并尝试缩放。')
+            })
+            .catch((error) => {
+              console.error(
+                '加载GeoJSON数据到Cesium时出错 (Cesium.GeoJsonDataSource.load failed):',
+                error
+              )
+              alert('加载GeoJSON数据到Cesium时发生错误。')
+            })
+          console.log('loadSoilDataIntoCesium 函数执行完毕。')
+        }
+
+        // 4. 图例生成函数
+        function updateLegend(loadedTypesSet) {
+          console.log(
+            '进入 updateLegend 函数... loadedTypesSet内容:',
+            loadedTypesSet,
+            '大小:',
+            loadedTypesSet.size
+          )
+          if (!soilTypesLegendElement) {
+            console.warn("土壤图例容器 'soilTypesLegendContainer' 未找到。")
+            return
+          }
+          soilTypesLegendElement.innerHTML =
+            '<strong style="display:block; margin-bottom:5px; font-size:14px; color:#333;">土壤类型图例</strong><hr style="margin-top:0; margin-bottom:8px; border-top: 1px solid #ccc;">'
+          const sortedDlValues = Array.from(loadedTypesSet).sort((a, b) => {
+            const numA = parseInt(a, 10)
+            const numB = parseInt(b, 10)
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB
+            return String(a).localeCompare(String(b))
+          })
+          if (sortedDlValues.length === 0) {
+            soilTypesLegendElement.innerHTML +=
+              '<p style="font-style: italic; color: #777;">未加载有效的土壤类型数据。</p>'
+            console.log('图例更新：未加载有效土壤类型。')
+            return
+          }
+          console.log('准备生成图例项，数量:', sortedDlValues.length)
+          sortedDlValues.forEach((dlValue) => {
+            if (soilTypes[dlValue]) {
+              const colorObject = getSoilColor(dlValue)
+              const cssColorString = colorObject.toCssColorString()
+              const legendItemDiv = document.createElement('div')
+              legendItemDiv.style.cssText = 'display:flex; align-items:center; margin-bottom:5px;'
+              const colorBoxDiv = document.createElement('div')
+              colorBoxDiv.style.cssText =
+                'width:16px; height:16px; margin-right:8px; border:1px solid #666; background-color:' +
+                cssColorString +
+                ';'
+              const labelSpan = document.createElement('span')
+              labelSpan.textContent = `${dlValue}: ${soilTypes[dlValue]}`
+              labelSpan.style.fontSize = '12px'
+              legendItemDiv.appendChild(colorBoxDiv)
+              legendItemDiv.appendChild(labelSpan)
+              soilTypesLegendElement.appendChild(legendItemDiv)
+            }
+          })
+          console.log('updateLegend 函数执行完毕。')
+        }
+
+        if (soilTypesLegendElement) updateLegend(new Set())
+        else console.warn('初始化图例失败：图例容器未找到。')
+        console.log('土壤SHP加载脚本初始化完成。等待按钮点击...')
+      })
+      //土壤类型
+
+      // 预设每个模型ID对应的网址
+      const modelUrls = {
+        Apriori: 'YOUR_URL_FOR_APRIORI', // 请替换为 Apriori 对应的实际网址
+        'k-均值聚类算法': 'YOUR_URL_FOR_KMEANS', // 请替换为 k-均值聚类算法 对应的实际网址
+        岭回归: 'YOUR_URL_FOR_RIDGEREGRESSION', // 请替换为 岭回归 对应的实际网址
+        逻辑回归: 'YOUR_URL_FOR_LOGISTICREGRESSION', // 请替换为 逻辑回归 对应的实际网址
+        朴素贝叶斯: 'YOUR_URL_FOR_NAIVEBAYES', // 请替换为 朴素贝叶斯 对应的实际网址
+        受限波尔兹曼机: 'YOUR_URL_FOR_RBM', // 请替换为 受限波尔兹曼机 对应的实际网址
+        随机森林: 'YOUR_URL_FOR_RANDOMFOREST', // 请替换为 随机森林 对应的实际网址
+        梯度推进机:
+          'https://data.tpdc.ac.cn/analysisDetail?algorithmId=3cfbed55-df8a-4506-9ca7-a94b3e226982', // 请替换为 梯度推进机 对应的实际网址
+        支持向量机: 'YOUR_URL_FOR_SVM', // 请替换为 支持向量机 对应的实际网址
+        主成分分析: 'YOUR_URL_FOR_PCA', // 请替换为 主成分分析 对应的实际网址
+        最邻近算法: 'YOUR_URL_FOR_KNN' // 请替换为 最邻近算法 对应的实际网址
+      }
+
+      // 获取所有具有相同name属性的radio按钮
+      const radioButtons = document.querySelectorAll(
+        'input[type="radio"][name="machine-learning-model"]'
+      )
+
+      // 为每个radio按钮添加事件监听器
+      radioButtons.forEach((radio) => {
+        radio.addEventListener('change', function () {
+          // 当radio按钮被选中时
+          if (this.checked) {
+            const modelId = this.id // 获取被选中radio按钮的id
+            const urlToOpen = modelUrls[modelId] // 从预设的网址对象中找到对应的URL
+
+            if (
+              urlToOpen &&
+              urlToOpen !== `YOUR_URL_FOR_${modelId.toUpperCase().replace(/-/g, '')}`
+            ) {
+              // 确保URL已定义且不是占位符
+              // 在新标签页中打开网址
+              window.open(urlToOpen, '_blank')
+            } else if (urlToOpen) {
+              // 如果URL仍然是占位符，可以在控制台提示用户修改
+              console.warn(`请为模型 "${modelId}" 设置一个有效的网址，当前为占位符: ${urlToOpen}`)
+              alert(`请为模型 "${modelId}" 在代码中设置一个有效的预设网址！`)
+            } else {
+              console.warn(`没有为模型ID "${modelId}" 定义URL。`)
+            }
+          }
+        })
+      })
+      // 预设每个模型ID对应的网址
+
+      //人口预测分析
+
+      // 全局变量 (在此声明以提高代码清晰度并避免意外的全局作用域污染)
+
+      let csvFile = null
+
+      // --- 文件加载函数 ---
+      function loadCSVFile() {
+        const fileInput = document.getElementById('csvFile')
+        const file = fileInput.files[0]
+        if (file) {
+          csvFile = file
+          console.log('CSV 文件已选择:', file.name)
+          const visualizePredictionBtn = document.getElementById('visualizePredictionBtn')
+          if (visualizePredictionBtn) {
+            visualizePredictionBtn.classList.remove('inactive')
+            visualizePredictionBtn.disabled = false // 启用按钮
+          }
+        } else {
+          alert('请选择预测数据 (CSV) 文件')
+          csvFile = null // 如果未选择文件则重置
+          const visualizePredictionBtn = document.getElementById('visualizePredictionBtn')
+          if (visualizePredictionBtn) {
+            visualizePredictionBtn.classList.add('inactive')
+            visualizePredictionBtn.disabled = true
+          }
+        }
+      }
+
+      function loadShapefiles() {
+        const fileInput = document.getElementById('shpFiles')
+        const files = fileInput.files // 这是一个 FileList 对象
+        if (files.length > 0) {
+          shpFilesData = Array.from(files) // 将 FileList 转换为数组
+          console.log(
+            'SHP 及相关文件已选择:',
+            shpFilesData.map((f) => f.name)
+          )
+          checkGeoDataReady()
+        } else {
+          alert('请选择泸定地区地理区块 SHP 文件 (及其相关文件 .dbf, .shx 等)')
+          shpFilesData = []
+          checkGeoDataReady() // 重新检查以在必要时禁用按钮
+        }
+      }
+
+      function loadPopulationData() {
+        const fileInput = document.getElementById('populationFile')
+        const file = fileInput.files[0]
+        if (file) {
+          populationFile = file
+          console.log('人口数据 (TIFF) 文件已选择:', file.name)
+          checkGeoDataReady()
+        } else {
+          alert('请选择泸定地区人口数据 (TIFF) 文件')
+          populationFile = null
+          checkGeoDataReady() // 重新检查以在必要时禁用按钮
+        }
+      }
+
+      function loadLudingBuildingsShpFile() {
+        const fileInput = document.getElementById('ludingBuildingsShp')
+        const files = fileInput.files
+        if (files.length > 0) {
+          ludingBuildingsShpFiles = Array.from(files) // 将 FileList 转换为数组
+          console.log(
+            '泸定地区建筑物 SHP 文件已选择:',
+            ludingBuildingsShpFiles.map((f) => f.name)
+          )
+        } else {
+          alert('请选择泸定地区建筑物 SHP 文件 (及其相关文件)')
+          ludingBuildingsShpFiles = []
+        }
+        // 可以在此处添加检查逻辑以启用/禁用主分析按钮
+      }
+
+      // --- 用于启用地理数据可视化按钮的辅助函数 ---
+      function checkGeoDataReady() {
+        const visualizeGeoDataBtn = document.getElementById('visualizeGeoDataBtn')
+        if (shpFilesData && shpFilesData.length > 0 && populationFile) {
+          if (visualizeGeoDataBtn) {
+            visualizeGeoDataBtn.classList.remove('inactive')
+            visualizeGeoDataBtn.disabled = false
+          }
+        } else {
+          if (visualizeGeoDataBtn) {
+            visualizeGeoDataBtn.classList.add('inactive')
+            visualizeGeoDataBtn.disabled = true
+          }
+        }
+      }
+
+      // --- 可视化函数 ---
+
+      // 可视化预测数据 (CSV)
+      async function visualizePrediction() {
+        if (!viewer) {
+          alert('Cesium Viewer 未初始化!')
+          return
+        }
+        const btn = document.getElementById('visualizePredictionBtn')
+
+        if (btn.classList.contains('active')) {
+          // 如果当前是激活状态，则隐藏
+          btn.classList.remove('active')
+          btn.textContent = '可视化预测'
+          if (predictionDataSource) {
+            viewer.dataSources.remove(predictionDataSource, true) // true 表示销毁数据源
+            predictionDataSource = null
+          }
+          return
+        }
+
+        // 如果未激活，则尝试显示
+        if (!csvFile) {
+          alert('请先选择CSV预测数据文件')
+          return
+        }
+
+        document.getElementById('loadingIndicator').style.display = 'block' // 显示加载提示
+        btn.disabled = true // 处理期间禁用按钮
+
+        try {
+          const reader = new FileReader()
+          reader.onload = async function (e) {
+            const contents = e.target.result
+            // 更可靠地按行分割，并过滤空行
+            const lines = contents.split(/[\r\n]+/).filter((line) => line.trim() !== '')
+
+            if (lines.length < 2) {
+              // 至少需要标题行和数据行
+              alert('CSV 文件为空或仅有标题行')
+              document.getElementById('loadingIndicator').style.display = 'none'
+              btn.disabled = false
+              return
+            }
+
+            const headers = lines[0].split(',').map((h) => h.trim().toLowerCase()) // 解析表头，并转为小写
+            // 查找 'fid' 或 'id' 列作为唯一标识
+            const fidIndex = headers.findIndex((h) => h.includes('fid') || h.includes('id'))
+            // 查找 'probability' 或 'prob' 列作为概率值
+            const probIndex = headers.findIndex(
+              (h) => h.includes('probability') || h.includes('prob')
+            )
+            // 尝试通过常见名称查找经纬度列
+            let lonIndex = headers.findIndex(
+              (h) => h === 'lon' || h === 'longitude' || h === '经度'
+            )
+            let latIndex = headers.findIndex((h) => h === 'lat' || h === 'latitude' || h === '纬度')
+
+            if (fidIndex === -1 || probIndex === -1) {
+              alert('CSV文件必须包含ID (fid/id) 和概率 (probability/prob) 列')
+              document.getElementById('loadingIndicator').style.display = 'none'
+              btn.disabled = false
+              return
+            }
+
+            const points = [] // 用于存储 GeoJSON Feature
+            for (let i = 1; i < lines.length; i++) {
+              // 从第二行开始遍历数据
+              const values = lines[i].split(',').map((v) => v.trim()) // 解析数据行
+              // 确保数据行长度足够
+              if (values.length <= Math.max(fidIndex, probIndex, lonIndex, latIndex)) continue
+
+              const fid = values[fidIndex]
+              const probability = parseFloat(values[probIndex])
+              let lon, lat
+
+              // 如果CSV中有明确的经纬度列，则使用它们
+              if (lonIndex !== -1 && latIndex !== -1 && values[lonIndex] && values[latIndex]) {
+                lon = parseFloat(values[lonIndex])
+                lat = parseFloat(values[latIndex])
+              } else {
+                // 后备方案：如果CSV没有经纬度，则在泸定县附近生成随机点（用于演示）
+                // 对于真实数据，这通常不是期望的行为，但保留了您原始的逻辑
+                console.warn(`行 ${i + 1}: 未找到经纬度数据，生成随机坐标。`)
+                lon = 102.23 + (Math.random() - 0.5) * 0.2 // 泸定县大致中心经度
+                lat = 29.91 + (Math.random() - 0.5) * 0.2 // 泸定县大致中心纬度
+              }
+              // 检查解析后的数字是否有效
+              if (isNaN(lon) || isNaN(lat) || isNaN(probability)) {
+                console.warn(
+                  `行 ${i + 1}: 无效数据 FID: ${fid}, Prob: ${values[probIndex]}, Lon: ${values[lonIndex]}, Lat: ${values[latIndex]}`
+                )
+                continue // 跳过此无效行
+              }
+
+              points.push({
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [lon, lat] },
+                properties: { fid: fid, probability: probability, lon: lon, lat: lat } // 将原始经纬度也存入属性
+              })
+            }
+
+            if (points.length === 0) {
+              // 如果没有解析出任何点
+              alert('未能从CSV文件中解析出任何有效的数据点。')
+              document.getElementById('loadingIndicator').style.display = 'none'
+              btn.disabled = false
+              return
+            }
+
+            const geojson = { type: 'FeatureCollection', features: points }
+
+            if (predictionDataSource) {
+              // 如果已存在旧的预测数据源，则移除
+              viewer.dataSources.remove(predictionDataSource, true)
+            }
+
+            // 加载新的 GeoJSON 数据源
+            predictionDataSource = await Cesium.GeoJsonDataSource.load(geojson)
+            const entities = predictionDataSource.entities.values
+            for (let entity of entities) {
+              // 遍历每个实体并设置样式
+              const probability = entity.properties.probability.getValue() // 获取概率属性
+              let color
+              if (probability > 0.7) color = Cesium.Color.RED
+              else if (probability > 0.4) color = Cesium.Color.ORANGE
+              else if (probability > 0.2) color = Cesium.Color.YELLOW
+              else color = Cesium.Color.GREEN
+
+              entity.point = new Cesium.PointGraphics({
+                color: color,
+                pixelSize: Math.max(5, probability * 15), // 确保最小尺寸，并根据概率调整大小
+                outlineColor: Cesium.Color.BLACK,
+                outlineWidth: 1
+              })
+              // 为实体添加描述信息，用于点击时显示
+              entity.description = `ID: ${entity.properties.fid.getValue()}<br>概率: ${probability.toFixed(3)}<br>坐标: ${entity.properties.lon.getValue().toFixed(4)}, ${entity.properties.lat.getValue().toFixed(4)}`
+            }
+
+            viewer.dataSources.add(predictionDataSource) // 将数据源添加到 Viewer
+            viewer.flyTo(predictionDataSource) // 视角飞到数据源范围
+
+            btn.classList.add('active')
+            btn.textContent = '隐藏预测'
+          }
+          reader.onerror = function () {
+            alert('读取CSV文件失败')
+          }
+          reader.readAsText(csvFile) // 开始读取文件内容
+        } catch (error) {
+          console.error('可视化预测数据失败:', error)
+          alert('可视化预测数据失败: ' + error.message)
+        } finally {
+          document.getElementById('loadingIndicator').style.display = 'none' // 隐藏加载提示
+          btn.disabled = false // 重新启用按钮
+        }
+      }
+
+      // 可视化地理数据 (SHP/TIFF 的占位符)
+      async function visualizeGeoData() {
+        if (!viewer) {
+          alert('Cesium Viewer 未初始化!')
+          return
+        }
+        const btn = document.getElementById('visualizeGeoDataBtn')
+
+        if (btn.classList.contains('active')) {
+          // 如果已激活，则隐藏
+          btn.classList.remove('active')
+          btn.textContent = '可视化地理数据'
+          if (geoDataSource) {
+            viewer.dataSources.remove(geoDataSource, true)
+            geoDataSource = null
+          }
+          return
+        }
+
+        // 如果未激活，则尝试显示
+        if (!shpFilesData || shpFilesData.length === 0 || !populationFile) {
+          alert('请先选择SHP地理文件和TIFF人口数据文件')
+          return
+        }
+
+        // 重要提示: 此函数不渲染实际的 SHP/TIFF 文件。
+        // 它显示一个泸定地区的硬编码示例多边形。
+        // 真正的客户端 SHP/TIFF 渲染非常复杂。
+        // 实际的 SHP/TIFF 文件预期由您的后端处理。
+        document.getElementById('loadingIndicator').style.display = 'block'
+        btn.disabled = true
+
+        try {
+          // 泸定地区示例硬编码多边形 GeoJSON
+          const ludingExampleGeoJson = {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Polygon',
+                  coordinates: [
+                    [
+                      // 注意多边形坐标是三维数组
+                      [102.0, 29.7],
+                      [102.4, 29.7],
+                      [102.4, 30.1],
+                      [102.0, 30.1],
+                      [102.0, 29.7]
+                    ]
+                  ]
+                },
+                properties: { name: '泸定县示例区域 (硬编码)' }
+              }
+            ]
+          }
+
+          if (geoDataSource) {
+            // 移除旧的地理数据源
+            viewer.dataSources.remove(geoDataSource, true)
+          }
+
+          // 加载示例 GeoJSON
+          geoDataSource = await Cesium.GeoJsonDataSource.load(ludingExampleGeoJson, {
+            stroke: Cesium.Color.BLUE,
+            fill: Cesium.Color.BLUE.withAlpha(0.3), // 填充色带透明度
+            strokeWidth: 3
+          })
+          viewer.dataSources.add(geoDataSource)
+          viewer.flyTo(geoDataSource) // 视角飞到数据范围
+
+          btn.classList.add('active')
+          btn.textContent = '隐藏地理数据'
+        } catch (error) {
+          console.error('可视化地理数据 (示例) 失败:', error)
+          alert('可视化地理数据 (示例) 失败: ' + error.message)
+        } finally {
+          document.getElementById('loadingIndicator').style.display = 'none'
+          btn.disabled = false
+        }
+      }
+
+      // 切换分析结果图层显示/隐藏
+      function toggleAnalysisResult() {
+        if (!viewer) {
+          alert('Cesium Viewer 未初始化!')
+          return
+        }
+        const btn = document.getElementById('toggleAnalysisResultBtn')
+        const legendDiv = document.getElementById('rescuePriorityLegend') // 获取图例的 div
+
+        const isActive = btn.classList.contains('active')
+
+        if (isActive) {
+          // 如果当前是激活状态（结果正在显示），则隐藏
+          btn.classList.remove('active')
+          btn.classList.add('inactive') // 可选: 添加表示“非激活”的类
+          btn.textContent = '显示分析结果' // 更新按钮文本
+
+          if (analysisDataSource) {
+            analysisDataSource.show = false // 隐藏 Cesium 中的数据源
+          }
+          if (legendDiv) {
+            legendDiv.style.display = 'none' // 隐藏图例 div
+          }
+        } else {
+          // 当前为非激活状态，尝试显示结果
+          // 仅当 analysisDataSource 存在且包含数据时，才进行显示操作
+          if (analysisDataSource && analysisDataSource.entities.values.length > 0) {
+            analysisDataSource.show = true // 显示数据源
+            // 可选：viewer.flyTo(analysisDataSource); // 重新定位到数据范围
+            viewer
+              .flyTo(analysisDataSource)
+              .catch((error) => console.warn('视角移动到 analysisDataSource 失败:', error)) // flyTo 可能因数据源为空或无效而失败
+
+            btn.classList.remove('inactive')
+            btn.classList.add('active')
+            btn.textContent = '隐藏分析结果' // 更新按钮文本
+
+            if (legendDiv) {
+              // 确保图例是最新的（如果之前已生成）
+              // 如果 priority_levels 可能已更改，或之前未成功生成，可能需要再次调用 generateLegends
+              // 为简单起见，我们假设它已由 analyzeAndVisualize 正确生成。
+              legendDiv.style.display = 'block' // 显示图例 div
+            }
+          } else {
+            // 如果 analysisDataSource 不存在或为空，提示用户
+            alert('没有可显示的分析结果。请先运行“救援优先级分析”。')
+            // 确保按钮和图例处于一致的“隐藏”状态
+            btn.classList.remove('active')
+            btn.classList.add('inactive')
+            btn.textContent = '显示分析结果'
+            if (legendDiv) {
+              legendDiv.style.display = 'none'
+            }
+          }
+        }
+      }
+
+      // --- 主要分析函数 ---
+      async function analyzeAndVisualize() {
+        if (!viewer) {
+          alert('Cesium Viewer 未初始化!')
+          return
+        }
+        document.getElementById('loadingIndicator').style.display = 'block' // 显示加载指示器
+        const analyzeBtn = document.getElementById('analyzeAndVisualizeBtn') // 假设存在此分析按钮
+        if (analyzeBtn) analyzeBtn.disabled = true // 分析期间禁用按钮
+
+        try {
+          // 检查所有必需的文件是否已选择
+          if (
+            !csvFile ||
+            !shpFilesData ||
+            shpFilesData.length === 0 ||
+            !populationFile ||
+            !ludingBuildingsShpFiles ||
+            ludingBuildingsShpFiles.length === 0
+          ) {
+            alert(
+              '请选择所有必需的文件: 预测CSV, 区域SHP(含.dbf等), 人口TIFF, 和建筑物SHP(含.dbf等)。'
+            )
+            throw new Error('文件不完整') // 抛出错误以进入 catch 块
+          }
+
+          const formData = new FormData() // 创建 FormData 对象以发送文件
+          formData.append('csvFile', csvFile)
+          shpFilesData.forEach((file) => formData.append('shpFiles', file)) // 添加所有 shp 相关文件
+          formData.append('populationFile', populationFile)
+          ludingBuildingsShpFiles.forEach((file) => formData.append('ludingBuildingsShp', file)) // 添加所有建筑物 shp 相关文件
+
+          // 发送 POST 请求到后端进行分析
+          const response = await fetch('http://127.0.0.1:5000/analyze_rescue_priority', {
+            method: 'POST',
+            body: formData
+          })
+
+          if (!response.ok) {
+            // 如果服务器响应不成功
+            let errorData
+            try {
+              errorData = await response.json() // 尝试解析 JSON 格式的错误信息
+            } catch (e) {
+              // 如果解析失败，则获取文本格式的错误信息
+              errorData = { error: '无法解析服务器错误响应: ' + (await response.text()) }
+            }
+            throw new Error(`服务器错误 (${response.status}): ${errorData.error || '未知错误'}`)
+          }
+
+          const data = await response.json() // 解析成功的 JSON 响应
+
+          if (data.error) {
+            // 如果后端返回了业务错误
+            throw new Error(`分析错误: ${data.error}`)
+          }
+
+          // 检查返回的救援数据是否有效
+          if (
+            !data.rescue_data ||
+            !data.rescue_data.features ||
+            data.rescue_data.features.length === 0
+          ) {
+            alert('分析成功，但未返回有效的救援区域数据。')
+            // 如果有优先级级别数据，仍然尝试生成图例，但可能隐藏它
+            if (data.priority_levels && Array.isArray(data.priority_levels)) {
+              generateLegends(data.priority_levels)
+              const legendDiv = document.getElementById('rescuePriorityLegend')
+              if (legendDiv) legendDiv.style.display = 'none' // 如果没有数据显示，则隐藏图例
+            } else {
+              generateLegends(null) // 清空/隐藏图例
+            }
+          } else {
+            // 可视化主要的分析结果
+            visualizeRescuePriority(data.rescue_data) // 此函数会设置全局的 analysisDataSource
+
+            // 更新切换按钮的状态
+            const resultBtn = document.getElementById('toggleAnalysisResultBtn')
+            if (resultBtn) {
+              resultBtn.classList.remove('inactive')
+              resultBtn.classList.add('active')
+              resultBtn.textContent = '隐藏分析结果'
+              resultBtn.disabled = false // 使其可点击
+            }
+            // 生成图例
+            if (data.priority_levels && Array.isArray(data.priority_levels)) {
+              generateLegends(data.priority_levels) // 这会显示图例
+            } else {
+              generateLegends(null) // 如果没有优先级级别数据，则隐藏/清空图例
+              console.warn(
+                "服务器未返回有效的 'priority_levels' 数据，图例可能无法正确生成或将为空。"
+              )
+            }
+          }
+        } catch (error) {
+          // 捕获过程中的任何错误
+          console.error('分析或可视化过程中发生错误:', error)
+          alert(`处理失败: ${error.message}`)
+          // 确保切换按钮在出错时处于合理状态
+          const resultBtn = document.getElementById('toggleAnalysisResultBtn')
+          if (resultBtn) {
+            resultBtn.classList.add('inactive')
+            resultBtn.classList.remove('active')
+            resultBtn.textContent = '显示分析结果'
+            // resultBtn.disabled = true; // 或者保持启用，以允许尝试显示旧数据（如果存在）
+          }
+          generateLegends(null) // 出错时隐藏图例
+        } finally {
+          // 无论成功或失败，最后都执行
+          document.getElementById('loadingIndicator').style.display = 'none' // 隐藏加载指示器
+          if (analyzeBtn) analyzeBtn.disabled = false // 重新启用分析按钮
+        }
+      }
+
+      // 可视化救援优先级数据
+      function visualizeRescuePriority(rescueGeoJsonData) {
+        if (!viewer) {
+          console.warn('Viewer 未准备好，无法执行 visualizeRescuePriority')
+          return
+        }
+        console.log('收到的救援GeoJSON数据:', rescueGeoJsonData)
+
+        if (rescueGeoJsonData && rescueGeoJsonData.features) {
+          // 确保数据有效
+          // 移除之前的分析图层
+          if (analysisDataSource) {
+            viewer.dataSources.remove(analysisDataSource, true) // true 表示销毁
+            analysisDataSource = null
+          }
+
+          // 加载从后端获取的 GeoJSON 数据
+          Cesium.GeoJsonDataSource.load(rescueGeoJsonData, {
+            // 通用默认样式，如果实体属性中存在，则会被覆盖
+            stroke: Cesium.Color.BLACK.withAlpha(0.8), // 边框颜色和透明度
+            fill: Cesium.Color.GRAY.withAlpha(0.5), // 默认填充色
+            strokeWidth: 1, // 边框宽度
+            clampToGround: true // 将几何体固定到地面
+          })
+            .then((dataSource) => {
+              analysisDataSource = dataSource // 赋值给全局变量
+              const entities = dataSource.entities.values // 获取所有实体
+
+              if (entities.length === 0) {
+                console.warn('GeoJSON已加载，但未包含任何实体 (features)。')
+                // 即使为空，也可能需要添加到viewer，以便有一个空的数据源
+                // 或者作为错误/警告条件处理。
+              }
+
+              for (let entity of entities) {
+                // 遍历每个实体进行样式设置
+                let color
+                let priority = 'N/A' // 如果没有优先级属性，则为默认值
+
+                if (entity.properties && entity.properties.priority) {
+                  // getValue() 对于获取 Cesium 属性值至关重要
+                  priority = entity.properties.priority.getValue()
+                  // 确保 priority 被视为数字进行比较
+                  switch (parseInt(priority)) {
+                    case 1:
+                      color = Cesium.Color.FIREBRICK.withAlpha(0.7)
+                      break // 最高优先级
+                    case 2:
+                      color = Cesium.Color.ORANGE.withAlpha(0.7)
+                      break // 橙色，较高
+                    case 3:
+                      color = Cesium.Color.GOLD.withAlpha(0.7)
+                      break // 金色 (替代之前的青色，以获得更好的视觉梯度)
+                    case 4:
+                      color = Cesium.Color.FORESTGREEN.withAlpha(0.7)
+                      break // 森林绿，较低
+                    default:
+                      color = Cesium.Color.BLUE.withAlpha(0.5)
+                      break // 针对未预期的优先级值
+                  }
+                } else {
+                  console.warn(
+                    "实体缺少 'priority' 属性，将使用默认颜色。FID:",
+                    entity.id || entity.properties.fid?.getValue()
+                  )
+                  color = Cesium.Color.SLATEGRAY.withAlpha(0.6) // 无优先级属性的实体使用默认颜色
+                }
+
+                // 根据几何类型设置样式
+                if (entity.polygon) {
+                  // 如果是多边形
+                  entity.polygon.material = color // 设置填充材质（颜色）
+                  entity.polygon.outlineColor = Cesium.Color.BLACK // 设置边框颜色
+                  entity.polygon.outlineWidth = 1 // 确保边框可见
+                } else if (entity.polyline) {
+                  // 如果是线
+                  entity.polyline.material = color
+                  entity.polyline.width = 3
+                } else if (entity.point) {
+                  // 如果是点
+                  entity.point.color = color
+                  entity.point.pixelSize = 10
+                  entity.point.outlineColor = Cesium.Color.BLACK
+                  entity.point.outlineWidth = 1
+                }
+                // 为实体添加描述信息，用于点击弹出窗口显示
+                let description = '分析结果:<br>'
+                if (entity.properties) {
+                  const props = entity.properties.getValue(Cesium.JulianDate.now()) // 获取所有属性
+                  for (const key in props) {
+                    // 遍历属性并添加到描述中
+                    description += `${key}: ${props[key]}<br>`
+                  }
+                }
+                entity.description = description
+              }
+              viewer.dataSources.add(analysisDataSource) // 将配置好的数据源添加到 Viewer
+              // 视角飞到数据源范围，如果数据源为空或无效，flyTo 可能会失败
+              viewer
+                .flyTo(analysisDataSource)
+                .catch((error) =>
+                  console.warn('视角移动到 analysisDataSource 失败 (可能为空或无效):', error)
+                )
+            })
+            .catch((error) => {
+              // GeoJSON 加载失败处理
+              console.error('加载救援优先等级 GeoJSON 数据失败:', error)
+              alert('加载救援优先等级数据失败: ' + error.message)
+            })
+        } else {
+          // 如果传入的 GeoJSON 数据无效或为空
+          console.warn('无法可视化救援数据：GeoJSON 数据无效或为空。')
+          // 如果存在旧数据，确保清除或按钮反映无数据状态
+          if (analysisDataSource) {
+            viewer.dataSources.remove(analysisDataSource, true)
+            analysisDataSource = null
+          }
+          // 可能需要更新UI以反映未显示任何数据
+          const resultBtn = document.getElementById('toggleAnalysisResultBtn')
+          if (resultBtn) {
+            resultBtn.classList.add('inactive')
+            resultBtn.classList.remove('active')
+            resultBtn.textContent = '显示分析结果'
+            resultBtn.disabled = true // 如果无数据则禁用
+          }
+          document.getElementById('rescuePriorityLegend').style.display = 'none' // 隐藏图例
+        }
+      }
+
+      // 生成图例
+      function generateLegends(priorityLevels) {
+        const legendDiv = document.getElementById('rescuePriorityLegend') // 获取图例的 DOM 元素
+        if (!legendDiv) {
+          console.error("图例 div 'rescuePriorityLegend' 未在 HTML 中找到!")
+          return
+        }
+
+        legendDiv.innerHTML = '' // 清空之前的图例项
+
+        // 如果优先级数据无效或为空，则隐藏图例
+        if (!priorityLevels || !Array.isArray(priorityLevels) || priorityLevels.length === 0) {
+          legendDiv.style.display = 'none'
+          console.warn('无法生成图例：优先级数据为空或无效。图例已隐藏。')
+          return
+        }
+
+        // 设置图例标题
+        legendDiv.innerHTML =
+          '<h4 style="margin-top:0; margin-bottom:8px; text-align:center; font-weight:bold;">泸定地区救援优先等级</h4>'
+        // 按等级 level 字段对 priorityLevels 数组进行排序，确保图例顺序一致
+        priorityLevels.sort((a, b) => parseInt(a.level) - parseInt(b.level))
+
+        // 遍历优先级数据，为每个等级创建图例项
+        priorityLevels.forEach((levelInfo) => {
+          const legendItem = document.createElement('div') // 创建图例项容器
+          // 图例项样式
+          legendItem.style.display = 'flex'
+          legendItem.style.alignItems = 'center'
+          legendItem.style.marginBottom = '4px' // 图例项之间的间距
+
+          const colorDiv = document.createElement('div') // 创建颜色块
+          // 颜色块样式
+          colorDiv.style.width = '18px'
+          colorDiv.style.height = '18px'
+          colorDiv.style.marginRight = '7px' // 颜色块与文字之间的间距
+          colorDiv.style.border = '1px solid #555' // 给颜色块添加边框
+
+          let backgroundColorCss
+          // 根据优先级等级设置颜色块的背景色 (确保颜色与 visualizeRescuePriority 函数中 Cesium 实体的颜色视觉上匹配)
+          switch (parseInt(levelInfo.level)) {
+            case 1:
+              backgroundColorCss = 'firebrick'
+              break // 对应 Cesium.Color.FIREBRICK
+            case 2:
+              backgroundColorCss = 'orange'
+              break // 对应 Cesium.Color.ORANGE
+            case 3:
+              backgroundColorCss = 'gold'
+              break // 对应 Cesium.Color.GOLD (之前是 CYAN)
+            case 4:
+              backgroundColorCss = 'forestgreen'
+              break // 对应 Cesium.Color.FORESTGREEN
+            default:
+              backgroundColorCss = 'blue'
+              break // 对应 Cesium.Color.BLUE (或其他默认颜色)
+          }
+          colorDiv.style.backgroundColor = backgroundColorCss
+
+          const textSpan = document.createElement('span') // 创建文本标签
+          // 设置图例文本，优先使用服务器返回的 label，否则使用默认格式
+          textSpan.textContent = levelInfo.label || `等级 ${levelInfo.level}`
+          textSpan.style.fontSize = '12px' // 图例使用稍小的字体
+
+          // 将颜色块和文本添加到图例项
+          legendItem.appendChild(colorDiv)
+          legendItem.appendChild(textSpan)
+          // 将图例项添加到图例 div
+          legendDiv.appendChild(legendItem)
+        })
+
+        legendDiv.style.display = 'block' // 完成图例内容填充后，确保图例 DIV 是可见的
+      }
+
+      // --- 事件监听器设置 ---
+      function initializeButtonStates() {
+        // 获取所有相关按钮
+        const visualizePredictionBtn = document.getElementById('visualizePredictionBtn')
+        const visualizeGeoDataBtn = document.getElementById('visualizeGeoDataBtn')
+        const toggleAnalysisResultBtn = document.getElementById('toggleAnalysisResultBtn')
+        const analyzeAndVisualizeBtn = document.getElementById('analyzeAndVisualizeBtn') // 假设此分析按钮存在
+
+        // 初始化预测按钮
+        if (visualizePredictionBtn) {
+          visualizePredictionBtn.classList.add('inactive')
+          visualizePredictionBtn.disabled = true // 初始禁用
+          visualizePredictionBtn.textContent = '可视化预测'
+        }
+
+        // 初始化地理数据按钮
+        if (visualizeGeoDataBtn) {
+          visualizeGeoDataBtn.classList.add('inactive')
+          visualizeGeoDataBtn.disabled = true // 初始禁用
+          visualizeGeoDataBtn.textContent = '可视化地理数据'
+        }
+
+        // 初始化切换分析结果按钮
+        if (toggleAnalysisResultBtn) {
+          toggleAnalysisResultBtn.classList.add('inactive')
+          // toggleAnalysisResultBtn.disabled = true; // 如果希望在首次分析前禁用，则取消此行注释
+          toggleAnalysisResultBtn.textContent = '显示分析结果'
+        }
+
+        // 初始化分析按钮 (如果存在)
+        if (analyzeAndVisualizeBtn) {
+          // analyzeAndVisualizeBtn.disabled = true; // 初始禁用，直到所有文件都可能已加载
+          // 您可能需要添加更复杂的逻辑，以仅在选择了所有必需文件时启用此按钮。
+        }
+
+        // 初始隐藏图例
+        const legendDiv = document.getElementById('rescuePriorityLegend')
+        if (legendDiv) {
+          legendDiv.style.display = 'none'
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // 重要提示: 在此处初始化 Cesium Viewer 或确保在此之前已初始化。
+        // 例如:
+
+        initializeButtonStates() // 设置按钮和图例的初始状态
+
+        // 文件输入框的 'change' 事件监听器
+        document.getElementById('csvFile').addEventListener('change', loadCSVFile)
+        document.getElementById('shpFiles').addEventListener('change', loadShapefiles)
+        document.getElementById('populationFile').addEventListener('change', loadPopulationData)
+        document
+          .getElementById('ludingBuildingsShp')
+          .addEventListener('change', loadLudingBuildingsShpFile)
+
+        // 用于触发隐藏文件输入框的按钮的 'click' 事件监听器
+        document
+          .getElementById('loadPredictionFileButton')
+          .addEventListener('click', () => document.getElementById('csvFile').click())
+        document
+          .getElementById('loadPopulationFileButton')
+          .addEventListener('click', () => document.getElementById('populationFile').click())
+        document
+          .getElementById('loadBuildingsFileButton')
+          .addEventListener('click', () => document.getElementById('ludingBuildingsShp').click())
+        // 假设您有一个按钮用于触发 shpFiles 文件输入框：
+        const loadShpFilesButton = document.getElementById('loadShpFilesButton') // 请在 HTML 中创建此按钮
+        if (loadShpFilesButton) {
+          loadShpFilesButton.addEventListener('click', () =>
+            document.getElementById('shpFiles').click()
+          )
+        }
+
+        // 可视化和分析按钮的 'click' 事件监听器
+        const visualizePredictionBtn = document.getElementById('visualizePredictionBtn')
+        if (visualizePredictionBtn)
+          visualizePredictionBtn.addEventListener('click', visualizePrediction)
+
+        const visualizeGeoDataBtn = document.getElementById('visualizeGeoDataBtn')
+        if (visualizeGeoDataBtn) visualizeGeoDataBtn.addEventListener('click', visualizeGeoData)
+
+        const toggleAnalysisResultBtn = document.getElementById('toggleAnalysisResultBtn')
+        if (toggleAnalysisResultBtn)
+          toggleAnalysisResultBtn.addEventListener('click', toggleAnalysisResult)
+
+        // 为主要分析按钮添加监听器 (假设其 ID 为 'analyzeAndVisualizeBtn')
+        const analyzeBtn = document.getElementById('analyzeAndVisualizeBtn')
+        if (analyzeBtn) {
+          analyzeBtn.addEventListener('click', analyzeAndVisualize)
+        } else {
+          console.warn("分析按钮 'analyzeAndVisualizeBtn' 未找到。")
+        }
+      })
+      // 人口，预测双重分析 (修改后 - 结合后端逻辑)
+
+      //ANN
+      document.addEventListener('DOMContentLoaded', function () {
+        const annModelRadio = document.getElementById('annModelRadio')
+        const annModelLabel = document.querySelector('label[for="annModelRadio"]')
+        const annModelFile = document.getElementById('annModelFile')
+        const infoDiv = document.getElementById('info')
+        const resultDiv = document.getElementById('result')
+
+        annModelLabel.addEventListener('click', (event) => {
+          event.preventDefault()
+          annModelRadio.checked = true
+          annModelFile.click()
+        })
+
+        annModelFile.addEventListener('change', handleFileSelect)
+
+        async function handleFileSelect(event) {
+          const file = event.target.files[0]
+          if (!file) {
+            return
+          }
+
+          //infoDiv.textContent = '正在处理文件...'; // Remove this line
+          try {
+            const csvText = await file.text()
+            const predictionResults = await sendCsvToBackend(csvText)
+            //infoDiv.textContent = '预测完成！'; // Remove this line
+            downloadResults(predictionResults) // Directly download
+          } catch (error) {
+            console.error('发生错误:', error)
+            infoDiv.textContent = `发生错误: ${error.message || error}`
+          }
+        }
+
+        async function sendCsvToBackend(csvText) {
+          const response = await fetch('http://127.0.0.1:5000/api/predict_landslide', {
+            // 使用完整 URL
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/csv'
+            },
+            body: csvText
+          })
+
+          if (!response.ok) {
+            const message = await response.text()
+            throw new Error(`HTTP error ${response.status}: ${message}`)
+          }
+
+          return await response.json()
+        }
+
+        function downloadResults(results) {
+          if (!results || results.length === 0) {
+            //resultDiv.textContent = '没有预测结果可供下载。'; // Remove this line
+            return
+          }
+
+          const csvContent = convertToCsv(results)
+          const blob = new Blob([csvContent], {
+            type: 'text/csv'
+          })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'landslide_predictions.csv'
+          // No text content for the link
+          document.body.appendChild(a)
+          a.click() // Programmatically trigger the click
+          document.body.removeChild(a) // Clean up the link
+          URL.revokeObjectURL(url) // Clean up the URL
+        }
+
+        function convertToCsv(results) {
+          const header = ['FID', 'predictions']
+          const rows = results.map((row) => [row.FID, row.predictions.toFixed(4)])
+          return [header, ...rows].map((row) => row.join(',')).join('\n')
+        }
+      })
+      //ANN
+      //RNN
+      document.addEventListener('DOMContentLoaded', function () {
+        const rnnModelRadio = document.getElementById('rnnModelRadio')
+        const rnnModelLabel = document.querySelector('label[for="rnnModelRadio"]')
+        const csvFileInput = document.getElementById('csvFileInput')
+        const rnnInfoDiv = document.getElementById('rnn-info')
+        const rnnResultDiv = document.getElementById('rnn-result')
+        const errorMessageDiv = document.getElementById('error-message')
+
+        rnnModelLabel.addEventListener('click', (event) => {
+          event.preventDefault() // 阻止 label 的默认行为
+          rnnModelRadio.checked = true
+          csvFileInput.click()
+        })
+
+        csvFileInput.addEventListener('change', handleFileSelect)
+
+        async function handleFileSelect(event) {
+          event.preventDefault() // 阻止表单提交导致的页面刷新 (关键！)
+          const file = event.target.files[0]
+          if (!file) return
+
+          rnnInfoDiv.textContent = '正在使用 RNN 模型处理数据...'
+          errorMessageDiv.textContent = '' // 清空之前的错误消息
+
+          try {
+            const csvText = await file.text()
+            const predictionResults = await sendCsvToBackend(csvText)
+            rnnInfoDiv.textContent = 'RNN 预测完成！'
+            displayAndDownloadResults(predictionResults)
+          } catch (error) {
+            console.error('发生错误:', error)
+            rnnInfoDiv.textContent = 'RNN 预测出错！'
+            errorMessageDiv.textContent = `错误: ${error.message || error}`
+          }
+        }
+
+        async function sendCsvToBackend(csvText) {
+          const response = await fetch('http://127.0.0.1:5000/api/rnn_predict', {
+            // 使用完整 URL
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/csv'
+            },
+            body: csvText
+          })
+
+          if (!response.ok) {
+            const message = await response.text()
+            throw new Error(`HTTP error ${response.status}: ${message}`)
+          }
+
+          return await response.json()
+        }
+
+        function displayAndDownloadResults(results) {
+          if (!results || results.length === 0) {
+            rnnResultDiv.textContent = '没有 RNN 预测结果可供下载。'
+            return
+          }
+
+          const csvContent = convertToCsv(results)
+          const blob = new Blob([csvContent], {
+            type: 'text/csv'
+          })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'rnn_landslide_predictions.csv'
+          a.textContent = '点击下载 RNN 预测结果 (CSV)'
+          rnnResultDiv.appendChild(a)
+
+          // 可选：你也可以在页面上显示原始结果
+          // rnnResultDiv.innerHTML += '<br><br><b>预测结果：</b><pre>' + JSON.stringify(results, null, 2) + '</pre>';
+        }
+
+        function convertToCsv(results) {
+          const header = ['NewID', 'Probability'] // Adjust header as needed
+          const rows = results.map((row) => [row.NewID, row.Probability.toFixed(4)]) // Adjust property names
+          return [header, ...rows].map((row) => row.join(',')).join('\n')
+        }
+      })
+      //RNN
+
+      //预处理
+      document.getElementById('selectFileButton').addEventListener('click', function () {
+        document.getElementById('fileInput').click()
+      })
+
+      document.getElementById('fileInput').addEventListener('change', function () {
+        const file = this.files[0]
+        if (file) {
+          uploadFile(file)
+        }
+      })
+
+      function uploadFile(file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        fetch('http://localhost:5000/upload', {
+          method: 'POST',
+          body: formData
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('网络响应不正常')
+            }
+            return response.json()
+          })
+          .then((data) => {
+            document.getElementById('message').textContent = data.message
+            // 在这里，您可以根据后端返回的数据更新页面上的其他元素
+          })
+          .catch((error) => {
+            console.error('Error:', error)
+            document.getElementById('message').textContent = '上传失败，请重试。'
+          })
+      }
+      //预处理
+
+      //cnn yuce
+      let shpFile, shxFile, dbfFile, prjFile
+      let fileQueue = ['csv', 'shp', 'shx', 'dbf', 'prj']
+
+      function handleFileSelection(file, type) {
+        switch (type) {
+          case 'csv':
+            csvFile = file
+            break
+          case 'shp':
+            shpFile = file
+            break
+          case 'shx':
+            shxFile = file
+            break
+          case 'dbf':
+            dbfFile = file
+            break
+          case 'prj':
+            prjFile = file
+            break
+        }
+        if (csvFile && shpFile && shxFile && dbfFile && prjFile) {
+          visualizeData()
+        } else {
+          fileQueue.shift() // 移除已选择的文件类型
+        }
+      }
+
+      function openFileInput() {
+        if (fileQueue.length > 0) {
+          const type = fileQueue[0]
+          const input = document.createElement('input')
+          input.type = 'file'
+          input.accept = `.${type}`
+          input.onchange = function (event) {
+            const file = event.target.files[0]
+            handleFileSelection(file, type)
+            if (fileQueue.length > 0) {
+              openFileInput() // 打开下一个文件选择对话框
+            }
+          }
+          input.click()
+        }
+      }
+
+      function getColor(probability) {
+        const hue = (1 - probability) * 240
+        return Cesium.Color.fromHsl(hue / 360, 1.0, 0.5, 0.7)
+      }
+
+      function generateLegend() {
+        // 修改这里的 ID
+        const legendDiv = document.getElementById('cnnPredictionLegend') // <--- 修改 ID
+        // 确保 HTML 中有 <div id="cnnPredictionLegend"></div>
+        if (!legendDiv) {
+          console.error('错误：找不到图例的 div 元素 "cnnPredictionLegend"。请在 HTML 中添加它。')
+          return
+        }
+        legendDiv.innerHTML = '' // 清空之前的图例项
+        legendDiv.style.display = 'block' // 确保图例是可见的
+
+        // 创建图例标题
+        const title = document.createElement('h4')
+        title.innerText = '预测概率图例' // 或者其他合适的标题
+        legendDiv.appendChild(title)
+
+        for (let i = 0; i < 10; i++) {
+          const probability = i / 9 // 生成 0 到 1 之间的概率值
+          const color = getColor(probability) // getColor 函数保持不变
+          const legendItem = document.createElement('div')
+          legendItem.style.marginBottom = '5px' // 增加一些间距
+
+          // 创建颜色块
+          const colorBox = document.createElement('span')
+          colorBox.style.display = 'inline-block'
+          colorBox.style.width = '20px'
+          colorBox.style.height = '20px'
+          colorBox.style.marginRight = '8px'
+          colorBox.style.border = '1px solid #ccc' // 可选：给颜色块加个边框
+          colorBox.style.backgroundColor = `rgb(${color.red * 255}, ${color.green * 255}, ${color.blue * 255})`
+
+          // 创建文本标签
+          const textLabel = document.createElement('span')
+          textLabel.innerText = probability.toFixed(2)
+
+          legendItem.appendChild(colorBox)
+          legendItem.appendChild(textLabel)
+          legendDiv.appendChild(legendItem)
+        }
+      }
+
+      function visualizeData() {
+        if (csvFile && shpFile && shxFile && dbfFile && prjFile) {
+          const formData = new FormData()
+          formData.append('csvFile', csvFile)
+          formData.append('shpFile', shpFile)
+          formData.append('shxFile', shxFile)
+          formData.append('dbfFile', dbfFile)
+          formData.append('prjFile', prjFile)
+          fetch('http://127.0.0.1:5000/process_and_visualize', { method: 'POST', body: formData })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                alert(`错误: ${data.error}`)
+                return
+              }
+              // 使用已经创建的 viewer 实例
+              data.geojson.features.forEach((feature, index) => {
+                const polygon = feature.geometry.coordinates[0].map((coord) =>
+                  Cesium.Cartesian3.fromDegrees(coord[0], coord[1])
+                )
+                const probability = data.predictions[index].probability
+                const color = getColor(probability)
+                viewer.entities.add({
+                  polygon: { hierarchy: polygon, material: color, outline: false }
+                })
+              })
+              generateLegend()
+
+              // --- 处理并下载 CSV 数据 ---
+              if (data.prediction_csv) {
+                const csvData = data.prediction_csv
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.setAttribute('href', url)
+                link.setAttribute('download', 'predictions.csv')
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+                alert('预测结果已可视化，包含 FID 和 Probability 的 CSV 文件已开始下载。')
+              } else {
+                alert('预测结果已可视化，但未能生成预测 CSV 文件。')
+              }
+              // --- 处理 CSV 数据结束 ---
+            })
+            .catch((error) => console.error('Error:', error))
+        } else {
+          alert('请选择所有文件')
+        }
+      }
+
+      document.getElementById('卷积神经网络').addEventListener('change', openFileInput)
+      //cnn yuce
+
+      // 打开选择的接口
+      function openSelectedInterface() {
+        const select = document.getElementById('interface-select')
+        const url = select.value
+        if (url) {
+          window.open(url, '_blank')
+        }
+      }
+
+      // 加载 GeoJSON 数据
+      async function selectGeoJson() {
+        console.log('selectGeoJson called')
+        try {
+          const [fileHandle] = await window.showOpenFilePicker({
+            types: [
+              {
+                description: 'GeoJSON files',
+                accept: {
+                  'application/json': ['.json', '.geojson']
+                }
+              }
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false
+          })
+
+          if (fileHandle) {
+            // 读取文件内容并保存
+            selectedJsonFile = await fileHandle.getFile()
+            alert('文件已选择：' + selectedJsonFile.name)
+          } else {
+            console.error('未选择文件')
+          }
+
+          if (fileHandle) {
+            const file = await fileHandle.getFile()
+            const url = URL.createObjectURL(file)
+            loadGeoJson(url)
+          } else {
+            console.error('未选择文件')
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            console.error('选择文件失败', error)
+          }
+        }
+      }
+
+      async function loadGeoJson(url) {
+        try {
+          let geojson = await Cesium.GeoJsonDataSource.load(url, {
+            // 设置边框为蓝色
+            stroke: Cesium.Color.BLUE,
+            // 设置填充区域为半透明的粉色
+            fill: Cesium.Color.PINK.withAlpha(0.5),
+            // 设置边框宽度为3
+            strokeWidth: 3,
+            // 将数据固定在地面上
+            clampToGround: true
+          })
+
+          // 将 GeoJSON 文件添加到场景中
+          viewer.dataSources.add(geojson)
+          geoJsonDataSources.push(geojson) // 保存数据源
+
+          // 调整视角以适应 GeoJSON 数据
+          viewer.zoomTo(geojson)
+
+          // Define destination
+          var destination = null
+
+          var orientation = {
+            heading: Cesium.Math.toRadians(0), // 水平方向的旋转角度
+            pitch: Cesium.Math.toRadians(-90), // 俯仰角度
+            roll: 0 // 翻滚角度
+          }
+
+          // Only fly to the destination if it's valid
+          if (destination) {
+            viewer.camera.flyTo({
+              destination: destination,
+              orientation: orientation,
+              duration: 3 // 过渡动画的持续时间(秒)
+            })
+          }
+        } catch (error) {
+          console.error('加载 GeoJSON 时出错:', error)
+        }
+      }
+
+      // 加载影像数据
+      async function openImageFolder() {
+        try {
+          const [fileHandle] = await window.showOpenFilePicker({
+            types: [
+              {
+                description: 'Image files',
+                accept: {
+                  'image/*': ['.jpg', '.jpeg', '.png', '.tif', '.tiff']
+                }
+              }
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false
+          })
+
+          if (fileHandle) {
+            const file = await fileHandle.getFile()
+            const url = URL.createObjectURL(file)
+            loadImage(url)
+          }
+        } catch (error) {
+          console.error('加载影像数据文件失败', error)
+        }
+      }
+
+      async function loadImage(url) {
+        try {
+          // 读取tif文件元数据
+          const response = await fetch(url)
+          const arrayBuffer = await response.arrayBuffer()
+          const tiff = await GeoTIFF.fromArrayBuffer(arrayBuffer)
+          const image = await tiff.getImage()
+
+          // 获取地理范围
+          const bbox = image.getBoundingBox()
+          const rectangle = Cesium.Rectangle.fromDegrees(bbox[0], bbox[1], bbox[2], bbox[3])
+
+          // 创建影像图层
+          const demLayer = new Cesium.ImageryLayer(
+            new Cesium.SingleTileImageryProvider({
+              url: url,
+              rectangle: rectangle
+            })
+          )
+          imageryLayers.push(demLayer)
+
+          // 添加图层
+          viewer.imageryLayers.add(demLayer)
+
+          // 调整视角
+          const centerLongitude = (bbox[0] + bbox[2]) / 2
+          const centerLatitude = (bbox[1] + bbox[3]) / 2
+          viewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(centerLongitude, centerLatitude, 1000000.0)
+          })
+        } catch (error) {
+          console.error('加载影像数据时出错:', error)
+        }
+      }
+
+      let demData = [] // 用于存储从 TIFF 文件中提取的地理空间数据
+      let currentDEMBounds = null // 存储当前DEM数据的边界范围
+      let dataSources = [] // 存储所有数据源的数据
+
+      // 加载数据文件
+      async function openFolder() {
+        try {
+          const fileHandles = await window.showOpenFilePicker({
+            multiple: true
+          })
+
+          for (const fileHandle of fileHandles) {
+            const file = await fileHandle.getFile()
+            const url = URL.createObjectURL(file)
+            const fileName = file.name.toLowerCase()
+
+            if (fileName.endsWith('.tif')) {
+              await loadDEM(url)
+            } else if (fileName.endsWith('.shp')) {
+              await loadSHP(url)
+            } else if (fileName.endsWith('.json')) {
+              await loadJSON(url)
+            }
+          }
+        } catch (error) {
+          console.error('加载文件失败', error)
+        }
+      }
+
+      async function loadDEM(url) {
+        try {
+          demData = [] // 添加这行代码
+          // 加载TIFF文件
+          const response = await fetch(url)
+          const arrayBuffer = await response.arrayBuffer()
+
+          // 保存文件到当前工程文件夹
+          if (selectedDirectoryHandle) {
+            try {
+              // 创建 "高程" 文件夹
+              let gaochengFolderHandle
+              try {
+                gaochengFolderHandle = await selectedDirectoryHandle.getDirectoryHandle('高程', {
+                  create: true
+                })
+              } catch (e) {
+                console.error("创建 '高程' 文件夹失败:", e)
+                return
+              }
+
+              // 获取文件名
+              const urlParts = url.split('/')
+              const filename = urlParts[urlParts.length - 1]
+              const fileHandle = await gaochengFolderHandle.getFileHandle(filename, {
+                create: true
+              })
+              const writable = await fileHandle.createWritable()
+              await writable.write(arrayBuffer)
+              await writable.close()
+              console.log('文件已保存到当前工程/高程')
+            } catch (error) {
+              console.error('保存文件失败:', error)
+            }
+          } else {
+            console.warn('未选择当前工程，无法保存文件')
+          }
+
+          const tiff = await GeoTIFF.fromArrayBuffer(arrayBuffer)
+          const image = await tiff.getImage()
+          const width = image.getWidth()
+          const height = image.getHeight()
+          const data = await image.readRasters()
+          console.log('TIFF 宽度:', width, '高度:', height) // 添加这行代码
+
+          // 获取地理范围
+          const bbox = image.getBoundingBox()
+          currentDEMBounds = bbox // 保存边界范围
+          const rectangle = Cesium.Rectangle.fromDegrees(bbox[0], bbox[1], bbox[2], bbox[3])
+
+          // 创建高程数据数组
+          const terrainData = new Float32Array(width * height)
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              const index = y * width + x
+              terrainData[index] = data[0][index]
+            }
+          }
+
+          // 提取地理空间数据
+          demData = []
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              const index = y * width + x
+              const elevation = terrainData[index]
+
+              // 将像素坐标转换为地理坐标
+              const longitude = bbox[0] + ((bbox[2] - bbox[0]) * x) / width
+              const latitude = bbox[3] - ((bbox[3] - bbox[1]) * y) / height
+
+              demData.push({
+                x: longitude,
+                y: latitude,
+                elevation: elevation,
+                value1: Math.random(), // 随机生成 value1
+                value2: Math.random() // 随机生成 value2
+              })
+              //添加这一行
+            }
+          }
+          dataSources = dataSources.concat(demData)
+
+          // 创建高程图层（保持不变）
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          const imageData = ctx.createImageData(width, height)
+          for (let i = 0; i < terrainData.length; i++) {
+            const heightValue = terrainData[i]
+            const color = getColorForHeight(heightValue)
+            const index = i * 4
+            imageData.data[index] = color.r
+            imageData.data[index + 1] = color.g
+            imageData.data[index + 2] = color.b
+            imageData.data[index + 3] = 255
+          }
+          ctx.putImageData(imageData, 0, 0)
+          const dataUrl = canvas.toDataURL()
+          demLayer = new Cesium.ImageryLayer(
+            new Cesium.SingleTileImageryProvider({
+              url: dataUrl,
+              rectangle: rectangle
+            })
+          )
+          viewer.imageryLayers.add(demLayer)
+          createElevationLegend(viewer)
+          viewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(
+              (bbox[0] + bbox[2]) / 2,
+              (bbox[1] + bbox[3]) / 2,
+              1000000.0
+            )
+          })
+
+          function getColorForHeight(height) {
+            const normalizedHeight = Math.min(Math.max(height / 4000, 0), 1)
+            if (normalizedHeight < 0.2) return { r: 0, g: 0, b: 255 }
+            else if (normalizedHeight < 0.4) return { r: 0, g: 255, b: 255 }
+            else if (normalizedHeight < 0.6) return { r: 0, g: 255, b: 0 }
+            else if (normalizedHeight < 0.8) return { r: 255, g: 255, b: 0 }
+            else return { r: 255, g: 0, b: 0 }
+          }
+        } catch (error) {
+          console.error('加载DEM数据时出错:', error)
+        }
+      }
+      // 创建高程颜色图例
+      function createElevationLegend(viewer) {
+        const legend = document.createElement('div')
+        legend.style.position = 'absolute'
+        legend.style.bottom = '50px'
+        legend.style.right = '20px'
+        legend.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
+        legend.style.padding = '15px 20px'
+        legend.style.color = '#333'
+        legend.style.borderRadius = '8px'
+        legend.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
+        legend.style.fontFamily = 'Arial, sans-serif'
+        legend.style.zIndex = '1000'
+
+        const title = document.createElement('div')
+        title.textContent = '高程图例 (米)'
+        title.style.fontWeight = '600'
+        title.style.fontSize = '14px'
+        title.style.marginBottom = '12px'
+        title.style.color = '#2c3e50'
+        legend.appendChild(title)
+
+        const gradientContainer = document.createElement('div')
+        gradientContainer.style.display = 'flex'
+        gradientContainer.style.alignItems = 'center'
+
+        const gradient = document.createElement('div')
+        gradient.style.width = '24px'
+        gradient.style.height = '180px'
+        gradient.style.borderRadius = '4px'
+        gradient.style.background =
+          'linear-gradient(to bottom, ' +
+          '#003366 0%, ' + // 深蓝
+          '#0066cc 25%, ' + // 中蓝
+          '#66ccff 40%, ' + // 浅蓝
+          '#99ff99 55%, ' + // 浅绿
+          '#ffff66 70%, ' + // 黄色
+          '#ff9966 85%, ' + // 橙色
+          '#ff3300 100%)' // 红色
+        gradient.style.boxShadow = 'inset 0 0 4px rgba(0, 0, 0, 0.1)'
+        gradientContainer.appendChild(gradient)
+
+        const labels = document.createElement('div')
+        labels.style.position = 'relative'
+        labels.style.height = '180px'
+        labels.style.marginLeft = '12px'
+        labels.style.fontSize = '12px'
+
+        // 创建标签项
+        const elevationLevels = [
+          {
+            value: 4000,
+            position: 0
+          },
+          {
+            value: 3000,
+            position: 25
+          },
+          {
+            value: 2000,
+            position: 50
+          },
+          {
+            value: 1000,
+            position: 75
+          },
+          {
+            value: 0,
+            position: 100
+          }
+        ]
+
+        elevationLevels.forEach((level) => {
+          const label = document.createElement('div')
+          label.textContent = level.value
+          label.style.position = 'absolute'
+          label.style.right = '0'
+          label.style.transform = 'translateY(-50%)'
+          label.style.top = `${level.position}%`
+          label.style.color = '#666'
+          label.style.textShadow = '0 1px 2px rgba(255, 255, 255, 0.5)'
+          labels.appendChild(label)
+        })
+
+        gradientContainer.appendChild(labels)
+        legend.appendChild(gradientContainer)
+
+        // 添加单位说明
+        const unit = document.createElement('div')
+        unit.textContent = '单位: 米 (m)'
+        unit.style.fontSize = '10px'
+        unit.style.color = '#999'
+        unit.style.marginTop = '8px'
+        unit.style.borderTop = '1px solid #eee'
+        unit.style.paddingTop = '6px'
+        legend.appendChild(unit)
+
+        viewer.container.appendChild(legend)
+      }
+
+      function focusOnDEM() {
+        if (currentDEMBounds) {
+          // 计算中心点
+          const centerLon = (currentDEMBounds[0] + currentDEMBounds[2]) / 2
+          const centerLat = (currentDEMBounds[1] + currentDEMBounds[3]) / 2
+
+          // 将视角聚焦在中心点
+          viewer.camera.flyTo({
+            destination: Cesium.Cartographic.fromDegrees(centerLon, centerLat),
+            orientation: {
+              heading: Cesium.Math.toRadians(0),
+              pitch: Cesium.Math.toRadians(-90), // 垂直向下
+              roll: 0.0
+            },
+            duration: 2.0 // 动画持续时间 (秒)
+          })
+
+          // 缩放到包含整个 DEM 范围
+          viewer.camera.flyTo({
+            destination: Cesium.Rectangle.fromDegrees(
+              currentDEMBounds[0],
+              currentDEMBounds[1],
+              currentDEMBounds[2],
+              currentDEMBounds[3]
+            ),
+            duration: 2
+          })
+        }
+      }
+      function gaochengjj(button) {
+        // 调用 focusOnDEM 函数聚焦视角
+        focusOnDEM()
+      }
+
+      function setDEMVisibility(visible) {
+        if (demLayer) {
+          demLayer.show = visible
+        }
+      }
+
+      function toggleDEMVisibility() {
+        demVisible = !demVisible
+        setDEMVisibility(demVisible)
+        const button = document.getElementById('toggleDEMButton')
+      }
+
+      // 加载SHP数据
+      async function loadSHP(url) {
+        try {
+          const dataSource = await Cesium.ShapefileDataSource.load(url)
+          viewer.dataSources.add(dataSource)
+          const shpData = extractSHPData(dataSource)
+          dataSources = dataSources.concat(shpData)
+        } catch (error) {
+          console.error('加载SHP文件失败', error)
+        }
+      }
+
+      // 加载JSON数据
+      async function loadJSON(url) {
+        try {
+          const dataSource = await Cesium.GeoJsonDataSource.load(url)
+          viewer.dataSources.add(dataSource)
+          const jsonData = extractJSONData(dataSource)
+          dataSources = dataSources.concat(jsonData)
+        } catch (error) {
+          console.error('加载JSON文件失败', error)
+        }
+      }
+      // 提取SHP数据
+      function extractSHPData(dataSource) {
+        const shpData = []
+        const entities = dataSource.entities.values
+        for (const entity of entities) {
+          if (entity.position) {
+            const position = entity.position.getValue(Cesium.JulianDate.now())
+            const cartographic = Cesium.Cartographic.fromCartesian(position)
+            shpData.push({
+              x: Cesium.Math.toDegrees(cartographic.longitude),
+              y: Cesium.Math.toDegrees(cartographic.latitude),
+              elevation: cartographic.height,
+              value1:
+                entity.properties && entity.properties.value1
+                  ? entity.properties.value1.getValue()
+                  : Math.random(),
+              value2:
+                entity.properties && entity.properties.value2
+                  ? entity.properties.value2.getValue()
+                  : Math.random()
+            })
+          }
+        }
+        return shpData
+      }
+
+      // 提取JSON数据
+      function extractJSONData(dataSource) {
+        const jsonData = []
+        const entities = dataSource.entities.values
+        for (const entity of entities) {
+          if (entity.position) {
+            const position = entity.position.getValue(Cesium.JulianDate.now())
+            const cartographic = Cesium.Cartographic.fromCartesian(position)
+            jsonData.push({
+              x: Cesium.Math.toDegrees(cartographic.longitude),
+              y: Cesium.Math.toDegrees(cartographic.latitude),
+              elevation: cartographic.height,
+              value1:
+                entity.properties && entity.properties.value1
+                  ? entity.properties.value1.getValue()
+                  : Math.random(),
+              value2:
+                entity.properties && entity.properties.value2
+                  ? entity.properties.value2.getValue()
+                  : Math.random()
+            })
+          }
+        }
+        return jsonData
+      }
+
+      let projects = []
+
+      async function selectDirectory() {
+        try {
+          selectedDirectoryHandle = await window.showDirectoryPicker()
+          alert('已选择文件夹')
+        } catch (error) {
+          console.error('选择文件夹失败', error)
+        }
+      }
+
+      async function createNewProject() {
+        if (!selectedDirectoryHandle) {
+          alert('请先选择一个文件夹')
+          await selectDirectory()
+        }
+
+        const projectName = prompt('请输入新建文件夹的名称：')
+
+        if (projectName && selectedDirectoryHandle) {
+          try {
+            const newFolderHandle = await selectedDirectoryHandle.getDirectoryHandle(projectName, {
+              create: true
+            })
+            alert(`文件夹 "${projectName}" 已创建`)
+
+            const project = {
+              name: projectName,
+              files: []
+            }
+            projects.push(project)
+
+            const fileList = document.getElementById('project-list')
+            const currentFile = document.getElementById('current-file')
+
+            // 更新当前工程
+            currentFile.textContent = projectName
+            selectedDirectoryHandle = newFolderHandle
+
+            // 存储当前工程文件夹信息
+            localStorage.setItem('currentProjectName', projectName)
+            localStorage.setItem('currentDirectoryHandle', JSON.stringify(newFolderHandle))
+
+            // 创建高程文件夹
+            let gaochengFolderHandle
+            try {
+              gaochengFolderHandle = await selectedDirectoryHandle.getDirectoryHandle('高程', {
+                create: true
+              })
+              console.log('高程文件夹 handle:', gaochengFolderHandle) // 添加调试信息
+            } catch (e) {
+              console.error("创建 '高程' 文件夹失败:", e)
+              return
+            }
+
+            // 更新localStorage，存储高程文件夹的handle
+            localStorage.setItem('currentDirectoryHandle', JSON.stringify(gaochengFolderHandle))
+            // 更新已有工程列表
+            fileList.innerHTML = ''
+            projects.forEach((proj) => {
+              const listItem = document.createElement('div')
+              listItem.textContent = proj.name
+              fileList.appendChild(listItem)
+            })
+
+            async function saveDirectoryHandle(projectName, handle) {
+              // 打开IndexedDB
+              const db = await openIDB()
+              const tx = db.transaction('directoryHandles', 'readwrite')
+              const store = tx.objectStore('directoryHandles')
+
+              // 存储句柄
+              await store.put(handle, projectName)
+              await tx.complete
+              console.log(`已保存目录句柄: ${projectName}`)
+            }
+
+            async function getDirectoryHandle(projectName) {
+              try {
+                const db = await openIDB()
+                const tx = db.transaction('directoryHandles', 'readonly')
+                const store = tx.objectStore('directoryHandles')
+
+                const handle = await store.get(projectName)
+                console.log(`已获取目录句柄: ${projectName}`)
+                return handle
+              } catch (error) {
+                console.error(`获取目录句柄失败: ${projectName}`, error)
+                return null
+              }
+            }
+
+            // 初始化IndexedDB
+            async function openIDB() {
+              return new Promise((resolve, reject) => {
+                const request = indexedDB.open('ProjectsDatabase', 1)
+
+                request.onupgradeneeded = () => {
+                  const db = request.result
+                  if (!db.objectStoreNames.contains('directoryHandles')) {
+                    db.createObjectStore('directoryHandles')
+                  }
+                }
+
+                request.onsuccess = () => resolve(request.result)
+                request.onerror = () => reject(request.error)
+              })
+            }
+          } catch (error) {
+            console.error('创建文件夹失败', error)
+          }
+        }
+      }
+
+      async function selectShapefile() {
+        try {
+          const [fileHandle] = await window.showOpenFilePicker({
+            types: [
+              {
+                description: 'Shapefile files (ZIP)',
+                accept: {
+                  'application/zip': ['.zip'] // 修改为 application/zip
+                }
+              }
+            ],
+            excludeAcceptAllOption: true,
+            multiple: false
+          })
+
+          if (fileHandle) {
+            const file = await fileHandle.getFile()
+            const arrayBuffer = await file.arrayBuffer()
+            await readShp(arrayBuffer)
+          } else {
+            console.error('未选择文件')
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            console.error('选择文件失败', error)
+          }
+        }
+      }
+
+      async function readShp(buffer) {
+        try {
+          // 使用 shpjs 解析 Shapefile 数据 (使用 parseZip)
+          const geojson = await shp.parseZip(buffer)
+
+          if (!geojson) {
+            console.error('解析 Shapefile 失败，未生成 GeoJSON 数据。')
+            return
+          }
+
+          let dataSource = await Cesium.GeoJsonDataSource.load(geojson, {
+            stroke: Cesium.Color.YELLOW,
+            fill: Cesium.Color.YELLOW.withAlpha(0.5),
+            strokeWidth: 2,
+            clampToGround: true
+          })
+
+          viewer.dataSources.add(dataSource)
+          geoJsonDataSources.push(dataSource)
+
+          viewer.zoomTo(dataSource)
+        } catch (error) {
+          console.error('读取或解析 Shapefile 时出错:', error)
+        }
+      }
+      function showBox(boxId) {
+        const boxes = document.querySelectorAll('.box')
+        boxes.forEach((box) => box.classList.remove('active'))
+
+        const box = document.getElementById(boxId)
+        box.classList.add('active')
+      }
+
+      //deep
+
+      // 随机森林模型处理
+
+      // 添加示例实体
+
+      async function processDataOnClick() {
+        try {
+          console.log('开始处理数据')
+
+          if (dataSources.length === 0) {
+            alert('没有加载任何数据')
+            return
+          }
+
+          console.log('有效数据点数:', dataSources.length)
+
+          if (dataSources.length < 10) {
+            console.error('数据点太少，无法进行机器学习')
+            return
+          }
+
+          // 2. 数据预处理
+          const processedData = preprocessData(dataSources)
+          const eventSource = new EventSource('/run_random_forest')
+
+          // 初始化状态文本为 "处理中"
+          updateStatusText('处理中')
+
+          eventSource.onmessage = (event) => {
+            const result = JSON.parse(event.data)
+            if (result.progress !== undefined) {
+              updateProgressBar(result.progress)
+              console.log(`前端收到进度信息：${result.progress}%`) // 在控制台显示进度
+            } else {
+              visualizeMLResults(result)
+              eventSource.close()
+              updateStatusText('')
+              console.log('前端收到最终结果') // 在控制台显示最终结果
+            }
+          }
+
+          // 3. 将数据发送到 Python 后端
+          eventSource.onerror = (error) => {
+            console.error('SSE error:', error)
+            eventSource.close()
+            // 处理失败时更新状态文本
+            updateStatusText('处理失败')
+          }
+
+          eventSource.onopen = () => {
+            fetch('/run_random_forest', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(processedData)
+            })
+          }
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+
+          const mlResults = await response.json()
+
+          // 4. 可视化机器学习结果
+          visualizeMLResults(mlResults)
+        } catch (error) {
+          console.error('处理数据失败', error)
+          alert('处理数据失败: ' + error.message)
+          // 发生异常时更新状态文本
+          updateStatusText('处理失败')
+        }
+      }
+      function updateProgressBar(progress) {
+        document.getElementById('progress-bar').value = progress
+        console.log(`进度：${progress}%`)
+      }
+
+      function updateStatusText(status) {
+        document.getElementById('status-text').textContent = status
+      }
+
+      function preprocessData(geospatialData) {
+        console.log('开始数据预处理')
+        console.log('原始数据量:', geospatialData.length)
+
+        // 数据标准化
+        const normalizeFeature = (data, key) => {
+          const values = data.map((item) => item[key])
+          const mean = values.reduce((a, b) => a + b, 0) / values.length
+          const std = Math.sqrt(
+            values.reduce((sq, n) => sq + Math.pow(n - mean, 2), 0) / values.length
+          )
+
+          return data.map((item) => (item[key] - mean) / (std || 1))
+        }
+
+        // 特征工程
+        const X = geospatialData.map((item) => [
+          normalizeFeature(geospatialData, 'x')[geospatialData.indexOf(item)],
+          normalizeFeature(geospatialData, 'y')[geospatialData.indexOf(item)],
+          normalizeFeature(geospatialData, 'elevation')[geospatialData.indexOf(item)],
+          // 添加更多特征
+          Math.sin(item.x),
+          Math.cos(item.y)
+        ])
+
+        // 目标值
+        const y = geospatialData.map((item) => [
+          normalizeFeature(geospatialData, 'value1')[geospatialData.indexOf(item)],
+          normalizeFeature(geospatialData, 'value2')[geospatialData.indexOf(item)]
+        ])
+
+        console.log('特征矩阵X:', X)
+        console.log('目标矩阵y:', y)
+        console.log('预处理后数据量:', X.length)
+
+        return { X, y, originalData: geospatialData }
+      }
+
+      function calculateMSE(y_true, y_pred) {
+        let totalError = 0
+        let validCount = 0
+
+        for (let i = 0; i < y_true.length; i++) {
+          if (y_true[i] && y_pred[i]) {
+            const error1 = y_true[i][0] - y_pred[i][0]
+            const error2 = y_true[i][1] - y_pred[i][1]
+            totalError += error1 * error1 + error2 * error2
+            validCount++
+          }
+        }
+
+        return validCount > 0 ? totalError / (2 * validCount) : 0
+      }
+
+      function calculateR2Score(y_true, y_pred) {
+        let validCount = 0
+        const meanTrue1 = y_true.reduce((sum, row) => sum + row[0], 0) / y_true.length
+        const meanTrue2 = y_true.reduce((sum, row) => sum + row[1], 0) / y_true.length
+
+        let totalVariance1 = 0
+        let totalVariance2 = 0
+        let explainedVariance1 = 0
+        let explainedVariance2 = 0
+
+        for (let i = 0; i < y_true.length; i++) {
+          if (y_true[i] && y_pred[i]) {
+            totalVariance1 += Math.pow(y_true[i][0] - meanTrue1, 2)
+            totalVariance2 += Math.pow(y_true[i][1] - meanTrue2, 2)
+            explainedVariance1 += Math.pow(y_true[i][0] - y_pred[i][0], 2)
+            explainedVariance2 += Math.pow(y_true[i][1] - y_pred[i][1], 2)
+            validCount++
+          }
+        }
+
+        const r2_1 =
+          validCount > 0 && totalVariance1 > 0 ? 1 - explainedVariance1 / totalVariance1 : 0
+        const r2_2 =
+          validCount > 0 && totalVariance2 > 0 ? 1 - explainedVariance2 / totalVariance2 : 0
+
+        return (r2_1 + r2_2) / 2
+      }
+
+      function visualizeMLResults(mlResults) {
+        const { predictions, original_test_data, mse, r2_score } = mlResults
+
+        predictions.forEach((prediction, index) => {
+          const originalPoint = original_test_data[index]
+
+          if (!originalPoint) {
+            console.warn('无法找到原始测试数据点:', index)
+            return
+          }
+
+          viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(
+              originalPoint.x,
+              originalPoint.y,
+              originalPoint.elevation
+            ),
+            point: {
+              pixelSize: 15,
+              color: Cesium.Color.RED.withAlpha(0.7)
+            },
+            label: {
+              text: `预测值: ${prediction[0].toFixed(2)}, ${prediction[1].toFixed(2)}\nMSE: ${mse.toFixed(4)}\nR²: ${r2_score.toFixed(4)}`,
+              font: '14px monospace',
+              fillColor: Cesium.Color.WHITE,
+              outlineColor: Cesium.Color.BLACK,
+              outlineWidth: 2,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              pixelOffset: new Cesium.Cartesian2(0, -20)
+            }
+          })
+        })
+
+        viewer.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(0, 0, 0),
+          label: {
+            text: `模型性能\n均方误差 (MSE): ${mse.toFixed(4)}\nR²系数: ${r2_score.toFixed(4)}`,
+            text: '完成',
+            font: '16px sans-serif',
+            fillColor: Cesium.Color.GREEN,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 2,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(30, 0)
+          }
+        })
+      }
+
+      //结尾
+
+      const interfaceOptions = document.querySelector('.interface-options')
+      const deepLearningModels = document.getElementById('deep-learning-models')
+      const machineLearningModels = document.getElementById('machine-learning-models')
+
+      if (interfaceOptions) {
+        interfaceOptions.addEventListener('change', () => {
+          const selectedInterface = document.querySelector(
+            'input[name="interface-type"]:checked'
+          ).value
+          if (deepLearningModels && machineLearningModels) {
+            deepLearningModels.style.display =
+              selectedInterface === 'deep-learning' ? 'block' : 'none'
+            machineLearningModels.style.display =
+              selectedInterface === 'machine-learning' ? 'block' : 'none'
+          }
+        })
+      }
+
+      function connectInterface() {
+        const interfaceType = interfaceOptions.querySelector(
+          'input[name="interface-type"]:checked'
+        ).value
+        const interfaceUrl = document.getElementById('interface-url').value
+
+        if (interfaceUrl) {
+          // 在这里根据接口类型和地址进行连接操作
+          if (interfaceType === 'deep-learning') {
+            connectDeepLearningInterface(interfaceUrl)
+          } else if (interfaceType === 'machine-learning') {
+            connectMachineLearningInterface(interfaceUrl)
+          }
+        } else {
+          alert('请输入接口地址')
+        }
+      }
+
+      function connectDeepLearningInterface(interfaceUrl) {
+        // 这里是连接深度学习接口的具体实现
+        // 你可以使用 fetch 或 XMLHttpRequest 等方法发送请求
+        // 例如：
+        fetch(interfaceUrl, {
+          method: 'POST' // 或 GET
+          // ... 其他请求参数
+        })
+          .then((response) => {
+            // 处理响应
+          })
+          .catch((error) => {
+            // 处理错误
+          })
+      }
+
+      function connectMachineLearningInterface(interfaceUrl) {
+        // 这里是连接机器学习接口的具体实现
+        // 类似于连接深度学习接口
+        // 你也可以使用第三方库，例如 Axios
+        // 例如：
+        // axios.post(interfaceUrl, {
+        //   // ... 其他请求参数
+        // }).then(response => {
+        //   // 处理响应
+        // }).catch(error => {
+        //   // 处理错误
+        // });
+      }
+    </script>
+  </body>
+</html>

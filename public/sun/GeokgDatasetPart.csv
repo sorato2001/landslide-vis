@@ -1,0 +1,35 @@
+size,path,id,color,name,coordinates,type,nodeVisibility,start_node_id,start_node_labels,description,start_node_property_ID,relationship_type,end_node_id,end_node_labels,end_node_property_name,end_node_property_ID
+20000,landslide,landslide,#006FEA,landslide,,root,true,,,,,,,,,
+10000,landslide/LOC.0,LOC.0,#2579e8,landslide.LOC.0,"[101.9758, 4.2105]",LOC,false,3730,INF,tropical hilly area of Malaysia,INF1704,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.1,LOC.1,#2579e8,landslide.LOC.1,"[102.8257, 30.9966]",LOC,false,3896,INF,Xianshuihe fault,INF1870,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.2,LOC.2,#2579e8,landslide.LOC.2,"[104.1954, 35.8617]",LOC,false,2313,INF,China,INF287,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.3,LOC.3,#2579e8,landslide.LOC.3,"[106.7784, 34.4583]",LOC,false,3360,INF,Qingshui River Basin,INF1334,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.4,LOC.4,#2579e8,landslide.LOC.4,"[107.0985, 29.201]",LOC,false,3127,INF,Nanchuan region of Chongqing,INF1101,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.5,LOC.5,#2579e8,landslide.LOC.5,"[108.092, 30.8357]",LOC,false,3704,INF,Three Gorges Reservoir area to the Padang section,INF1678,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.6,LOC.6,#2579e8,landslide.LOC.6,"[11.334, 47.0481]",LOC,false,3871,INF,western part of Tyrol/Austria,INF1845,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.7,LOC.7,#2579e8,landslide.LOC.7,"[112.4594, 31.0856]",LOC,false,3922,INF,Yangtze River,INF1896,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.8,LOC.8,#2579e8,landslide.LOC.8,"[12.25, 44.5]",LOC,false,2512,INF,Flysch,INF486,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.9,LOC.9,#2579e8,landslide.LOC.9,"[127.0804, 35.3812]",LOC,false,2731,INF,Janghung area in Korea,INF705,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.10,LOC.10,#2579e8,landslide.LOC.10,"[16.3917, 48.2098]",LOC,false,2513,INF,Flysch areas including the Penninic Klippen in the Vienna Forest,INF487,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.11,LOC.11,#2579e8,landslide.LOC.11,"[19.1451, 49.8153]",LOC,false,2236,INF,Carpathian region in southern Poland,INF210,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.12,LOC.12,#2579e8,landslide.LOC.12,"[3.1623, 45.8855]",LOC,false,3543,INF,south - eastern French Massif central,INF1517,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.13,LOC.13,#2579e8,landslide.LOC.13,"[32.8742, 34.8226]",LOC,false,3614,INF,southwestern region of Cyprus,INF1588,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.14,LOC.14,#2579e8,landslide.LOC.14,"[34.9967, 14.4105]",LOC,false,2035,INF,Abe Barek,INF9,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.15,LOC.15,#2579e8,landslide.LOC.15,"[35.2433, 38.9637]",LOC,false,3740,INF,Turkey,INF1714,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.16,LOC.16,#2579e8,landslide.LOC.16,"[41.5, 41.5]",LOC,false,3451,INF,Savsat city,INF1425,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.17,LOC.17,#2579e8,landslide.LOC.17,"[5.5311, 5.506]",LOC,false,2049,INF,Ago District,INF23,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.18,LOC.18,#2579e8,landslide.LOC.18,"[50.0, 31.0]",LOC,false,3605,INF,southern Zagros Mountains,INF1579,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.19,LOC.19,#2579e8,landslide.LOC.19,"[51.6834, 36.0773]",LOC,false,2604,INF,Haraz watershed,INF578,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.20,LOC.20,#2579e8,landslide.LOC.20,"[53.688, 32.4279]",LOC,false,2702,INF,Iran,INF676,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.21,LOC.21,#2579e8,landslide.LOC.21,"[54.4342, 36.8369]",LOC,false,3592,INF,southern part of Golestan province,INF1566,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.22,LOC.22,#2579e8,landslide.LOC.22,"[66.2385, 33.9391]",LOC,false,2044,INF,Afghanistan,INF18,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.23,LOC.23,#2579e8,landslide.LOC.23,"[71.6874, 36.4325]",LOC,false,2126,INF,Badakhshan Province,INF100,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.24,LOC.24,#2579e8,landslide.LOC.24,"[77.7128, 29.9206]",LOC,false,3524,INF,Siwaliks,INF1498,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.25,LOC.25,#2579e8,landslide.LOC.25,"[78.9629, 20.5937]",LOC,false,2690,INF,India,INF664,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.26,LOC.26,#2579e8,landslide.LOC.26,"[82.2386, 28.8727]",LOC,false,2174,INF,Bhalubang - Shiwapur section of Mahendra Highway lying in Western Nepal,INF148,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.27,LOC.27,#2579e8,landslide.LOC.27,"[85.2893, 27.744]",LOC,false,2855,INF,Kulekhani River Basin in Central Nepal,INF829,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.28,LOC.28,#2579e8,landslide.LOC.28,"[88.4726, 27.0357]",LOC,false,2393,INF,Darjeeling and Kalimpong districts of West Bengal,INF367,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.29,LOC.29,#2579e8,landslide.LOC.29,"[9.1313, 48.8002]",LOC,false,2765,INF,Jurassic escarpment in the Swabian Alb,INF739,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.30,LOC.30,#2579e8,landslide.LOC.30,"[9.4117, 48.4148]",LOC,false,3642,INF,Swabian Alb valleys,INF1616,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.31,LOC.31,#2579e8,landslide.LOC.31,"[9.6096, 48.7826]",LOC,false,3640,INF,SW - Germany,INF1614,use_of,4027,MED,weight - of - evidence,MED28
+10000,landslide/LOC.32,LOC.32,#2579e8,landslide.LOC.32,"[90.4253, 24.4246]",LOC,false,3680,INF,TGRA,INF1654,use_of,4027,MED,weight - of - evidence,MED28

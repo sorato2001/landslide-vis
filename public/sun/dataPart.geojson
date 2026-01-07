@@ -1,0 +1,705 @@
+{
+    "type": "FeatureCollection",
+    "name": "landslide",
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+        }
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    101.9758,
+                    4.2105
+                ]
+            },
+            "properties": {
+                "start_node_id": "3730",
+                "start_node_labels": "INF",
+                "description": "tropical hilly area of Malaysia",
+                "start_node_property_ID": "INF1704",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    102.8257,
+                    30.9966
+                ]
+            },
+            "properties": {
+                "start_node_id": "3896",
+                "start_node_labels": "INF",
+                "description": "Xianshuihe fault",
+                "start_node_property_ID": "INF1870",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    104.1954,
+                    35.8617
+                ]
+            },
+            "properties": {
+                "start_node_id": "2313",
+                "start_node_labels": "INF",
+                "description": "China",
+                "start_node_property_ID": "INF287",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.7784,
+                    34.4583
+                ]
+            },
+            "properties": {
+                "start_node_id": "3360",
+                "start_node_labels": "INF",
+                "description": "Qingshui River Basin",
+                "start_node_property_ID": "INF1334",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    107.0985,
+                    29.201
+                ]
+            },
+            "properties": {
+                "start_node_id": "3127",
+                "start_node_labels": "INF",
+                "description": "Nanchuan region of Chongqing",
+                "start_node_property_ID": "INF1101",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    108.092,
+                    30.8357
+                ]
+            },
+            "properties": {
+                "start_node_id": "3704",
+                "start_node_labels": "INF",
+                "description": "Three Gorges Reservoir area to the Padang section",
+                "start_node_property_ID": "INF1678",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    11.334,
+                    47.0481
+                ]
+            },
+            "properties": {
+                "start_node_id": "3871",
+                "start_node_labels": "INF",
+                "description": "western part of Tyrol/Austria",
+                "start_node_property_ID": "INF1845",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    112.4594,
+                    31.0856
+                ]
+            },
+            "properties": {
+                "start_node_id": "3922",
+                "start_node_labels": "INF",
+                "description": "Yangtze River",
+                "start_node_property_ID": "INF1896",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.25,
+                    44.5
+                ]
+            },
+            "properties": {
+                "start_node_id": "2512",
+                "start_node_labels": "INF",
+                "description": "Flysch",
+                "start_node_property_ID": "INF486",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    127.0804,
+                    35.3812
+                ]
+            },
+            "properties": {
+                "start_node_id": "2731",
+                "start_node_labels": "INF",
+                "description": "Janghung area in Korea",
+                "start_node_property_ID": "INF705",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    16.3917,
+                    48.2098
+                ]
+            },
+            "properties": {
+                "start_node_id": "2513",
+                "start_node_labels": "INF",
+                "description": "Flysch areas including the Penninic Klippen in the Vienna Forest",
+                "start_node_property_ID": "INF487",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    19.1451,
+                    49.8153
+                ]
+            },
+            "properties": {
+                "start_node_id": "2236",
+                "start_node_labels": "INF",
+                "description": "Carpathian region in southern Poland",
+                "start_node_property_ID": "INF210",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    3.1623,
+                    45.8855
+                ]
+            },
+            "properties": {
+                "start_node_id": "3543",
+                "start_node_labels": "INF",
+                "description": "south - eastern French Massif central",
+                "start_node_property_ID": "INF1517",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    32.8742,
+                    34.8226
+                ]
+            },
+            "properties": {
+                "start_node_id": "3614",
+                "start_node_labels": "INF",
+                "description": "southwestern region of Cyprus",
+                "start_node_property_ID": "INF1588",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    34.9967,
+                    14.4105
+                ]
+            },
+            "properties": {
+                "start_node_id": "2035",
+                "start_node_labels": "INF",
+                "description": "Abe Barek",
+                "start_node_property_ID": "INF9",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    35.2433,
+                    38.9637
+                ]
+            },
+            "properties": {
+                "start_node_id": "3740",
+                "start_node_labels": "INF",
+                "description": "Turkey",
+                "start_node_property_ID": "INF1714",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    41.5,
+                    41.5
+                ]
+            },
+            "properties": {
+                "start_node_id": "3451",
+                "start_node_labels": "INF",
+                "description": "Savsat city",
+                "start_node_property_ID": "INF1425",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    5.5311,
+                    5.506
+                ]
+            },
+            "properties": {
+                "start_node_id": "2049",
+                "start_node_labels": "INF",
+                "description": "Ago District",
+                "start_node_property_ID": "INF23",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    50.0,
+                    31.0
+                ]
+            },
+            "properties": {
+                "start_node_id": "3605",
+                "start_node_labels": "INF",
+                "description": "southern Zagros Mountains",
+                "start_node_property_ID": "INF1579",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    51.6834,
+                    36.0773
+                ]
+            },
+            "properties": {
+                "start_node_id": "2604",
+                "start_node_labels": "INF",
+                "description": "Haraz watershed",
+                "start_node_property_ID": "INF578",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    53.688,
+                    32.4279
+                ]
+            },
+            "properties": {
+                "start_node_id": "2702",
+                "start_node_labels": "INF",
+                "description": "Iran",
+                "start_node_property_ID": "INF676",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    54.4342,
+                    36.8369
+                ]
+            },
+            "properties": {
+                "start_node_id": "3592",
+                "start_node_labels": "INF",
+                "description": "southern part of Golestan province",
+                "start_node_property_ID": "INF1566",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    66.2385,
+                    33.9391
+                ]
+            },
+            "properties": {
+                "start_node_id": "2044",
+                "start_node_labels": "INF",
+                "description": "Afghanistan",
+                "start_node_property_ID": "INF18",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    71.6874,
+                    36.4325
+                ]
+            },
+            "properties": {
+                "start_node_id": "2126",
+                "start_node_labels": "INF",
+                "description": "Badakhshan Province",
+                "start_node_property_ID": "INF100",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    77.7128,
+                    29.9206
+                ]
+            },
+            "properties": {
+                "start_node_id": "3524",
+                "start_node_labels": "INF",
+                "description": "Siwaliks",
+                "start_node_property_ID": "INF1498",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    78.9629,
+                    20.5937
+                ]
+            },
+            "properties": {
+                "start_node_id": "2690",
+                "start_node_labels": "INF",
+                "description": "India",
+                "start_node_property_ID": "INF664",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    82.2386,
+                    28.8727
+                ]
+            },
+            "properties": {
+                "start_node_id": "2174",
+                "start_node_labels": "INF",
+                "description": "Bhalubang - Shiwapur section of Mahendra Highway lying in Western Nepal",
+                "start_node_property_ID": "INF148",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    85.2893,
+                    27.744
+                ]
+            },
+            "properties": {
+                "start_node_id": "2855",
+                "start_node_labels": "INF",
+                "description": "Kulekhani River Basin in Central Nepal",
+                "start_node_property_ID": "INF829",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    88.4726,
+                    27.0357
+                ]
+            },
+            "properties": {
+                "start_node_id": "2393",
+                "start_node_labels": "INF",
+                "description": "Darjeeling and Kalimpong districts of West Bengal",
+                "start_node_property_ID": "INF367",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    9.1313,
+                    48.8002
+                ]
+            },
+            "properties": {
+                "start_node_id": "2765",
+                "start_node_labels": "INF",
+                "description": "Jurassic escarpment in the Swabian Alb",
+                "start_node_property_ID": "INF739",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    9.4117,
+                    48.4148
+                ]
+            },
+            "properties": {
+                "start_node_id": "3642",
+                "start_node_labels": "INF",
+                "description": "Swabian Alb valleys",
+                "start_node_property_ID": "INF1616",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    9.6096,
+                    48.7826
+                ]
+            },
+            "properties": {
+                "start_node_id": "3640",
+                "start_node_labels": "INF",
+                "description": "SW - Germany",
+                "start_node_property_ID": "INF1614",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    90.4253,
+                    24.4246
+                ]
+            },
+            "properties": {
+                "start_node_id": "3680",
+                "start_node_labels": "INF",
+                "description": "TGRA",
+                "start_node_property_ID": "INF1654",
+                "relationship_type": "use_of",
+                "end_node_id": "4027",
+                "end_node_labels": "MED",
+                "end_node_property_name": "weight - of - evidence",
+                "end_node_property_ID": "MED28"
+            }
+        }
+    ]
+}
