@@ -23,15 +23,15 @@
     <!-- 过滤器 -->
     <div class="filter-ctrl" id="filter1">
       <p>Study Region:</p>
-      <input type="text" placeholder="Filter by name" @input="handleFilter" />
+      <input id="filter-input" type="text" name="filter" placeholder="Filter by name" />
     </div>
     <div class="filter-ctrl" id="filter2">
       <p>Key Factor:</p>
-      <input type="text" placeholder="Filter by name" />
+      <input id="filter-input" type="text" name="filter" placeholder="Filter by name" />
     </div>
     <div class="filter-ctrl" id="filter3">
       <p>Method category:</p>
-      <input type="text" placeholder="Filter by name" />
+      <input id="filter-input" type="text" name="filter" placeholder="Filter by name" />
     </div>
   </div>
 </template>
@@ -260,17 +260,65 @@ const initMaps = () => {
   })
 
   // 主地图
-  map1 = new maplibregl.Map({
+ const map1 = new maplibregl.Map({
     container: mapContainer.value,
     center: [9, 0],
     zoom: 1.9,
     style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${maptilerKey}`,
   })
 
+  const layerIDs = [] // Will contain a list used to filter against.
+  let selectedId
+  const filterInput = document.getElementById('filter-input')
+
   map1.on('load', async () => {
     map1.addSource('landslide', {
       type: 'geojson',
       data: './sun/output1.geojson',
+    })
+
+    map1.addSource('highlight-point', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    })
+
+    map1.addLayer({
+      id: 'highlight-point',
+      type: 'circle',
+      source: 'highlight-point',
+      paint: {
+        'circle-radius': [
+          'interpolate', // 使用插值函数来根据 zoom 设置大小
+          ['linear'], // 使用线性插值
+          ['zoom'], // 根据 zoom 级别调整
+          5,
+          10,
+          20,
+          40,
+        ],
+        'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+        'circle-stroke-width': [
+          'interpolate', // 使用插值函数来根据 zoom 设置大小
+          ['linear'], // 使用线性插值
+          ['zoom'], // 根据 zoom 级别调整
+          0,
+          0.1, // zoom 为 0 时，圆半径为 5
+          2,
+          0.5,
+          3,
+          1,
+          4,
+          2,
+          5,
+          3, // zoom 为 5 时，圆半径为 10
+        ],
+        'circle-color': '#ff0000',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#fff',
+      },
     })
 
     // 尝试加载自定义图标（可选，失败不影响主要功能）
@@ -290,80 +338,169 @@ const initMaps = () => {
         return response.json()
       })
       .then((data) => {
-        if (!data.features || data.features.length === 0) {
-          console.warn('GeoJSON文件为空，请添加滑坡点位数据')
-          return
-        }
+        // if (!data.features || data.features.length === 0) {
+        //   console.warn('GeoJSON文件为空，请添加滑坡点位数据')
+        //   return
+        // }
         
         console.log(`成功加载 ${data.features.length} 个滑坡点位`)
-        
-        // 添加统一的滑坡点图层（所有点）
-        if (!map1.getLayer('landslide-points')) {
-          map1.addLayer({
-            id: 'landslide-points',
-            type: 'circle',
-            source: 'landslide',
-            paint: {
-              'circle-color': '#ff0000',
-              'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 4, 5, 6, 7, 10],
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 0, 0.1, 2, 0.5, 3, 1, 4, 2, 5, 3],
-            },
-          })
-        }
-        
-        // 为每个独特的LOC创建过滤图层（用于搜索和高亮）
-        const uniqueLOCs = new Set()
         data.features.forEach((feature) => {
           const symbol = feature.properties['LOC']
-          if (symbol && !uniqueLOCs.has(symbol)) {
-            uniqueLOCs.add(symbol)
-            const layerID = `poi-${symbol}`
+          const layerID = `poi-${symbol}`
+          
+          // 添加统一的滑坡点图层（所有点）
+          if (!map1.getLayer(layerID)) {
+            map1.addLayer({
+              id: layerID,
+              type: 'circle',
+              source: 'landslide',
+              paint: {
+                'circle-color': '#ff0000',
+                'circle-radius': [
+                  'interpolate', // 使用插值函数来根据 zoom 设置大小
+                  ['linear'], // 使用线性插值
+                  ['zoom'], // 根据 zoom 级别调整
+                  3,
+                  4, // zoom 为 0 时，圆半径为 5
+                  5,
+                  6,
+                  7,
+                  10,
+                ],
+                'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+                'circle-stroke-width': [
+                  'interpolate', // 使用插值函数来根据 zoom 设置大小
+                  ['linear'], // 使用线性插值
+                  ['zoom'], // 根据 zoom 级别调整
+                  0,
+                  0.1, // zoom 为 0 时，圆半径为 5
+                  2,
+                  0.5,
+                  3,
+                  1,
+                  4,
+                  2,
+                  5,
+                  3, // zoom 为 5 时，圆半径为 10
+                ], // 圆的边缘宽度
+              },
+              filter: ['==', 'LOC', symbol],
+            })
             layerIDs.push(layerID)
           }
-        })
-        
-        console.log(`创建了 ${uniqueLOCs.size} 个不同的滑坡点位图层`)
 
-        // 点击事件（使用统一图层）
-        map1.on('click', 'landslide-points', async (e) => {
-          const feature = e.features[0]
-          if (!feature) return
-          
-          // 高亮当前点
-          if (selectedId) {
-            map1.setPaintProperty('landslide-points', 'circle-color', '#ff0000')
-          }
-          
-          // 临时高亮
-          map1.setPaintProperty('landslide-points', 'circle-color', [
-            'case',
-            ['==', ['get', 'LOC'], feature.properties.LOC],
-            'rgb(255, 153, 0)',
-            '#ff0000'
-          ])
-          selectedId = 'landslide-points'
+          map1.on('click', layerID, (e) => {
+            const features = e.features
+            if (e.features && e.features.length > 0) {
+              // highlightSource.setData({
+              //   type: 'FeatureCollection',
+              //   features: [],
+              // })
+              const feature = e.features[0]
+              if (selectedId) map1.setPaintProperty(selectedId, 'circle-color', '#ff0000') // 设置为红色
+              map1.setPaintProperty(layerID, 'circle-color', 'rgb(255, 153, 0)') // 设置为红色
+              selectedId = layerID
+              // const allLayers = map1.getStyle().layers
+              // const lastLayerId = allLayers[allLayers.length - 1].id
+              // const highlightSource = map1.getSource('highlight-point')
+              // if (highlightSource) {
+              //   highlightSource.setData({
+              //     type: 'FeatureCollection',
+              //     features: [feature], // 把当前点击的 feature 设置为高亮显示
+              //   })
+              // }
+              async function handleNodeJump(feature) {
+                const name = feature.properties.LOC
+                await getCypherResult(100, name)
+                const node = graph
+                  .graphData()
+                  .nodes.find((n) => n.name === feature.properties.LOC)
+                if (node) {
+                  // Aim at node from outside it
+                  // Center/zoom on node
+                  graphStatus = true
+                  showGraph(graphStatus)
+                  // highlightNodes.clear()
+                  // if (node) {
+                  //   console.log(node)
+                  //   highlightNodes.add(node)
+                  // }
+                  // hoverNode = node || null
+                  // updateHighlight()
 
-          // 跳转到节点并显示图谱
-          const name = feature.properties.LOC
-          await getCypherResult(100, name)
-          const node = graph?.graphData().nodes.find((n) => n.name === name)
-          if (node) {
-            graphVisible.value = true
-            graph.centerAt(node.x, node.y, 1000)
-            graph.zoom(4.5, 200)
-          }
+                  graph.centerAt(node.x, node.y, 1000)
+                  graph.zoom(4.5, 200)
+                }
+                const coordinates = feature.geometry.coordinates.slice()
+                const zoomLevel = 8 // 设置为点击后的缩放级别
+                map1.flyTo({
+                  center: coordinates,
+                  zoom: zoomLevel,
+                  essential: true,
+                })
+              }
+              handleNodeJump(feature)
+            }
+            const feature = features[0]
+            const properties = feature.properties
 
-          // 地图飞行到该点
-          const coordinates = feature.geometry.coordinates.slice()
-          map1.flyTo({
-            center: coordinates,
-            zoom: 8,
-            essential: true,
+            // Generate table rows dynamically from properties
+            const tableRows = Object.entries(properties)
+              .map(
+                ([key, value]) => `
+                              <tr>
+                                <td style="padding: 8px; border-bottom: 1px solid #555;"><strong>${key}</strong></td>
+                                <td style="padding: 8px; border-bottom: 1px solid #555;">${value}</td>
+                              </tr>
+                            `,
+              )
+              .join('')
+
+            const content = `
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="font-size: 25px;">滑坡信息</strong>
+                            <button id="closeBtn" style="
+                              background: transparent;
+                              color: white;
+                              border: none;
+                              font-size: 18px;
+                              cursor: pointer;
+                            " title="关闭">&times;</button>
+                          </div>
+
+                          <table style="
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 20px;
+                            color: white;
+                          ">
+                            ${tableRows}
+                          </table>
+                        `
+
+            const propertyWindow = document.getElementById('propertyWindow')
+            propertyWindow.innerHTML = content
+            propertyWindow.style.display = 'block'
+
+            // 关闭按钮功能
+            document.getElementById('closeBtn').onclick = () => {
+              propertyWindow.style.display = 'none'
+            }
+
+            // const x = e.point.x
+            // const y = e.point.y
+            // const panelWidth = infoPanel.offsetWidth
+            // const panelHeight = infoPanel.offsetHeight
+            // const left = x - panelWidth / 2 // Center horizontally
+            // const top = y + 10 // Place 10px below the click position
+
+            // // Apply the position
+            // infoPanel.style.left = `${left}px`
+            // infoPanel.style.top = `${top}px`
+
+            // arrow.style.left = `${left + panelWidth / 2 - 5}px` // Center the arrow horizontally
+            // arrow.style.top = `${top - 10}px` // Position the arrow above the panel
           })
-
-          // 显示属性窗口
-          showPropertyWindow(feature.properties)
         })
       })
       .catch((error) => {
@@ -371,9 +508,21 @@ const initMaps = () => {
         console.info('请确保 public/sun/output1.geojson 文件存在')
       })
 
+    filterInput.addEventListener('keyup', (e) => {
+      // If the input value matches a layerID set
+      // it's visibility to 'visible' or else hide it.
+      const value = e.target.value.trim().toLowerCase()
+      const searchWords = value.split(/\s+/) // Split input into words by space
+      layerIDs.forEach((layerID) => {
+        const lowerLayerID = layerID.toLowerCase() // Convert layer ID to lowercase for case-insensitive matching
+        const matches = searchWords.some((word) => lowerLayerID.includes(word)) // Check if any word matches
+        map1.setLayoutProperty(layerID, 'visibility', matches ? 'visible' : 'none')
+      })
+    })      
     // 添加控件
     map1.addControl(new maplibregl.NavigationControl({ visualizePitch: true, showZoom: true, showCompass: true }))
   })
+
 
   // 地图同步
   map1.on('move', () => {
@@ -555,40 +704,38 @@ header h1 {
   background-color: #868686;
 }
 
+#filter-result {
+  font-size: 2vh;
+  font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+}
 .filter-ctrl {
   position: absolute;
   top: 8vh;
   z-index: 11;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: center; /* 垂直居中对齐 */
+  gap: 10px; /* 元素之间的间距 */
 }
-
 #filter1 {
   left: 25vw;
   transform: translateX(-50%);
 }
-
 #filter2 {
   left: 50vw;
   transform: translateX(-50%);
 }
-
 #filter3 {
   left: 75vw;
   transform: translateX(-50%);
 }
 
-.filter-ctrl p {
-  margin: 0;
-  font-size: 2.3vh;
-  font-weight: 700;
-  font-family: 'Times New Roman', 'Roboto', sans-serif;
-  color: #000000;
-}
-
 .filter-ctrl input[type='text'] {
-  font: 2vh 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+  font:
+    2vh 'Times New Roman',
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif;
   width: 10vw;
   border: 0;
   background-color: #d6d6d6cc;
@@ -598,11 +745,20 @@ header h1 {
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.747);
   border-radius: 10px;
 }
-
 .filter-ctrl input[type='text']:focus {
-  background-color: #d6d6d6cc;
-  color: rgb(0, 0, 0);
-  outline: 2px solid #8d8d8d;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.747);
+  background-color: #d6d6d6cc; /* 保持一致 */
+  color: rgb(0, 0, 0); /* 保持一致 */
+  outline: 2px solid #8d8d8d; /* 去除默认高亮轮廓 */
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.747); /* 保持一致 */
 }
+
+
+.filter-ctrl p {
+  margin: 0;
+  font-size: 2.3vh;
+  font-weight: 700;
+  font-family: 'Times New Roman', 'Roboto', sans-serif;
+  color: #000000;
+}
+
 </style>
