@@ -18,7 +18,7 @@
     <div id="propertyWindow" ref="propertyWindow"></div>
 
     <!-- 图谱控制按钮 -->
-    <button id="graphControl" @click="toggleGraph">G</button>
+    <button id="graphControl">G</button>
 
     <!-- 过滤器 -->
     <div class="filter-ctrl" id="filter1">
@@ -176,11 +176,6 @@ const showGraph = (graphStatus) => {
     container.style.display = 'none'
   }
 }
-
-document.getElementById('graphControl').addEventListener('click', () => {
-  graphStatus = !graphStatus
-  showGraph(graphStatus)
-})
 
 // 加载图谱
 const loadGraph = (data) => {
@@ -612,6 +607,10 @@ const handleFilter = (e) => {
 
 onMounted(() => {
   initMaps()
+  document.getElementById('graphControl').addEventListener('click', () => {
+    graphStatus = !graphStatus
+    showGraph(graphStatus)
+  })
   // getCypherResult() // 初始加载图谱
 })
 
