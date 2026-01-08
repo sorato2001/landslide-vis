@@ -12,7 +12,7 @@
     <div id="map2" ref="map2Container"></div>
 
     <!-- 图谱容器 -->
-    <div id="3dgraph" ref="graphContainer" :style="{ display: graphVisible ? 'block' : 'none' }"></div>
+    <div id="3dgraph" ref="graphContainer" v-show="graphStatus" :style="{ display: graphVisible ? 'block' : 'none' }"></div>
 
     <!-- 属性窗口 -->
     <div id="propertyWindow" ref="propertyWindow"></div>
@@ -55,6 +55,8 @@ let map2 = null
 let graph = null
 let layerIDs = []
 let selectedId = null
+
+let graphStatus = false
 
 const maptilerKey = 'ycORim2UMOdY1xFgUl1e'
 
@@ -166,12 +168,28 @@ const getCypherResult = async (limit_items = 100, name = null) => {
   }
 }
 
+const showGraph = (graphStatus) => {
+  if (graphStatus) {
+    container.style.display = 'block'
+    graph.zoom(4.5, 200) // 如果重新显示，您可以控制缩放
+  } else {
+    container.style.display = 'none'
+  }
+}
+
+document.getElementById('graphControl').addEventListener('click', () => {
+  graphStatus = !graphStatus
+  showGraph(graphStatus)
+})
+
 // 加载图谱
 const loadGraph = (data) => {
   const container = graphContainer.value
   if (!container) return
 
   const { clientWidth, clientHeight } = container
+
+  showGraph(graphStatus)
 
   graph = ForceGraph()(container)
     .graphData(data)
