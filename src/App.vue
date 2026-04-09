@@ -2,39 +2,30 @@
 import { ref } from 'vue'
 
 import CesiumViewer from './components/CesiumViewer.vue'
-import MapLibreViewer from './components/MapLibreViewer.vue'
+import MiniMapPanel from './components/MiniMapPanel.vue'
 import LeftMenu from './components/LeftMenu.vue'
 import DataPanel from './components/DataPanel.vue'
 import ModelPanel from './components/model/ModelPanel.vue'
 import DecisionPanel from './components/DecisionPanel.vue'
 
 const active = ref(null)
-const viewMode = ref('cesium') // 'cesium' 或 'maplibre'
-
-const switchView = () => {
-  viewMode.value = viewMode.value === 'cesium' ? 'maplibre' : 'cesium'
-}
 </script>
 
 <template>
-  <!-- 视图切换按钮 -->
-  <button class="view-switch-btn" @click="switchView">
-    <span v-if="viewMode === 'cesium'">📊 图谱模式</span>
-    <span v-else>🌍 三维模式</span>
-  </button>
-
-  <!-- 1️⃣ Cesium 地图视图 -->
-  <div v-show="viewMode === 'cesium'" class="view-container">
+  <!-- 单一视图：Cesium + 小地图/图谱 -->
+  <div class="view-container">
     <CesiumViewer />
+    
+    <!-- 顶部标题栏 -->
+    <div class="top-header">
+      <h1 class="system-title">滑坡危险性评价集成化决策支持可视化系统</h1>
+    </div>
+    
+    <MiniMapPanel />
     <LeftMenu @show="active = $event" />
     <DataPanel v-show="active === 'data'" @close="active = null" />
     <ModelPanel v-show="active === 'model'" @close="active = null" />
     <DecisionPanel v-show="active === 'decision'" @close="active = null" />
-  </div>
-
-  <!-- 2️⃣ MapLibre 图谱视图 -->
-  <div v-show="viewMode === 'maplibre'" class="view-container">
-    <MapLibreViewer />
   </div>
 </template>
 
@@ -46,35 +37,25 @@ const switchView = () => {
   height: 100%;
 }
 
-.view-switch-btn {
-  position: fixed;
-  top: 1%;
-  left: 1%;
-  z-index: 1000;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s ease;
+.top-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
+  text-align: center;
+  padding: 10px 20px 10px;
+  background: rgba(10, 10, 25);
+  pointer-events: none;
 }
 
-.view-switch-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-}
-
-.view-switch-btn:active {
-  transform: translateY(0);
-}
-
-.view-switch-btn span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.system-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(102, 126, 234, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
 }
 </style>

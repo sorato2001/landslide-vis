@@ -173,15 +173,15 @@ async function runANN() {
 <style scoped>
 .model-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 250, 252, 0.98) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
+  top: 100px;
+  left: 20px;
+  background: rgba(10, 10, 25, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 14px;
   width: 320px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   z-index: 10;
 }
@@ -190,9 +190,9 @@ async function runANN() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .panel-header h3 {
@@ -225,7 +225,7 @@ async function runANN() {
 
 .model-section {
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .model-section:last-of-type {
@@ -237,7 +237,7 @@ async function runANN() {
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  color: #333;
+  color: #e0e0e0;
   font-size: 14px;
   font-weight: 600;
 }
@@ -382,18 +382,18 @@ async function runANN() {
 }
 
 .status-bar.info {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-  color: #1976d2;
+  background: rgba(102, 126, 234, 0.2);
+  color: #90caf9;
 }
 
 .status-bar.success {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  color: #388e3c;
+  background: rgba(46, 213, 115, 0.2);
+  color: #81c784;
 }
 
 .status-bar.error {
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  color: #d32f2f;
+  background: rgba(231, 76, 60, 0.2);
+  color: #ef9a9a;
 }
 
 .status-icon {

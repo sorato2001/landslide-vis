@@ -79,18 +79,19 @@ function toggle1() {
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(102, 126, 234, 0.25);
   color: #fff;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
   font-weight: 500;
+  border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
 .file-label:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .file-icon {
@@ -115,15 +116,15 @@ function toggle1() {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .checkbox-label:hover {
-  background: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.1);
   border-color: rgba(102, 126, 234, 0.4);
 }
 
@@ -135,7 +136,7 @@ function toggle1() {
 
 .checkbox-text {
   font-size: 14px;
-  color: #333;
+  color: #e0e0e0;
 }
 
 .action-btn {
@@ -144,10 +145,10 @@ function toggle1() {
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #fff;
-  border: 2px solid rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(102, 126, 234, 0.3);
   border-radius: 8px;
-  color: #667eea;
+  color: #90caf9;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -155,9 +156,8 @@ function toggle1() {
 }
 
 .action-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(102, 126, 234, 0.15);
   border-color: rgba(102, 126, 234, 0.5);
-  transform: translateY(-1px);
 }
 
 .btn-icon {
@@ -173,7 +173,7 @@ function toggle1() {
 }
 
 .status-badge.success {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  color: #388e3c;
+  background: rgba(46, 213, 115, 0.2);
+  color: #81c784;
 }
 </style>

@@ -12,9 +12,21 @@
     <div id="map2" ref="map2Container"></div>
 
     <!-- 图谱容器 -->
-    <div id="3dgraph" ref="graphContainer" v-show="graphStatus" :style="{ display: graphVisible ? 'block' : 'none' }"></div>
-
-    <!-- 属性窗口 -->
+    <div
+      id="3dgraph"
+      v-show="graphStatus"
+      style="
+        height: 100%;
+        width: 100vw;
+        position: absolute;
+        /* bottom: 0.5%;
+        right: 0.5%; */
+        z-index: 6;
+        /* border: 2px solid black; */
+        /* border-radius: 8px; */
+        background-color: rgba(0, 0, 0, 0);
+      "
+    ></div>
     <div id="propertyWindow" ref="propertyWindow"></div>
 
     <!-- 图谱控制按钮 -->
@@ -164,83 +176,442 @@ const getCypherResult = async (limit_items = 100, name = null) => {
   } catch (error) {
     console.warn('Neo4j连接失败，图谱功能将不可用:', error.message)
     // 加载空图谱数据，避免组件崩溃
-    loadGraph({ nodes: [], links: [] })
+    // loadGraph({ nodes: [], links: [] })
   }
 }
+
+const getGraphContainer = () => document.getElementById('3dgraph')
 
 const showGraph = (graphStatus) => {
+  const el = getGraphContainer()
+  if (!el) return
   if (graphStatus) {
-    container.style.display = 'block'
-    graph.zoom(4.5, 200) // 如果重新显示，您可以控制缩放
+    el.style.display = 'block'
+    graph?.zoom?.(4.5, 200) // 如果重新显示，您可以控制缩放
   } else {
-    container.style.display = 'none'
+    el.style.display = 'none'
   }
-}
+} 
 
-// 加载图谱
-const loadGraph = (data) => {
-  const container = graphContainer.value
+// 图谱
+const highlightNodes = new Set()
+const highlightLinks = new Set()
+let hoverNode = null
+const NODE_REL_SIZE = 1
+let isRotationActive = true
+
+function resizeGraphToContainer() {
+  const container = document.getElementById('3dgraph')
   if (!container) return
 
   const { clientWidth, clientHeight } = container
+  graph.width(clientWidth)
+  graph.height(clientHeight)
+}
 
+// 监听页面大小变化
+window.addEventListener('resize', resizeGraphToContainer)
+
+// 加载图谱
+const loadGraph = (data) => {
+  // const container = graphContainer.value
+  // if (!container) return
   showGraph(graphStatus)
 
-  graph = ForceGraph()(container)
+  const el = getGraphContainer()
+  const width = el?.clientWidth ?? 800
+  const height = el?.clientHeight ?? 600
+
+  graph = ForceGraph()(el)
+    // .numDimensions(3) // 确保使用三维布局
+    // .enableNodeDrag(false)
     .graphData(data)
-    .width(clientWidth)
-    .height(clientHeight)
+    .width(width) // 画布宽度(充满父级容器)
+    .height(height)
     .nodeLabel('name')
-    .nodeColor((node) => node.color)
+    // .nodeRelSize('size')
+    .nodeColor((node) =>
+      highlightNodes.has(node)
+        ? node === hoverNode
+          ? 'rgb(255,0,0,1)'
+          : 'rgba(255,160,0,0.8)'
+        : node.color,
+    )
     .nodeCanvasObject((node, ctx, globalScale) => {
+      // const label = node.name || ''
+      // const fontSize = 12 / globalScale
+      // ctx.font = `${fontSize}px Sans-Serif`
+      // const textWidth = ctx.measureText(label).width
+      // const bckgDimensions = [textWidth, fontSize].map((n) => n + fontSize * 0.2) // some padding
+
+      // ctx.textAlign = 'center'
+      // ctx.textAlign = 'center'
+      // ctx.textBaseline = 'middle'
+      // const getContrastColor = (inputColor) => {
+      //   if (!inputColor) return '#000000'
+      //   // 统一转换为小写并移除首尾空格
+      //   const color = inputColor.trim().toLowerCase()
+      //   // 1. 处理颜色名称
+      //   let hex = colorNameToHex[color]
+      //   // 2. 如果输入是颜色名称，直接使用映射值；否则尝试处理为十六进制
+      //   if (!hex) {
+      //     // 添加#前缀（如果缺失）
+      //     hex = color.startsWith('#') ? color : `#${color}`
+      //     // 验证是否为有效的十六进制颜色格式
+      //     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+      //     if (!hexRegex.test(hex)) {
+      //       return '#000000' // 无效格式返回默认黑色
+      //     }
+      //     // 处理3位缩写（如 #F00 → #FF0000）
+      //     if (hex.length === 4) {
+      //       hex =
+      //         '#' +
+      //         hex
+      //           .slice(1)
+      //           .split('')
+      //           .map((c) => c + c)
+      //           .join('')
+      //     }
+      //   }
+      //   // 3. 解析RGB分量
+      //   const r = parseInt(hex.slice(1, 3), 16)
+      //   const g = parseInt(hex.slice(3, 5), 16)
+      //   const b = parseInt(hex.slice(5, 7), 16)
+      //   // 4. 计算亮度（YIQ公式）
+      //   const brightness = (r * 299 + g * 587 + b * 114) / 1000
+      //   // 返回对比色
+      //   return brightness > 128 ? '#000000' : '#FFFFFF'
+      // }
+      // // 取出节点颜色
+      // const nodeColor = node.color || '#6495ED'
+      // const textColor = getContrastColor(nodeColor)
+      // ctx.fillStyle = textColor
+      // ctx.fillText(label, node.x, node.y)
+
+      // node.__bckgDimensions = bckgDimensions // to re-use in nodePointerAreaPaint
+
+      // const label = node.name || ''
+      // // 定义节点的大小（使用 node.value 或固定值）
+      // const radius = node.value ? Math.sqrt(node.size) * 3 : 12
+
+      // const paddingRatio = 0.85
+      // const maxTextWidth = radius * 2 * paddingRatio
+      // const maxTextHeight = radius * 2 * paddingRatio
+      // // 计算合适的字体大小，最大不超过节点半径
+
+      // // 获取合适字号和行数组
+      // const getFittingFontSize = (ctx, text, maxWidth, maxHeight) => {
+      //   let fontSize = 20
+      //   let lines = []
+      //   const words = text.split(/,|，|\s+/)
+      //   while (fontSize > 4) {
+      //     ctx.font = `${fontSize}px Sans-Serif`
+      //     lines = []
+      //     let currentLine = ''
+      //     for (const word of words) {
+      //       const testLine = currentLine ? `${currentLine} ${word}` : word
+      //       const testWidth = ctx.measureText(testLine).width
+      //       if (testWidth <= maxWidth) {
+      //         currentLine = testLine
+      //       } else {
+      //         lines.push(currentLine)
+      //         currentLine = word
+      //       }
+      //     }
+      //     if (currentLine) lines.push(currentLine)
+      //     const totalHeight = lines.length * fontSize * 1.2
+      //     if (totalHeight <= maxHeight * 0.95) break
+      //     fontSize -= 1
+      //   }
+      //   return { fontSize, lines }
+      // }
+
+      // // const { fontSize, lines } = getFittingFontSize(ctx, label, maxTextWidth, maxTextHeight)
+
+      // let fontSize = Math.min((radius * globalScale) / 10)
+
+      // // ---- ① 先绘制节点圆形 ----
+      // ctx.beginPath()
+      // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+      // ctx.fillStyle = node.color || 'rgba(100, 150, 255, 0.8)' // 默认节点颜色
+      // ctx.fill()
+      // if (highlightNodes.has(node)) {
+      //   ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)' // 高亮边框颜色
+      //   ctx.lineWidth = 2
+      //   ctx.stroke()
+      //   // (可选) 高亮时放大节点
+      //   ctx.beginPath()
+      //   ctx.arc(node.x, node.y, radius + 2, 0, 2 * Math.PI)
+      //   ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)'
+      //   ctx.lineWidth = 2
+      //   ctx.stroke()
+      // } else {
+      //   ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)' // 默认边框
+      //   ctx.lineWidth = 1
+      //   ctx.stroke()
+      // }
+      // // ---- ② 裁剪文字到节点内 ----
+      // ctx.save() // 保存当前 canvas 状态
+      // ctx.beginPath()
+      // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+      // // ctx.clip()
+      // // 自动换行处理
+      // let lines = []
+      // while (fontSize > 0) {
+      //   ctx.font = `${fontSize}px Sans-Serif`
+      //   let currentLine = ''
+      //   lines = []
+      //   let maxtestWidth = 0
+      //   const words = label.split(/,|，|\s+/)
+      //   for (let i = 0; i < words.length; i++) {
+      //     const testLine = currentLine + (currentLine ? ' ' : '') + words[i]
+      //     const testWidth = ctx.measureText(testLine).width
+      //     if (testWidth <= maxTextWidth) {
+      //       currentLine = testLine
+      //     } else {
+      //       if (currentLine != '') {
+      //         lines.push(currentLine)
+      //         maxtestWidth =
+      //           ctx.measureText(currentLine).width > maxtestWidth
+      //             ? ctx.measureText(currentLine).width
+      //             : maxtestWidth
+      //       }
+      //       currentLine = words[i]
+      //     }
+      //   }
+      //   if (currentLine) {
+      //     lines.push(currentLine)
+      //     ctx.measureText(currentLine).width > maxtestWidth
+      //       ? ctx.measureText(currentLine).width
+      //       : maxtestWidth
+      //   }
+      //   const totalHeight = lines.length * fontSize * 1.2
+      //   if (totalHeight <= maxTextHeight && maxtestWidth <= maxTextWidth) break
+      //   fontSize -= 1
+      //   if (fontSize < 0) {
+      //     fontSize += 1
+      //     break
+      //   }
+      // }
+      // ctx.font = `${fontSize}px Sans-Serif`
+      // // 将颜色转换为相对色
+      // const getContrastColor = (inputColor) => {
+      //   if (!inputColor) return '#000000'
+      //   // 统一转换为小写并移除首尾空格
+      //   const color = inputColor.trim().toLowerCase()
+      //   // 1. 处理颜色名称
+      //   let hex = colorNameToHex[color]
+      //   // 2. 如果输入是颜色名称，直接使用映射值；否则尝试处理为十六进制
+      //   if (!hex) {
+      //     // 添加#前缀（如果缺失）
+      //     hex = color.startsWith('#') ? color : `#${color}`
+      //     // 验证是否为有效的十六进制颜色格式
+      //     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+      //     if (!hexRegex.test(hex)) {
+      //       return '#000000' // 无效格式返回默认黑色
+      //     }
+      //     // 处理3位缩写（如 #F00 → #FF0000）
+      //     if (hex.length === 4) {
+      //       hex =
+      //         '#' +
+      //         hex
+      //           .slice(1)
+      //           .split('')
+      //           .map((c) => c + c)
+      //           .join('')
+      //     }
+      //   }
+      //   // 3. 解析RGB分量
+      //   const r = parseInt(hex.slice(1, 3), 16)
+      //   const g = parseInt(hex.slice(3, 5), 16)
+      //   const b = parseInt(hex.slice(5, 7), 16)
+      //   // 4. 计算亮度（YIQ公式）
+      //   const brightness = (r * 299 + g * 587 + b * 114) / 1000
+      //   // 返回对比色
+      //   return brightness > 128 ? '#000000' : '#FFFFFF'
+      // }
+      // // 取出节点颜色
+      // const nodeColor = node.color || '#6495ED'
+      // const textColor = getContrastColor(nodeColor)
+      // ctx.textAlign = 'center'
+      // ctx.textBaseline = 'middle'
+      // ctx.fillStyle = textColor
+      // // 垂直居中多行文本
+      // const lineHeight = fontSize * 1.2
+      // const totalHeight = lines.length * lineHeight
+      // let yOffset = node.y - totalHeight / 2 + lineHeight / 2
+      // for (const line of lines) {
+      //   if (line != '') {
+      //     ctx.fillText(line, node.x, yOffset)
+      //     yOffset += lineHeight
+      //   }
+      // }
+      // ctx.restore() // 恢复 canvas 状态
+      // // ---- ③ (可选) 重新绘制节点边框，增强视觉效果 ----
+      // ctx.beginPath()
+      // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+      // ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)' // 节点边框颜色
+      // ctx.lineWidth = 1
+      // ctx.stroke()
+
       const label = node.name || ''
-      const radius = 12
+      const radius = node.value ? Math.sqrt(node.size) * 3 : 12
       const paddingRatio = 0.85
       const maxTextWidth = radius * 2 * paddingRatio
-      let fontSize = Math.min((radius * globalScale) / 10, 20)
-      fontSize = Math.max(fontSize, 4)
 
-      // 绘制节点圆
+      // 字号随着缩放变化
+      let fontSize = Math.min((radius * globalScale) / 10, 20)
+      fontSize = Math.max(fontSize, 4) // 最小字号保护
+
+      // ---- ① 绘制节点圆 ----
       ctx.beginPath()
       ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
       ctx.fillStyle = node.color || 'rgba(100, 150, 255, 0.8)'
       ctx.fill()
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)'
-      ctx.lineWidth = 1
+      ctx.strokeStyle = highlightNodes.has(node)
+        ? 'rgba(255, 0, 0, 0.9)'
+        : 'rgba(0, 0, 0, 0.2)'
+      ctx.lineWidth = highlightNodes.has(node) ? 2 : 1
       ctx.stroke()
 
-      // 绘制文字
+      // ---- ② 绘制文字 ----
       ctx.save()
+      ctx.beginPath()
+      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+      ctx.clip()
+
+      // 设置字体
       ctx.font = `${fontSize}px Times New Roman`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillStyle = '#FFFFFF'
 
+      // 计算对比色
+      const getContrastColor = (inputColor) => {
+        if (!inputColor) return '#000000'
+        let hex = colorNameToHex[inputColor.trim().toLowerCase()] || inputColor
+        if (!hex.startsWith('#')) hex = `#${hex}`
+        if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3]
+        const r = parseInt(hex.slice(1, 3), 16)
+        const g = parseInt(hex.slice(3, 5), 16)
+        const b = parseInt(hex.slice(5, 7), 16)
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000
+        return brightness > 128 ? '#000000' : '#FFFFFF'
+      }
+      const nodeColor = node.color || '#6495ED'
+      ctx.fillStyle = getContrastColor(nodeColor)
+
+      // 处理超长文字
       let displayText = label
       let textWidth = ctx.measureText(displayText).width
       if (textWidth > maxTextWidth) {
-        while (displayText.length > 0 && ctx.measureText(displayText + '...').width > maxTextWidth) {
+        while (
+          displayText.length > 0 &&
+          ctx.measureText(displayText + '...').width > maxTextWidth
+        ) {
           displayText = displayText.slice(0, -1)
         }
         displayText += '...'
       }
 
+      // 画文字
       ctx.fillText(displayText, node.x, node.y)
+
       ctx.restore()
+
+      // ---- ③ （可选）重新描边增强节点视觉 ----
+      ctx.beginPath()
+      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)'
+      ctx.lineWidth = 1
+      ctx.stroke()
     })
     .nodeCanvasObjectMode(() => 'after')
+    .linkCanvasObjectMode(() => 'after')
+    .linkCanvasObject((link, ctx) => {
+      const MAX_FONT_SIZE = 4
+      const LABEL_NODE_MARGIN = graph.nodeRelSize() * 1.5
+
+      const start = link.source
+      const end = link.target
+
+      // ignore unbound links
+      if (typeof start !== 'object' || typeof end !== 'object') return
+
+      // calculate label positioning
+      const textPos = Object.assign(
+        ...['x', 'y'].map((c) => ({
+          [c]: start[c] + (end[c] - start[c]) / 2, // calc middle point
+        })),
+      )
+
+      const relLink = { x: end.x - start.x, y: end.y - start.y }
+
+      const maxTextLength =
+        Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2
+
+      let textAngle = Math.atan2(relLink.y, relLink.x)
+      // maintain label vertical orientation for legibility
+      if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle)
+      if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle)
+
+      const label = `${link.properties}`
+
+      // estimate fontSize to fit in link length
+      ctx.font = '1px Times New Roman'
+      const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width)
+      ctx.font = `${fontSize}px Times New Roman`
+      const textWidth = ctx.measureText(label).width
+      const bckgDimensions = [textWidth, fontSize].map((n) => n + fontSize * 0.2) // some padding
+
+      // draw text label (with background rect)
+      ctx.save()
+      ctx.translate(textPos.x, textPos.y)
+      ctx.rotate(textAngle)
+
+      // ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      // ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, ...bckgDimensions)
+
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#515353'
+      ctx.fillText(label, 0, 0)
+      ctx.restore()
+    })
+    // .linkDirectionalParticles(2)
+    // .linkDirectionalParticleWidth(1.4)
     .linkWidth(5)
     .onNodeRightClick(async (node) => {
+      // Aim at node from outside it
+      // Center/zoom on node
+      highlightNodes.clear()
+      if (node) {
+        console.log(node)
+        highlightNodes.add(node)
+      }
+      hoverNode = node || null
+      updateHighlight()
+
       graph.centerAt(node.x, node.y, 1000)
       graph.zoom(4.5, 200)
     })
-
-  // 配置力导向布局
   const nodeCount = data.nodes.length
+  const nodeRadius = 20 // 设置你的节点视觉半径
   graph.d3Force('charge', d3.forceManyBody().strength(-Math.max(300, nodeCount)))
-  graph.d3Force('link').distance(() => 20).strength(0.105)
-  graph.d3Force('collision', d3.forceCollide().radius(12).strength(0.5))
-  graph.d3Force('center', d3.forceCenter(0, 0))
+  graph
+    .d3Force('link')
+    .distance((link) => 20)
+    .strength(0.105)
+  graph.d3Force(
+    'collision',
+    d3
+      .forceCollide()
+      .radius((node) => {
+        return node.value ? Math.sqrt(node.size) * 3 : nodeRadius
+      })
+      .strength(0.5),
+  )
+  graph.d3Force('center', d3.forceCenter(0, 0, 0))
+
 }
 
 // 初始化地图
@@ -611,7 +982,6 @@ onMounted(() => {
     graphStatus = !graphStatus
     showGraph(graphStatus)
   })
-  // getCypherResult() // 初始加载图谱
 })
 
 onUnmounted(() => {
@@ -672,13 +1042,6 @@ header h1 {
   border-radius: 8px;
 }
 
-#3dgraph {
-  height: 100%;
-  width: 100vw;
-  position: absolute;
-  z-index: 6;
-  background-color: rgba(0, 0, 0, 0);
-}
 
 #propertyWindow {
   height: 42vh;
