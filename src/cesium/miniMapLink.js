@@ -2,15 +2,25 @@ import * as Cesium from 'cesium'
 import { getViewer } from './viewer'
 
 /**
- * Cesium 与 MapLibre 联动模块
+ * Cesium 滑坡点与图谱联动模块
  * 负责：
- * 1. 在 Cesium 中显示/高亮 MapLibre 筛选出的滑坡点
- * 2. MapLibre 点击点时在 Cesium 中飞行并高亮
+ * 1. 在 Cesium 中显示/高亮/筛选滑坡点
+ * 2. 点击滑坡点时触发图谱查询（通过回调）
+ * 3. 外部调用高亮并飞行到指定点
  */
 
 let landslideEntities = []      // 所有滑坡点实体
 let highlightedEntity = null     // 当前高亮的实体
-let highlightHandler = null      // 点击事件处理器
+let clickHandler = null          // Cesium 点击事件处理器
+let onPointClickCallback = null  // 图谱查询回调
+
+/**
+ * 设置点击滑坡点时的回调函数（由 GraphPanel 调用）
+ * @param {Function} callback - 回调函数，参数为 (loc, lng, lat, properties)
+ */
+export function setOnPointClickCallback(callback) {
+  onPointClickCallback = callback
+}
 
 /**
  * 在 Cesium 中加载滑坡点位（从 GeoJSON 数据）
@@ -30,7 +40,6 @@ export async function loadLandslidePointsInCesium(geoJsonUrl) {
     const entities = dataSource.entities.values
     entities.forEach((entity) => {
       if (entity.billboard) {
-        // 移除默认 billboard，改用 point
         entity.billboard = undefined
       }
       entity.point = {
@@ -41,7 +50,6 @@ export async function loadLandslidePointsInCesium(geoJsonUrl) {
         heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
         disableDepthTestDistance: 10000,
       }
-      // 保存 LOC 属性用于筛选
       const loc = entity.properties?.LOC?.getValue() || ''
       entity._customLoc = loc
     })
@@ -49,11 +57,59 @@ export async function loadLandslidePointsInCesium(geoJsonUrl) {
     viewer.dataSources.add(dataSource)
     landslideEntities = entities
 
+    // 设置 Cesium 点击事件
+    setupClickHandler(viewer)
+
     console.log(`Cesium 中加载了 ${entities.length} 个滑坡点`)
     return dataSource
   } catch (error) {
     console.warn('Cesium 加载滑坡点失败:', error.message)
   }
+}
+
+/**
+ * 设置 Cesium 点击事件 - 点击滑坡点时触发图谱查询
+ */
+function setupClickHandler(viewer) {
+  // 移除旧的点击处理器
+  if (clickHandler) {
+    clickHandler.destroy()
+    clickHandler = null
+  }
+
+  clickHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
+  clickHandler.setInputAction((click) => {
+    const pickedObject = viewer.scene.pick(click.position)
+    if (Cesium.defined(pickedObject) && pickedObject.id) {
+      const entity = pickedObject.id
+      if (entity && entity._customLoc) {
+        const loc = entity._customLoc
+        const pos = entity.position?.getValue(Cesium.JulianDate.now())
+        let lng = null, lat = null
+        if (pos) {
+          const carto = Cesium.Cartographic.fromCartesian(pos)
+          lng = Cesium.Math.toDegrees(carto.longitude)
+          lat = Cesium.Math.toDegrees(carto.latitude)
+        }
+
+        // 高亮此点
+        highlightAndFlyToCesiumPoint(lng, lat, loc)
+
+        // 触发图谱查询回调
+        if (onPointClickCallback) {
+          // 获取所有属性
+          const props = {}
+          if (entity.properties) {
+            const propertyNames = entity.properties.propertyNames
+            for (const name of propertyNames) {
+              props[name] = entity.properties[name]?.getValue()
+            }
+          }
+          onPointClickCallback(loc, lng, lat, props)
+        }
+      }
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 }
 
 /**
@@ -66,7 +122,6 @@ export function filterCesiumPoints(filterText, allLocValues) {
   if (!viewer || landslideEntities.length === 0) return
 
   if (!filterText || filterText.trim() === '') {
-    // 无筛选，显示所有点
     landslideEntities.forEach((entity) => {
       entity.show = true
       entity.point = entity.point || {}
@@ -114,14 +169,15 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
 
   // 查找匹配实体
   const target = landslideEntities.find((e) => {
-    if (e._customLoc === loc) return true
-    // 也尝试坐标匹配
-    const pos = e.position?.getValue(Cesium.JulianDate.now())
-    if (pos) {
-      const carto = Cesium.Cartographic.fromCartesian(pos)
-      const eLng = Cesium.Math.toDegrees(carto.longitude)
-      const eLat = Cesium.Math.toDegrees(carto.latitude)
-      return Math.abs(eLng - lng) < 0.001 && Math.abs(eLat - lat) < 0.001
+    if (loc && e._customLoc === loc) return true
+    if (lng != null && lat != null) {
+      const pos = e.position?.getValue(Cesium.JulianDate.now())
+      if (pos) {
+        const carto = Cesium.Cartographic.fromCartesian(pos)
+        const eLng = Cesium.Math.toDegrees(carto.longitude)
+        const eLat = Cesium.Math.toDegrees(carto.latitude)
+        return Math.abs(eLng - lng) < 0.001 && Math.abs(eLat - lat) < 0.001
+      }
     }
     return false
   })
@@ -144,8 +200,7 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
         0
       ),
     })
-  } else {
-    // 没有找到实体，直接飞到坐标
+  } else if (lng != null && lat != null) {
     viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(lng, lat, 5000),
       orientation: {
@@ -156,7 +211,6 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
       duration: 2.0,
     })
 
-    // 在该位置创建临时高亮点
     const tempEntity = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(lng, lat),
       point: {
@@ -168,7 +222,6 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
         disableDepthTestDistance: 10000,
       },
     })
-    // 5秒后移除临时点
     setTimeout(() => {
       viewer.entities.remove(tempEntity)
     }, 8000)
@@ -182,7 +235,11 @@ export function clearLandslidePoints() {
   const viewer = getViewer()
   if (!viewer) return
 
-  // 注意：不在这里移除 dataSource，因为可能由其他模块管理
+  if (clickHandler) {
+    clickHandler.destroy()
+    clickHandler = null
+  }
+
   landslideEntities = []
   highlightedEntity = null
 }

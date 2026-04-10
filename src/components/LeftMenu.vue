@@ -9,6 +9,13 @@
     </button>
     <button 
       class="tab-btn"
+      :class="{ active: activeTab === 'input' }"
+      @click="handleClick('input')"
+    >
+      数据录入
+    </button>
+    <button 
+      class="tab-btn"
       :class="{ active: activeTab === 'model' }"
       @click="handleClick('model')"
     >
@@ -43,7 +50,7 @@ const handleClick = (tab) => {
 }
 
 .tab-btn {
-  padding: 6px 22px;
+  padding: 6px 18px;
   font-size: 14px;
   font-weight: 500;
   border: 2px solid #2A5298;
