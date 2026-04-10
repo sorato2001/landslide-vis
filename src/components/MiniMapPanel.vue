@@ -569,16 +569,14 @@ const handleResize = () => {
 <style scoped>
 .mini-map-panel {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  bottom: 12px;
+  right: 12px;
   z-index: 20;
   width: 520px;
-  background: rgba(15, 15, 25, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  background: #fff;
+  border-radius: 10px;
+  border: 2px solid #2A5298;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   transition: all 0.3s ease;
 }
@@ -594,16 +592,16 @@ const handleResize = () => {
 .panel-header {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
+  padding: 8px 14px;
   cursor: pointer;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #e8eef6;
+  border-bottom: 2px solid #2A5298;
   user-select: none;
   transition: background 0.2s;
 }
 
 .panel-header:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5));
+  background: #d0dced;
 }
 
 .header-icon {
@@ -613,13 +611,13 @@ const handleResize = () => {
 
 .header-title {
   flex: 1;
-  color: #fff;
+  color: #2A5298;
   font-size: 14px;
   font-weight: 600;
 }
 
 .expand-icon {
-  color: rgba(255, 255, 255, 0.6);
+  color: #2A5298;
   font-size: 12px;
 }
 
@@ -628,8 +626,8 @@ const handleResize = () => {
   display: flex;
   gap: 6px;
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f5f7fa;
+  border-bottom: 1px solid #dde5f0;
 }
 
 .filter-row {
@@ -640,29 +638,30 @@ const handleResize = () => {
 }
 
 .filter-row label {
-  color: rgba(255, 255, 255, 0.7);
+  color: #2A5298;
   font-size: 11px;
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .filter-row input {
   width: 100%;
   padding: 4px 8px;
   font-size: 11px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #b0c4de;
+  border-radius: 4px;
+  color: #333;
   outline: none;
 }
 
 .filter-row input:focus {
-  border-color: rgba(102, 126, 234, 0.6);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: #2A5298;
+  box-shadow: 0 0 4px rgba(42, 82, 152, 0.2);
 }
 
 .filter-row input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: #999;
 }
 
 /* 小地图 */
@@ -677,8 +676,8 @@ const handleResize = () => {
   width: 100%;
   height: 240px;
   position: relative;
-  background: rgba(0, 0, 0, 0.4);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f5f7fa;
+  border-top: 1px solid #dde5f0;
 }
 
 /* 图谱切换按钮 */
@@ -688,17 +687,17 @@ const handleResize = () => {
   right: 8px;
   padding: 4px 12px;
   font-size: 11px;
-  background: rgba(102, 126, 234, 0.6);
+  background: #2A5298;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  border: 1px solid #2A5298;
+  border-radius: 4px;
   cursor: pointer;
   z-index: 5;
   transition: all 0.2s;
 }
 
 .graph-toggle-btn:hover {
-  background: rgba(102, 126, 234, 0.8);
+  background: #1e3d72;
 }
 
 /* 属性弹窗 */
@@ -708,11 +707,12 @@ const handleResize = () => {
   left: 8px;
   right: 8px;
   max-height: 180px;
-  background: rgba(30, 30, 40, 0.95);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid #2A5298;
   z-index: 10;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .popup-header {
@@ -720,8 +720,8 @@ const handleResize = () => {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: rgba(102, 126, 234, 0.3);
-  color: #fff;
+  background: #e8eef6;
+  color: #2A5298;
   font-size: 13px;
   font-weight: 600;
 }
@@ -729,21 +729,21 @@ const handleResize = () => {
 .popup-close {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: #666;
   font-size: 18px;
   cursor: pointer;
   line-height: 1;
 }
 
 .popup-close:hover {
-  color: #fff;
+  color: #2A5298;
 }
 
 .popup-content {
   padding: 8px 12px;
   max-height: 130px;
   overflow-y: auto;
-  color: #e0e0e0;
+  color: #333;
   font-size: 12px;
 }
 
@@ -751,16 +751,16 @@ const handleResize = () => {
   display: flex;
   justify-content: space-between;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #e8eef6;
 }
 
 .prop-key {
   font-weight: 600;
-  color: rgba(102, 126, 234, 0.9);
+  color: #2A5298;
   margin-right: 12px;
 }
 
 .prop-val {
-  color: #ccc;
+  color: #555;
 }
 </style>

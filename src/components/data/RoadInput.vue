@@ -36,7 +36,7 @@ function toggle() {
 <style scoped>
 .file-upload-wrapper {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .file-input {
@@ -49,23 +49,23 @@ function toggle() {
 .file-label {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(102, 126, 234, 0.25);
-  color: #fff;
-  border-radius: 8px;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #e8eef6;
+  color: #2A5298;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  font-size: 13px;
   font-weight: 500;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  border: 1px solid #2A5298;
 }
 
 .file-label:hover {
-  background: rgba(102, 126, 234, 0.4);
+  background: #d0dced;
 }
 
-.file-icon { font-size: 18px; }
+.file-icon { font-size: 16px; }
 
 .file-text { flex: 1; }
 
@@ -73,12 +73,16 @@ function toggle() {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #dde5f0;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.checkbox-text { font-size: 14px; color: #e0e0e0; }
+.checkbox-label:hover {
+  border-color: #2A5298;
+}
+
+.checkbox-text { font-size: 13px; color: #333; }
 </style>

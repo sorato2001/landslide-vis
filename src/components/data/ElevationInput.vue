@@ -77,25 +77,24 @@ function toggle1() {
 .file-label {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(102, 126, 234, 0.25);
-  color: #fff;
-  border-radius: 8px;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #e8eef6;
+  color: #2A5298;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  font-size: 13px;
   font-weight: 500;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  border: 1px solid #2A5298;
 }
 
 .file-label:hover {
-  background: rgba(102, 126, 234, 0.4);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: #d0dced;
 }
 
 .file-icon {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .file-text {
@@ -108,72 +107,72 @@ function toggle1() {
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .checkbox-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #dde5f0;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .checkbox-label:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(102, 126, 234, 0.4);
+  border-color: #2A5298;
 }
 
 .checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
+  accent-color: #2A5298;
 }
 
 .checkbox-text {
-  font-size: 14px;
-  color: #e0e0e0;
+  font-size: 13px;
+  color: #333;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
-  color: #90caf9;
-  font-size: 14px;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #2A5298;
+  border-radius: 6px;
+  color: #2A5298;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: rgba(102, 126, 234, 0.15);
-  border-color: rgba(102, 126, 234, 0.5);
+  background: #e8eef6;
 }
 
 .btn-icon {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .status-badge {
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 500;
   text-align: center;
 }
 
 .status-badge.success {
-  background: rgba(46, 213, 115, 0.2);
-  color: #81c784;
+  background: #e6f7ef;
+  color: #0d7a5f;
+  border: 1px solid #b0dcc8;
 }
 </style>

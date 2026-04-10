@@ -140,7 +140,7 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
       duration: 2.0,
       offset: new Cesium.HeadingPitchRange(
         0.0,
-        Cesium.Math.toRadians(-45),
+        Cesium.Math.toRadians(-90),
         0
       ),
     })
@@ -150,7 +150,7 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
       destination: Cesium.Cartesian3.fromDegrees(lng, lat, 5000),
       orientation: {
         heading: 0,
-        pitch: Cesium.Math.toRadians(-45),
+        pitch: Cesium.Math.toRadians(-90),
         roll: 0,
       },
       duration: 2.0,

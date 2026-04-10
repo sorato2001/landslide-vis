@@ -14,18 +14,18 @@ import InputSection from './InputSection.vue'
 <style scoped>
 .hint {
   font-size: 12px;
-  color: #aaa;
-  margin: 0 0 10px 0;
+  color: #888;
+  margin: 0 0 8px 0;
 }
 
 .disabled-btn {
   width: 100%;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #666;
-  font-size: 14px;
+  padding: 8px 14px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #999;
+  font-size: 13px;
   cursor: not-allowed;
 }
 </style>

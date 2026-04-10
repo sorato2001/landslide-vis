@@ -29,15 +29,22 @@ const sorted = computed(() =>
 .legend {
   margin-top: 10px;
 }
+.legend h4 {
+  font-size: 13px;
+  color: #2A5298;
+  margin: 0 0 6px 0;
+}
 .item {
   display: flex;
   align-items: center;
   font-size: 12px;
+  color: #333;
 }
 .color {
   width: 14px;
   height: 14px;
   margin-right: 6px;
-  border: 1px solid #333;
+  border: 1px solid #999;
+  border-radius: 2px;
 }
 </style>

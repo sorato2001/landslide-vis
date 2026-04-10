@@ -15,6 +15,6 @@ onMounted(() => {
 #cesiumContainer {
   position: absolute;
   inset: 0;
-  z-index: 0;   /* 地图在最底层 */
+  z-index: 0;
 }
 </style>

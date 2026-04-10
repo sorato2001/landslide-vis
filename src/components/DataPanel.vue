@@ -1,7 +1,8 @@
 <template>
   <div class="data-panel">
     <div class="panel-header">
-      <h3>📊 数据录入</h3>
+      <span class="header-icon">📊</span>
+      <span class="header-title">数据录入</span>
       <button class="close-btn" @click="$emit('close')" title="关闭">&times;</button>
     </div>
 
@@ -25,82 +26,75 @@ defineEmits(['close'])
 
 <style scoped>
 .data-panel {
-  position: absolute;
-  top: 100px;
-  left: 20px;
-  width: 360px;
-  max-height: calc(100vh - 40px);
-  background: rgba(10, 10, 25, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  z-index: 10;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  background: #fff;
 }
 
 .panel-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  background: #e8eef6;
+  border-bottom: 2px solid #2A5298;
   flex-shrink: 0;
+  gap: 8px;
 }
 
-.panel-header h3 {
-  margin: 0;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
+.header-icon {
+  font-size: 16px;
+}
+
+.header-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2A5298;
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: none;
   border: none;
-  color: #fff;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  color: #666;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg);
+  background: #d0dced;
+  color: #2A5298;
 }
 
 .panel-content {
-  padding: 20px;
+  padding: 14px;
   overflow-y: auto;
   flex: 1;
 }
 
 .panel-content::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .panel-content::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f0f0f0;
   border-radius: 3px;
 }
 
 .panel-content::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.3);
+  background: #b0c4de;
   border-radius: 3px;
 }
 
 .panel-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.5);
+  background: #2A5298;
 }
 </style>

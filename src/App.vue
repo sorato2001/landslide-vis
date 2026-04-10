@@ -12,50 +12,99 @@ const active = ref(null)
 </script>
 
 <template>
-  <!-- 单一视图：Cesium + 小地图/图谱 -->
-  <div class="view-container">
-    <CesiumViewer />
-    
-    <!-- 顶部标题栏 -->
-    <div class="top-header">
-      <h1 class="system-title">滑坡危险性评价集成化决策支持可视化系统</h1>
+  <div class="app-layout">
+    <!-- 顶部导航栏：标题 + 功能标签 -->
+    <header class="top-bar">
+      <div class="title-box">
+        <h1 class="system-title">知识引导的滑坡易发性评估智能决策系统</h1>
+      </div>
+      <LeftMenu @show="active = $event" :activeTab="active" />
+    </header>
+
+    <!-- 主内容区 -->
+    <div class="main-area">
+      <!-- 左侧边栏 -->
+      <aside class="left-sidebar" v-show="active">
+        <DataPanel v-if="active === 'data'" @close="active = null" />
+        <ModelPanel v-if="active === 'model'" @close="active = null" />
+        <DecisionPanel v-if="active === 'decision'" @close="active = null" />
+      </aside>
+
+      <!-- Cesium 地球 -->
+      <div class="cesium-wrapper">
+        <CesiumViewer />
+        <MiniMapPanel />
+      </div>
     </div>
-    
-    <MiniMapPanel />
-    <LeftMenu @show="active = $event" />
-    <DataPanel v-show="active === 'data'" @close="active = null" />
-    <ModelPanel v-show="active === 'model'" @close="active = null" />
-    <DecisionPanel v-show="active === 'decision'" @close="active = null" />
   </div>
 </template>
 
 <style scoped>
-.view-container {
+.app-layout {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.top-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 15;
-  text-align: center;
-  padding: 10px 20px 10px;
-  background: rgba(10, 10, 25);
-  pointer-events: none;
+/* ========== 顶部导航栏 ========== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  background: #fff;
+  border-bottom: 2px solid #2A5298;
+  z-index: 100;
+  flex-shrink: 0;
+  padding: 0 12px;
+  gap: 16px;
+}
+
+.title-box {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 34px;
+  border: 2px solid #2A5298;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .system-title {
   margin: 0;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 4px;
-  color: #fff;
-  text-shadow: 0 0 12px rgba(102, 126, 234, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
+  color: #2A5298;
+  letter-spacing: 2px;
+  white-space: nowrap;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+/* ========== 主内容区 ========== */
+.main-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========== 左侧边栏 ========== */
+.left-sidebar {
+  width: 320px;
+  min-width: 320px;
+  background: #f5f7fa;
+  border-right: 2px solid #2A5298;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* ========== Cesium 区域 ========== */
+.cesium-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 </style>

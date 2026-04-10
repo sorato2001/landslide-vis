@@ -1,71 +1,85 @@
 <template>
   <div class="model-panel">
     <div class="panel-header">
-      <h3>🤖 模型集成</h3>
+      <span class="header-icon">🤖</span>
+      <span class="header-title">模型集成</span>
       <button class="close-btn" @click="$emit('close')" title="关闭">&times;</button>
     </div>
 
-    <div class="model-section">
-      <div class="section-title">
-        <span class="icon">📊</span>
-        <span>数据预处理</span>
+    <div class="panel-content">
+      <div class="section-group">
+        <div class="section-label">数据信息</div>
+        <button class="sub-btn" @click="$emit('close')">地理环境数据</button>
+        <button class="sub-btn" @click="$emit('close')">动态触发数据</button>
+        <button class="sub-btn" @click="$emit('close')">滑坡编录数据</button>
       </div>
-      <button 
-        class="model-btn primary"
-        @click="runReclass"
-        :disabled="running"
-      >
-        <span class="btn-icon">📝</span>
-        <span class="btn-text">重分类</span>
-        <span v-if="running" class="loading-spinner"></span>
-      </button>
-    </div>
 
-    <div class="model-section">
-      <div class="section-title">
-        <span class="icon">🧠</span>
-        <span>机器学习模型</span>
+      <div class="section-group">
+        <div class="section-label">模型信息</div>
+
+        <div class="model-section">
+          <div class="section-title">
+            <span class="icon">📊</span>
+            <span>数据预处理</span>
+          </div>
+          <button 
+            class="model-btn primary"
+            @click="runReclass"
+            :disabled="running"
+          >
+            <span class="btn-icon">📝</span>
+            <span class="btn-text">重分类</span>
+            <span v-if="running" class="loading-spinner"></span>
+          </button>
+        </div>
+
+        <div class="model-section">
+          <div class="section-title">
+            <span class="icon">🧠</span>
+            <span>机器学习模型</span>
+          </div>
+          
+          <input
+            ref="cnnInput"
+            type="file"
+            multiple
+            accept=".csv,.shp,.shx,.dbf,.prj"
+            hidden
+            @change="onCNNFilesSelected"
+          />
+
+          <button 
+            class="model-btn success"
+            @click="openCNNFileDialog"
+            :disabled="running"
+          >
+            <span class="btn-icon">🌐</span>
+            <div class="btn-content">
+              <span class="btn-text">卷积神经网络</span>
+              <span class="btn-subtext">CNN 预测</span>
+            </div>
+            <span v-if="running" class="loading-spinner"></span>
+          </button>
+
+          <button 
+            class="model-btn info"
+            @click="runANN" 
+            :disabled="running"
+          >
+            <span class="btn-icon">⚡</span>
+            <div class="btn-content">
+              <span class="btn-text">人工神经网络</span>
+              <span class="btn-subtext">ANN 预测</span>
+            </div>
+            <span v-if="running" class="loading-spinner"></span>
+          </button>
+        </div>
       </div>
-      
-      <input
-        ref="cnnInput"
-        type="file"
-        multiple
-        accept=".csv,.shp,.shx,.dbf,.prj"
-        hidden
-        @change="onCNNFilesSelected"
-      />
 
-      <button 
-        class="model-btn success"
-        @click="openCNNFileDialog"
-        :disabled="running"
-      >
-        <span class="btn-icon">🌐</span>
-        <div class="btn-content">
-          <span class="btn-text">卷积神经网络</span>
-          <span class="btn-subtext">CNN 预测</span>
-        </div>
-        <span v-if="running" class="loading-spinner"></span>
-      </button>
-
-      <button 
-        class="model-btn info"
-        @click="runANN" 
-        :disabled="running"
-      >
-        <span class="btn-icon">⚡</span>
-        <div class="btn-content">
-          <span class="btn-text">人工神经网络</span>
-          <span class="btn-subtext">ANN 预测</span>
-        </div>
-        <span v-if="running" class="loading-spinner"></span>
-      </button>
-    </div>
-
-    <div v-if="status" class="status-bar" :class="statusType">
-      <span class="status-icon">ℹ️</span>
-      <span>{{ status }}</span>
+      <div v-if="status" class="status-bar" :class="statusType">
+        <span class="status-icon">ℹ️</span>
+        <span>{{ status }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -172,60 +186,125 @@ async function runANN() {
 
 <style scoped>
 .model-panel {
-  position: absolute;
-  top: 100px;
-  left: 20px;
-  background: rgba(10, 10, 25, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 14px;
-  width: 320px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
 }
 
 .panel-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  background: #e8eef6;
+  border-bottom: 2px solid #2A5298;
+  flex-shrink: 0;
+  gap: 8px;
 }
 
-.panel-header h3 {
-  margin: 0;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
+.header-icon {
+  font-size: 16px;
+}
+
+.header-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #2A5298;
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: none;
   border: none;
-  color: #fff;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  color: #666;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg);
+  background: #d0dced;
+  color: #2A5298;
 }
 
+.panel-content {
+  padding: 14px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.panel-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+  background: #b0c4de;
+  border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+  background: #2A5298;
+}
+
+/* 分组标签 */
+.section-group {
+  margin-bottom: 16px;
+  border: 1px solid #2A5298;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafe;
+}
+
+.section-label {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2A5298;
+  padding: 4px 14px;
+  border: 2px solid #2A5298;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 10px;
+  background: #e8eef6;
+}
+
+.sub-btn {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: #fff;
+  border: 1px solid #2A5298;
+  border-radius: 6px;
+  color: #2A5298;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sub-btn:hover {
+  background: #e8eef6;
+}
+
+.sub-btn:last-of-type {
+  margin-bottom: 0;
+}
+
+/* 模型区域 */
 .model-section {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 0;
+  border-bottom: 1px solid #dde5f0;
 }
 
 .model-section:last-of-type {
@@ -235,95 +314,71 @@ async function runANN() {
 .section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  color: #e0e0e0;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: #2A5298;
   font-size: 14px;
   font-weight: 600;
 }
 
 .section-title .icon {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .model-btn {
   width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 10px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
   border: 2px solid transparent;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 12px;
-  position: relative;
-  overflow: hidden;
+  gap: 10px;
+  color: #fff;
 }
 
 .model-btn:last-child {
   margin-bottom: 0;
 }
 
-.model-btn::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.model-btn:hover::before {
-  opacity: 1;
-}
-
 .model-btn.primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-color: rgba(102, 126, 234, 0.3);
+  background: #2A5298;
+  border-color: #2A5298;
 }
 
 .model-btn.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: #1e3d72;
 }
 
 .model-btn.success {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  color: #fff;
-  border-color: rgba(17, 153, 142, 0.3);
+  background: #0d7a5f;
+  border-color: #0d7a5f;
 }
 
 .model-btn.success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+  background: #095e48;
 }
 
 .model-btn.info {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: #fff;
-  border-color: rgba(79, 172, 254, 0.3);
+  background: #3a7bd5;
+  border-color: #3a7bd5;
 }
 
 .model-btn.info:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+  background: #2a5fa8;
 }
 
 .model-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none !important;
 }
 
 .btn-icon {
-  font-size: 22px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -338,18 +393,18 @@ async function runANN() {
 }
 
 .btn-text {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .btn-subtext {
   font-size: 11px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .loading-spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
@@ -361,42 +416,38 @@ async function runANN() {
 }
 
 .status-bar {
-  padding: 12px 20px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   font-weight: 500;
+  border-radius: 6px;
+  margin-top: 10px;
   animation: slideIn 0.3s ease;
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .status-bar.info {
-  background: rgba(102, 126, 234, 0.2);
-  color: #90caf9;
+  background: #e8eef6;
+  color: #2A5298;
 }
 
 .status-bar.success {
-  background: rgba(46, 213, 115, 0.2);
-  color: #81c784;
+  background: #e6f7ef;
+  color: #0d7a5f;
 }
 
 .status-bar.error {
-  background: rgba(231, 76, 60, 0.2);
-  color: #ef9a9a;
+  background: #fde8e8;
+  color: #c0392b;
 }
 
 .status-icon {
-  font-size: 16px;
+  font-size: 14px;
 }
 </style>
