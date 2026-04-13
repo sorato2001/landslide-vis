@@ -79,22 +79,23 @@ function toggle1() {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: #e8eef6;
-  color: #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  color: #4A90D9;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.4);
 }
 
 .file-label:hover {
-  background: #d0dced;
+  background: rgba(58, 123, 213, 0.2);
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
 .file-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .file-text {
@@ -115,27 +116,27 @@ function toggle1() {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #fff;
-  border: 1px solid #dde5f0;
+  background: rgba(10, 22, 40, 0.4);
+  border: 1px solid rgba(58, 123, 213, 0.2);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .checkbox-label:hover {
-  border-color: #2A5298;
+  border-color: rgba(58, 123, 213, 0.4);
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #2A5298;
+  accent-color: #3A7BD5;
 }
 
 .checkbox-text {
-  font-size: 13px;
-  color: #333;
+  font-size: 15px;
+  color: #C0D4EC;
 }
 
 .action-btn {
@@ -144,35 +145,36 @@ function toggle1() {
   justify-content: center;
   gap: 6px;
   padding: 8px 14px;
-  background: #fff;
-  border: 1px solid #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  border: 1px solid rgba(58, 123, 213, 0.4);
   border-radius: 6px;
-  color: #2A5298;
-  font-size: 13px;
+  color: #4A90D9;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.2);
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
 .btn-icon {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .status-badge {
   padding: 6px 12px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   text-align: center;
 }
 
 .status-badge.success {
-  background: #e6f7ef;
-  color: #0d7a5f;
-  border: 1px solid #b0dcc8;
+  background: rgba(5, 141, 73, 0.15);
+  color: #0AA85A;
+  border: 1px solid rgba(5, 141, 73, 0.3);
 }
 </style>

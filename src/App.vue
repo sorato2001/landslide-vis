@@ -115,13 +115,14 @@ watch(graphPanelRef, (panel) => {
 .top-bar {
   display: flex;
   align-items: center;
-  height: 48px;
-  background: #fff;
-  border-bottom: 2px solid #2A5298;
+  height: 60px;
+  background: linear-gradient(135deg, #0A2E5C 0%, #1A3A6B 50%, #0D2847 100%);
+  border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   z-index: 100;
   flex-shrink: 0;
   padding: 0 12px;
   gap: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .title-box {
@@ -129,19 +130,21 @@ watch(graphPanelRef, (panel) => {
   align-items: center;
   padding: 0 16px;
   height: 34px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 6px;
   flex-shrink: 0;
+  background: rgba(58, 123, 213, 0.1);
 }
 
 .system-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
   letter-spacing: 2px;
   white-space: nowrap;
   font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  text-shadow: 0 0 10px rgba(58, 123, 213, 0.6);
 }
 
 /* ========== 主内容区 ========== */
@@ -154,8 +157,8 @@ watch(graphPanelRef, (panel) => {
 
 /* ========== 左侧边栏 ========== */
 .left-sidebar {
-  background: #f5f7fa;
-  border-right: 2px solid #2A5298;
+  background: rgba(10, 22, 40, 0.95);
+  border-right: 1px solid rgba(58, 123, 213, 0.3);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
@@ -179,14 +182,14 @@ watch(graphPanelRef, (panel) => {
 
 .resize-handle:hover .resize-line,
 .resize-handle:active .resize-line {
-  background: #2A5298;
+  background: #3A7BD5;
   width: 3px;
 }
 
 .resize-line {
   width: 2px;
   height: 40px;
-  background: #b0c4de;
+  background: rgba(58, 123, 213, 0.4);
   border-radius: 2px;
   transition: all 0.2s ease;
 }

@@ -51,21 +51,22 @@ function toggle() {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: #e8eef6;
-  color: #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  color: #4A90D9;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.4);
 }
 
 .file-label:hover {
-  background: #d0dced;
+  background: rgba(58, 123, 213, 0.2);
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
-.file-icon { font-size: 16px; }
+.file-icon { font-size: 18px; }
 
 .file-text { flex: 1; }
 
@@ -74,15 +75,15 @@ function toggle() {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #fff;
-  border: 1px solid #dde5f0;
+  background: rgba(10, 22, 40, 0.4);
+  border: 1px solid rgba(58, 123, 213, 0.2);
   border-radius: 6px;
   cursor: pointer;
 }
 
 .checkbox-label:hover {
-  border-color: #2A5298;
+  border-color: rgba(58, 123, 213, 0.4);
 }
 
-.checkbox-text { font-size: 13px; color: #333; }
+.checkbox-text { font-size: 15px; color: #C0D4EC; }
 </style>

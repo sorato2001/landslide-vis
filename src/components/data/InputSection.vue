@@ -21,15 +21,15 @@ defineProps({
 .input-section {
   margin-bottom: 14px;
   padding: 12px;
-  background: #f8fafe;
+  background: rgba(10, 30, 60, 0.4);
   border-radius: 8px;
-  border: 1px solid #dde5f0;
+  border: 1px solid rgba(58, 123, 213, 0.2);
   transition: all 0.2s ease;
 }
 
 .input-section:hover {
-  border-color: #2A5298;
-  box-shadow: 0 2px 8px rgba(42, 82, 152, 0.1);
+  border-color: rgba(58, 123, 213, 0.4);
+  box-shadow: 0 0 8px rgba(58, 123, 213, 0.15);
 }
 
 .section-header {
@@ -40,16 +40,16 @@ defineProps({
 }
 
 .section-icon {
-  font-size: 16px;
+  font-size: 18px;
   display: flex;
   align-items: center;
 }
 
 .section-title {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: #2A5298;
+  color: #4A90D9;
   flex: 1;
 }
 

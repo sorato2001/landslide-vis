@@ -29,39 +29,41 @@ defineEmits(['close'])
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: rgba(10, 22, 40, 0.95);
+  color: #E0E8F0;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  background: #e8eef6;
-  border-bottom: 2px solid #2A5298;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 8px;
 }
 
 .header-icon {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .header-title {
   flex: 1;
-  font-size: 15px;
+  font-size: 19px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(58, 123, 213, 0.5);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #666;
+  color: #8BA4C0;
   width: 24px;
   height: 24px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -70,8 +72,8 @@ defineEmits(['close'])
 }
 
 .close-btn:hover {
-  background: #d0dced;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.3);
+  color: #FFFFFF;
 }
 
 .panel-content {
@@ -85,16 +87,16 @@ defineEmits(['close'])
 }
 
 .panel-content::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: rgba(10, 22, 40, 0.5);
   border-radius: 3px;
 }
 
 .panel-content::-webkit-scrollbar-thumb {
-  background: #b0c4de;
+  background: rgba(58, 123, 213, 0.4);
   border-radius: 3px;
 }
 
 .panel-content::-webkit-scrollbar-thumb:hover {
-  background: #2A5298;
+  background: rgba(58, 123, 213, 0.6);
 }
 </style>

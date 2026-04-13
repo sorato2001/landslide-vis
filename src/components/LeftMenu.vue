@@ -46,29 +46,32 @@ const handleClick = (tab) => {
 .tab-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .tab-btn {
-  padding: 6px 18px;
-  font-size: 14px;
+  padding: 8px 24px;
+  font-size: 18px;
   font-weight: 500;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.4);
   border-radius: 6px;
-  background: #e8eef6;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.1);
+  color: #8BA4C0;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .tab-btn:hover {
-  background: #d0dced;
+  background: rgba(58, 123, 213, 0.25);
+  color: #C0D4EC;
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
 .tab-btn.active {
-  background: #2A5298;
+  background: linear-gradient(135deg, #1A3A6B, #3A7BD5);
   color: #fff;
-  border-color: #2A5298;
+  border-color: #3A7BD5;
+  box-shadow: 0 0 12px rgba(58, 123, 213, 0.4);
 }
 </style>

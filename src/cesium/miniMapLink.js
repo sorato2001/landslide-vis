@@ -192,17 +192,18 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
     target.point.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
     target.point.disableDepthTestDistance = 10000
 
-    viewer.flyTo(target, {
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lng, lat, 500000),
+      orientation: {
+        heading: 0,
+        pitch: Cesium.Math.toRadians(-90),
+        roll: 0,
+      },
       duration: 2.0,
-      offset: new Cesium.HeadingPitchRange(
-        0.0,
-        Cesium.Math.toRadians(-90),
-        0
-      ),
     })
   } else if (lng != null && lat != null) {
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(lng, lat, 5000),
+      destination: Cesium.Cartesian3.fromDegrees(lng, lat, 500000),
       orientation: {
         heading: 0,
         pitch: Cesium.Math.toRadians(-90),

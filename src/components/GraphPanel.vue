@@ -415,7 +415,7 @@ const createGraphInstance = (el, data, width, height, isFullscreen) => {
       ctx.rotate(textAngle)
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillStyle = '#515353'
+      ctx.fillStyle = '#FFFFFF'
       ctx.fillText(label, 0, 0)
       ctx.restore()
     })
@@ -476,15 +476,22 @@ const createGraphInstance = (el, data, width, height, isFullscreen) => {
     })
 
   const nodeCount = data.nodes.length
-  fg.d3Force('charge', d3.forceManyBody().strength(-Math.max(300, nodeCount)))
-  fg.d3Force('link').distance(() => 20).strength(0.105)
+  // 排斥力适当，避免节点过于密集
+  fg.d3Force('charge', d3.forceManyBody().strength(-200))
+  // 增大链接距离让节点更分散
+  fg.d3Force('link').distance(() => 60).strength(0.08)
   fg.d3Force(
     'collision',
     d3.forceCollide().radius((node) => {
-      return node.value ? Math.sqrt(node.size) * 3 : 20
-    }).strength(0.5)
+      return node.value ? Math.sqrt(node.size) * 3 : 25
+    }).strength(0.3)
   )
   fg.d3Force('center', d3.forceCenter(0, 0, 0))
+
+  // 初始缩放填充视口
+  setTimeout(() => {
+    fg.zoomToFit(400, 40)
+  }, 800)
 
   return fg
 }
@@ -512,6 +519,10 @@ const loadInlineGraph = (data) => {
 
   if (inlineGraph) {
     inlineGraph.graphData(data)
+    // 数据更新后自动缩放填充
+    setTimeout(() => {
+      inlineGraph.zoomToFit(400, 40)
+    }, 800)
     return
   }
 
@@ -530,6 +541,10 @@ const loadFullscreenGraph = (data) => {
     fullGraph.graphData(data)
     fullGraph.width(width)
     fullGraph.height(height)
+    // 数据更新后自动缩放填充
+    setTimeout(() => {
+      fullGraph.zoomToFit(400, 40)
+    }, 800)
     return
   }
 
@@ -541,6 +556,12 @@ const openFullscreen = () => {
   nextTick(() => {
     if (currentGraphData) {
       loadFullscreenGraph(currentGraphData)
+      // 全屏图谱延迟缩放填充
+      if (fullGraph) {
+        setTimeout(() => {
+          fullGraph.zoomToFit(400, 40)
+        }, 1000)
+      }
     }
   })
 }
@@ -644,39 +665,41 @@ const handleResize = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: rgba(10, 22, 40, 0.95);
+  color: #E0E8F0;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  background: #e8eef6;
-  border-bottom: 2px solid #2A5298;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 8px;
 }
 
 .header-icon {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .header-title {
   flex: 1;
-  font-size: 15px;
+  font-size: 19px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(58, 123, 213, 0.5);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #666;
+  color: #8BA4C0;
   width: 24px;
   height: 24px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -685,8 +708,8 @@ const handleResize = () => {
 }
 
 .close-btn:hover {
-  background: #d0dced;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.3);
+  color: #FFFFFF;
 }
 
 .panel-content {
@@ -703,20 +726,20 @@ const handleResize = () => {
 }
 
 .panel-content::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: rgba(10, 22, 40, 0.5);
 }
 
 .panel-content::-webkit-scrollbar-thumb {
-  background: #b0c4de;
+  background: rgba(58, 123, 213, 0.4);
   border-radius: 3px;
 }
 
 /* ============ 图例 ============ */
 .legend-section {
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.3);
   border-radius: 8px;
   padding: 10px;
-  background: #f8fafe;
+  background: rgba(10, 30, 60, 0.6);
 }
 
 .legend-group {
@@ -729,15 +752,16 @@ const handleResize = () => {
 
 .legend-group-title {
   text-align: center;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
   padding: 3px 12px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 20px;
   display: inline-block;
   margin-bottom: 8px;
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.2);
+  text-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
 }
 
 .legend-items {
@@ -751,8 +775,8 @@ const handleResize = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  color: #333;
+  font-size: 16px;
+  color: #C0D4EC;
 }
 
 .dot {
@@ -760,7 +784,7 @@ const handleResize = () => {
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.15);
 }
 
 .legend-text {
@@ -776,8 +800,8 @@ const handleResize = () => {
 }
 
 .relation-line {
-  font-size: 12px;
-  color: #555;
+  font-size: 16px;
+  color: #8BA4C0;
   font-family: 'Consolas', 'Courier New', monospace;
   letter-spacing: 0.5px;
 }
@@ -788,9 +812,9 @@ const handleResize = () => {
   flex-direction: column;
   gap: 6px;
   padding: 8px 10px;
-  background: #f5f7fa;
+  background: rgba(10, 30, 60, 0.6);
   border-radius: 6px;
-  border: 1px solid #dde5f0;
+  border: 1px solid rgba(58, 123, 213, 0.3);
 }
 
 .filter-row {
@@ -800,8 +824,8 @@ const handleResize = () => {
 }
 
 .filter-row label {
-  color: #2A5298;
-  font-size: 12px;
+  color: #8BA4C0;
+  font-size: 16px;
   white-space: nowrap;
   font-weight: 500;
   min-width: 60px;
@@ -809,22 +833,22 @@ const handleResize = () => {
 
 .filter-row input {
   flex: 1;
-  padding: 4px 8px;
-  font-size: 12px;
-  background: #fff;
-  border: 1px solid #b0c4de;
+  padding: 5px 10px;
+  font-size: 16px;
+  background: rgba(10, 22, 40, 0.8);
+  border: 1px solid rgba(58, 123, 213, 0.4);
   border-radius: 4px;
-  color: #333;
+  color: #E0E8F0;
   outline: none;
 }
 
 .filter-row input:focus {
-  border-color: #2A5298;
-  box-shadow: 0 0 4px rgba(42, 82, 152, 0.2);
+  border-color: #3A7BD5;
+  box-shadow: 0 0 8px rgba(58, 123, 213, 0.3);
 }
 
 .filter-row input::placeholder {
-  color: #999;
+  color: #5A7A9E;
 }
 
 /* ============ 图谱容器 ============ */
@@ -832,10 +856,10 @@ const handleResize = () => {
   position: relative;
   flex: 1;
   min-height: 250px;
-  border: 1px solid #dde5f0;
+  border: 1px solid rgba(58, 123, 213, 0.3);
   border-radius: 6px;
   overflow: hidden;
-  background: #f8fafe;
+  background: rgba(5, 15, 30, 0.8);
 }
 
 #graph-view {
@@ -855,36 +879,37 @@ const handleResize = () => {
 }
 
 .graph-action-btn {
-  padding: 4px 12px;
-  font-size: 11px;
-  background: #2A5298;
+  padding: 6px 16px;
+  font-size: 15px;
+  background: linear-gradient(135deg, #1A3A6B, #3A7BD5);
   color: #fff;
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .graph-action-btn:hover {
-  background: #1e3d72;
+  background: linear-gradient(135deg, #2A4E8B, #4A90D9);
+  box-shadow: 0 0 10px rgba(58, 123, 213, 0.4);
 }
 
 .fullscreen-btn {
-  background: #1e3d72;
-  border-color: #1e3d72;
+  background: linear-gradient(135deg, #0D2847, #1A3A6B);
+  border-color: rgba(58, 123, 213, 0.4);
 }
 
 .fullscreen-btn:hover {
-  background: #152d5a;
+  background: linear-gradient(135deg, #1A3A6B, #2A4E8B);
 }
 
 /* ============ 属性弹窗（侧栏） ============ */
 .property-popup {
-  background: #fff;
+  background: rgba(10, 22, 40, 0.95);
   border-radius: 6px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 
 .popup-header {
@@ -892,48 +917,48 @@ const handleResize = () => {
   justify-content: space-between;
   align-items: center;
   padding: 6px 10px;
-  background: #e8eef6;
-  color: #2A5298;
-  font-size: 13px;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  color: #FFFFFF;
+  font-size: 17px;
   font-weight: 600;
 }
 
 .popup-close {
   background: none;
   border: none;
-  color: #666;
-  font-size: 16px;
+  color: #8BA4C0;
+  font-size: 20px;
   cursor: pointer;
   line-height: 1;
 }
 
 .popup-close:hover {
-  color: #2A5298;
+  color: #FFFFFF;
 }
 
 .popup-content {
   padding: 6px 10px;
   max-height: 150px;
   overflow-y: auto;
-  color: #333;
-  font-size: 12px;
+  color: #C0D4EC;
+  font-size: 16px;
 }
 
 .prop-row {
   display: flex;
   justify-content: space-between;
   padding: 2px 0;
-  border-bottom: 1px solid #e8eef6;
+  border-bottom: 1px solid rgba(58, 123, 213, 0.15);
 }
 
 .prop-key {
   font-weight: 600;
-  color: #2A5298;
+  color: #4A90D9;
   margin-right: 10px;
 }
 
 .prop-val {
-  color: #555;
+  color: #8BA4C0;
 }
 
 /* ============ 全屏图谱弹窗 ============ */
@@ -941,7 +966,7 @@ const handleResize = () => {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -954,32 +979,33 @@ const handleResize = () => {
 }
 
 .fullscreen-panel {
-  width: 90vw;
-  height: 85vh;
-  background: #fff;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 15, 30, 0.95);
   border-radius: 12px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.4);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
 }
 
 .fullscreen-header {
   display: flex;
   align-items: center;
   padding: 12px 18px;
-  background: #e8eef6;
-  border-bottom: 2px solid #2A5298;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 12px;
 }
 
 .fullscreen-title {
   flex: 1;
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(58, 123, 213, 0.5);
 }
 
 .fullscreen-btns {
@@ -989,29 +1015,30 @@ const handleResize = () => {
 }
 
 .fullscreen-action {
-  padding: 6px 16px;
-  font-size: 13px;
-  background: #2A5298;
+  padding: 8px 20px;
+  font-size: 17px;
+  background: linear-gradient(135deg, #1A3A6B, #3A7BD5);
   color: #fff;
-  border: none;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .fullscreen-action:hover {
-  background: #1e3d72;
+  background: linear-gradient(135deg, #2A4E8B, #4A90D9);
+  box-shadow: 0 0 10px rgba(58, 123, 213, 0.4);
 }
 
 .fullscreen-close {
   background: none;
   border: none;
-  color: #666;
+  color: #8BA4C0;
   width: 30px;
   height: 30px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -1020,15 +1047,15 @@ const handleResize = () => {
 }
 
 .fullscreen-close:hover {
-  background: #d0dced;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.3);
+  color: #FFFFFF;
 }
 
 .fullscreen-body {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: #f8fafe;
+  background: rgba(5, 15, 30, 0.8);
 }
 
 #fullscreen-graph {
@@ -1045,11 +1072,11 @@ const handleResize = () => {
   left: 12px;
   width: 320px;
   max-height: 300px;
-  background: #fff;
+  background: rgba(10, 22, 40, 0.95);
   border-radius: 8px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   z-index: 10;
 }
 </style>

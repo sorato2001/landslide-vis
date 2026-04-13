@@ -30,21 +30,21 @@ const sorted = computed(() =>
   margin-top: 10px;
 }
 .legend h4 {
-  font-size: 13px;
-  color: #2A5298;
+  font-size: 15px;
+  color: #4A90D9;
   margin: 0 0 6px 0;
 }
 .item {
   display: flex;
   align-items: center;
-  font-size: 12px;
-  color: #333;
+  font-size: 14px;
+  color: #C0D4EC;
 }
 .color {
   width: 14px;
   height: 14px;
   margin-right: 6px;
-  border: 1px solid #999;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 2px;
 }
 </style>

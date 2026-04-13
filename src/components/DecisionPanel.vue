@@ -344,39 +344,41 @@ function toggleVisualization() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  background: rgba(10, 22, 40, 0.95);
+  color: #E0E8F0;
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   padding: 10px 14px;
-  background: #e8eef6;
-  border-bottom: 2px solid #2A5298;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 8px;
 }
 
 .header-icon {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .header-title {
   flex: 1;
-  font-size: 15px;
+  font-size: 19px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(58, 123, 213, 0.5);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #666;
+  color: #8BA4C0;
   width: 24px;
   height: 24px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -385,8 +387,8 @@ function toggleVisualization() {
 }
 
 .close-btn:hover {
-  background: #d0dced;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.3);
+  color: #FFFFFF;
 }
 
 .panel-content {
@@ -400,38 +402,39 @@ function toggleVisualization() {
 }
 
 .panel-content::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: rgba(10, 22, 40, 0.5);
 }
 
 .panel-content::-webkit-scrollbar-thumb {
-  background: #b0c4de;
+  background: rgba(58, 123, 213, 0.4);
   border-radius: 3px;
 }
 
 .panel-content::-webkit-scrollbar-thumb:hover {
-  background: #2A5298;
+  background: rgba(58, 123, 213, 0.6);
 }
 
 /* 分组 */
 .section-group {
   margin-bottom: 14px;
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.3);
   border-radius: 8px;
   padding: 12px;
-  background: #f8fafe;
+  background: rgba(10, 30, 60, 0.6);
 }
 
 .section-label {
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #2A5298;
+  color: #FFFFFF;
   padding: 4px 14px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 20px;
   display: inline-block;
   margin-bottom: 10px;
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.2);
+  text-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
 }
 
 /* 文件上传 */
@@ -452,22 +455,23 @@ function toggleVisualization() {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: #e8eef6;
-  color: #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  color: #4A90D9;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
-  border: 1px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.4);
 }
 
 .file-label:hover {
-  background: #d0dced;
+  background: rgba(58, 123, 213, 0.2);
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
 .file-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .file-text {
@@ -480,14 +484,15 @@ function toggleVisualization() {
 .file-list {
   margin-top: 6px;
   padding: 8px;
-  background: #f0f4fa;
+  background: rgba(10, 30, 60, 0.4);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
+  border: 1px solid rgba(58, 123, 213, 0.2);
 }
 
 .file-item {
   padding: 3px 0;
-  color: #2A5298;
+  color: #4A90D9;
 }
 
 /* 操作按钮 */
@@ -498,27 +503,28 @@ function toggleVisualization() {
   gap: 8px;
   padding: 8px 14px;
   width: 100%;
-  background: #fff;
-  border: 1px solid #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  border: 1px solid rgba(58, 123, 213, 0.4);
   border-radius: 6px;
-  color: #2A5298;
-  font-size: 13px;
+  color: #4A90D9;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.2);
+  border-color: rgba(58, 123, 213, 0.6);
 }
 
 .action-btn.secondary {
-  border-color: #3a7bd5;
-  color: #3a7bd5;
+  border-color: rgba(58, 123, 213, 0.3);
+  color: #8BA4C0;
 }
 
 .action-btn.secondary:hover {
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.15);
 }
 
 .action-section {
@@ -530,9 +536,9 @@ function toggleVisualization() {
 .analysis-btn {
   width: 100%;
   padding: 12px 14px;
-  border: 2px solid #2A5298;
+  border: 1px solid rgba(58, 123, 213, 0.5);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -540,12 +546,13 @@ function toggleVisualization() {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #2A5298;
+  background: linear-gradient(135deg, #0A2E5C, #3A7BD5);
   color: #fff;
 }
 
 .analysis-btn:hover:not(:disabled) {
-  background: #1e3d72;
+  background: linear-gradient(135deg, #1A3A6B, #4A90D9);
+  box-shadow: 0 0 12px rgba(58, 123, 213, 0.4);
 }
 
 .analysis-btn:disabled {
@@ -554,16 +561,17 @@ function toggleVisualization() {
 }
 
 .analysis-btn.secondary {
-  background: #fff;
-  color: #2A5298;
+  background: rgba(10, 22, 40, 0.6);
+  color: #4A90D9;
+  border-color: rgba(58, 123, 213, 0.4);
 }
 
 .analysis-btn.secondary:hover {
-  background: #e8eef6;
+  background: rgba(58, 123, 213, 0.2);
 }
 
 .btn-icon {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .loading-spinner {
@@ -586,7 +594,7 @@ function toggleVisualization() {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   animation: slideIn 0.3s ease;
 }
@@ -597,43 +605,47 @@ function toggleVisualization() {
 }
 
 .status-bar.info {
-  background: #e8eef6;
-  color: #2A5298;
+  background: rgba(58, 123, 213, 0.15);
+  color: #4A90D9;
+  border: 1px solid rgba(58, 123, 213, 0.3);
 }
 
 .status-bar.success {
-  background: #e6f7ef;
-  color: #0d7a5f;
+  background: rgba(5, 141, 73, 0.15);
+  color: #0AA85A;
+  border: 1px solid rgba(5, 141, 73, 0.3);
 }
 
 .status-bar.error {
-  background: #fde8e8;
-  color: #c0392b;
+  background: rgba(192, 57, 43, 0.15);
+  color: #E74C3C;
+  border: 1px solid rgba(192, 57, 43, 0.3);
 }
 
 .status-bar.warning {
-  background: #fff8e1;
-  color: #b8860b;
+  background: rgba(255, 153, 0, 0.15);
+  color: #FF9900;
+  border: 1px solid rgba(255, 153, 0, 0.3);
 }
 
 .status-icon {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .warning-box {
   margin-top: 12px;
   padding: 10px 14px;
-  background: #fff8e1;
-  border: 1px solid #f0d060;
+  background: rgba(255, 153, 0, 0.1);
+  border: 1px solid rgba(255, 153, 0, 0.3);
   border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: #b8860b;
+  font-size: 15px;
+  color: #FF9900;
 }
 
 .warning-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 </style>
