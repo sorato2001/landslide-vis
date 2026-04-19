@@ -7,6 +7,7 @@
     >
       图谱查询
     </button>
+    <span class="nav-sep">◇</span>
     <button 
       class="tab-btn"
       :class="{ active: activeTab === 'input' }"
@@ -14,6 +15,7 @@
     >
       数据录入
     </button>
+    <span class="nav-sep">◇</span>
     <button 
       class="tab-btn"
       :class="{ active: activeTab === 'model' }"
@@ -21,6 +23,7 @@
     >
       模型集成
     </button>
+    <span class="nav-sep">◇</span>
     <button 
       class="tab-btn" 
       :class="{ active: activeTab === 'decision' }"
@@ -46,32 +49,54 @@ const handleClick = (tab) => {
 .tab-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+  margin: 0 auto;
 }
 
 .tab-btn {
-  padding: 8px 24px;
-  font-size: 18px;
-  font-weight: 500;
-  border: 1px solid rgba(58, 123, 213, 0.4);
-  border-radius: 6px;
-  background: rgba(58, 123, 213, 0.1);
-  color: #8BA4C0;
+  padding: 6px 30px; 
+  font-size: 20px; 
+  font-weight: 700;
+  color: #80b8d4; 
+  /* color: #fff; */
   cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 3px; 
+  border: 1px solid transparent;
+  transition: all 0.2s; 
+  position: relative;
+  letter-spacing: 2px; 
   white-space: nowrap;
+  background-color: transparent;
 }
 
 .tab-btn:hover {
-  background: rgba(58, 123, 213, 0.25);
-  color: #C0D4EC;
-  border-color: rgba(58, 123, 213, 0.6);
+  color: #fff; 
+  border-color: rgba(0,212,255,0.3);
+  background: rgba(0,212,255,0.06);
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #1A3A6B, #3A7BD5);
   color: #fff;
-  border-color: #3A7BD5;
-  box-shadow: 0 0 12px rgba(58, 123, 213, 0.4);
+  background: linear-gradient(180deg, rgba(0,120,255,0.3), rgba(0,60,180,0.2));
+  border-color: rgba(0,212,255,0.5);
+  box-shadow: 0 0 12px rgba(0,150,255,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  text-shadow: 0 0 10px rgba(0,212,255,0.8);
+}
+
+.tab-btn.active::after {
+  content: ''; 
+  position: absolute; 
+  bottom: -1px; 
+  left: 20%; 
+  right: 20%;
+  height: 2px; 
+  background: #00d4ff; 
+  box-shadow: 0 0 8px #00d4ff;
+}
+
+.nav-sep { 
+  color: #00d4ff; 
+  font-size: 16px; 
+  user-select: none; 
 }
 </style>

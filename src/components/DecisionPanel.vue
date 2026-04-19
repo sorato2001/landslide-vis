@@ -9,7 +9,10 @@
     <div class="panel-content">
       <!-- 数据输入区域 -->
       <div class="section-group">
-        <div class="section-label">易发性评估</div>
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>易发性评估</span>
+        </div>
 
         <InputSection title="区域范围" icon="🗺️">
           <div class="file-upload-wrapper">
@@ -63,7 +66,10 @@
       </div>
 
       <div class="section-group">
-        <div class="section-label">易发性分区</div>
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>易发性分区</span>
+        </div>
 
         <InputSection title="人口数据" icon="👥">
           <div class="file-upload-wrapper">
@@ -109,7 +115,10 @@
       </div>
 
       <div class="section-group">
-        <div class="section-label">决策建议</div>
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>决策建议</span>
+        </div>
 
         <!-- 分析按钮 -->
         <div class="action-section">
@@ -353,6 +362,8 @@ function toggleVisualization() {
   align-items: center;
   padding: 10px 14px;
   background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  /* background: linear-gradient(180deg, #010e22 0%, #02153a 50%, #052a5c 100%); */
+  /* background: linear-gradient(180deg, #052a5c 0%, #02153a 50%, #010e22 100%); */
   border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 8px;
@@ -417,24 +428,49 @@ function toggleVisualization() {
 /* 分组 */
 .section-group {
   margin-bottom: 14px;
-  border: 1px solid rgba(58, 123, 213, 0.3);
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid rgba(0, 179, 255, 0.342);
   border-radius: 8px;
-  padding: 12px;
-  background: rgba(10, 30, 60, 0.6);
+  padding: 14px;
+  position: relative;
+  animation: fadein 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.section-group:hover {
+  border-color: rgba(0, 179, 255, 0.685);
+}
+
+.section-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
 }
 
 .section-label {
-  text-align: center;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
   font-weight: 700;
-  color: #FFFFFF;
-  padding: 4px 14px;
-  border: 1px solid rgba(58, 123, 213, 0.5);
-  border-radius: 20px;
+  color: #ffffff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 179, 255, 0.2);
+}
+
+.section-bar {
   display: inline-block;
-  margin-bottom: 10px;
-  background: rgba(58, 123, 213, 0.2);
-  text-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
+  flex-shrink: 0;
+  width: 4px;
+  height: 20px;
+  background: #00d4ff;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+  border-radius: 2px;
 }
 
 /* 文件上传 */
@@ -460,7 +496,7 @@ function toggleVisualization() {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
   border: 1px solid rgba(58, 123, 213, 0.4);
 }
@@ -647,5 +683,10 @@ function toggleVisualization() {
 
 .warning-icon {
   font-size: 18px;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

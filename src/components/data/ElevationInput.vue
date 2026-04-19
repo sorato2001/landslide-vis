@@ -79,14 +79,14 @@ function toggle1() {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: rgba(10, 22, 40, 0.6);
-  color: #4A90D9;
-  border-radius: 6px;
+  background: rgba(6, 35, 85, 0.6);
+  color: #fff;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
-  border: 1px solid rgba(58, 123, 213, 0.4);
+  border: 1px solid rgba(63, 127, 218, 0.849);
 }
 
 .file-label:hover {
@@ -116,9 +116,9 @@ function toggle1() {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(10, 22, 40, 0.4);
-  border: 1px solid rgba(58, 123, 213, 0.2);
-  border-radius: 6px;
+  background: rgba(6, 35, 85, 0.6);
+  border: 1px solid rgba(63, 127, 218, 0.849);
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -135,8 +135,8 @@ function toggle1() {
 }
 
 .checkbox-text {
-  font-size: 15px;
-  color: #C0D4EC;
+  font-size: 17px;
+  color: #fff;
 }
 
 .action-btn {
@@ -145,11 +145,11 @@ function toggle1() {
   justify-content: center;
   gap: 6px;
   padding: 8px 14px;
-  background: rgba(10, 22, 40, 0.6);
-  border: 1px solid rgba(58, 123, 213, 0.4);
-  border-radius: 6px;
-  color: #4A90D9;
-  font-size: 15px;
+  background: rgba(6, 35, 85, 0.6);
+  border: 1px solid rgba(63, 127, 218, 0.849);
+  border-radius: 15px;
+  color: #fff;
+  font-size: 17px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;

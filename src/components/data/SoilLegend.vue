@@ -28,17 +28,23 @@ const sorted = computed(() =>
 <style scoped>
 .legend {
   margin-top: 10px;
+  background: rgba(6, 35, 85, 0.6);
+  border: 1px solid rgba(63, 127, 218, 0.849);
+  border-radius: 15px;
+  padding: 12px;
 }
 .legend h4 {
   font-size: 15px;
-  color: #4A90D9;
+  color: #fff;
   margin: 0 0 6px 0;
 }
 .item {
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #C0D4EC;
+  color: #fff;
+  gap: 6px;
+  margin-bottom: 2px;
 }
 .color {
   width: 14px;

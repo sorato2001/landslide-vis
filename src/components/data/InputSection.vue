@@ -18,7 +18,7 @@ defineProps({
 </script>
 
 <style scoped>
-.input-section {
+/* .input-section {
   margin-bottom: 14px;
   padding: 12px;
   background: rgba(10, 30, 60, 0.4);
@@ -30,6 +30,37 @@ defineProps({
 .input-section:hover {
   border-color: rgba(58, 123, 213, 0.4);
   box-shadow: 0 0 8px rgba(58, 123, 213, 0.15);
+} */
+
+.input-section {
+  margin-bottom: 14px;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid rgba(0, 179, 255, 0.342);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  animation: fadein 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.input-section:hover {
+  border-color: rgba(0, 179, 255, 0.685);
+}
+
+.input-section:nth-child(1) { animation-delay: 0.05s; }
+.input-section:nth-child(2) { animation-delay: 0.12s; }
+.input-section:nth-child(3) { animation-delay: 0.20s; }
+.input-section:nth-child(4) { animation-delay: 0.28s; }
+
+.input-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
 }
 
 .section-header {
@@ -47,9 +78,9 @@ defineProps({
 
 .section-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: #4A90D9;
+  color: #fff;
   flex: 1;
 }
 

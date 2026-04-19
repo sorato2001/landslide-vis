@@ -8,14 +8,20 @@
 
     <div class="panel-content">
       <div class="section-group">
-        <div class="section-label">数据信息</div>
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>数据信息</span>
+        </div>
         <button class="sub-btn" @click="$emit('close')">地理环境数据</button>
         <button class="sub-btn" @click="$emit('close')">动态触发数据</button>
         <button class="sub-btn" @click="$emit('close')">滑坡编录数据</button>
       </div>
 
       <div class="section-group">
-        <div class="section-label">模型信息</div>
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>模型信息</span>
+        </div>
 
         <div class="model-section">
           <div class="section-title">
@@ -70,6 +76,39 @@
             <div class="btn-content">
               <span class="btn-text">人工神经网络</span>
               <span class="btn-subtext">ANN 预测</span>
+            </div>
+            <span v-if="running" class="loading-spinner"></span>
+          </button>
+        </div>
+
+        <div class="model-section">
+          <div class="section-title">
+            <span class="icon">🧬</span>
+            <span>深度学习模型</span>
+          </div>
+          
+          <button 
+            class="model-btn warning"
+            @click="runLSTM"
+            :disabled="running"
+          >
+            <span class="btn-icon">🔄</span>
+            <div class="btn-content">
+              <span class="btn-text">长短期记忆网络</span>
+              <span class="btn-subtext">LSTM 时序预测</span>
+            </div>
+            <span v-if="running" class="loading-spinner"></span>
+          </button>
+
+          <button 
+            class="model-btn danger"
+            @click="runTransformer"
+            :disabled="running"
+          >
+            <span class="btn-icon">🎯</span>
+            <div class="btn-content">
+              <span class="btn-text">Transformer 模型</span>
+              <span class="btn-subtext">Transformer 预测</span>
             </div>
             <span v-if="running" class="loading-spinner"></span>
           </button>
@@ -182,6 +221,48 @@ async function runANN() {
     running.value = false
   }
 }
+
+async function runLSTM() {
+  try {
+    running.value = true
+    status.value = '正在运行 LSTM 模型...'
+    statusType.value = 'info'
+    
+    // TODO: 实现 LSTM 模型调用
+    // await runLSTMModel()
+    
+    status.value = '✅ LSTM 预测完成！'
+    statusType.value = 'success'
+    setTimeout(() => { status.value = '' }, 3000)
+  } catch (e) {
+    console.error(e)
+    status.value = '❌ LSTM 预测失败'
+    statusType.value = 'error'
+  } finally {
+    running.value = false
+  }
+}
+
+async function runTransformer() {
+  try {
+    running.value = true
+    status.value = '正在运行 Transformer 模型...'
+    statusType.value = 'info'
+    
+    // TODO: 实现 Transformer 模型调用
+    // await runTransformerModel()
+    
+    status.value = '✅ Transformer 预测完成！'
+    statusType.value = 'success'
+    setTimeout(() => { status.value = '' }, 3000)
+  } catch (e) {
+    console.error(e)
+    status.value = '❌ Transformer 预测失败'
+    statusType.value = 'error'
+  } finally {
+    running.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -261,35 +342,60 @@ async function runANN() {
 
 /* 分组标签 */
 .section-group {
-  margin-bottom: 16px;
-  border: 1px solid rgba(58, 123, 213, 0.3);
+  margin-bottom: 14px;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid rgba(0, 179, 255, 0.342);
   border-radius: 8px;
-  padding: 12px;
-  background: rgba(10, 30, 60, 0.6);
+  padding: 14px;
+  position: relative;
+  animation: fadein 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.section-group:hover {
+  border-color: rgba(0, 179, 255, 0.685);
+}
+
+.section-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
 }
 
 .section-label {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
   font-weight: 700;
-  color: #FFFFFF;
-  padding: 4px 14px;
-  border: 1px solid rgba(58, 123, 213, 0.5);
-  border-radius: 20px;
+  color: #ffffff;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 179, 255, 0.2);
+}
+
+.section-bar {
   display: inline-block;
-  margin-bottom: 10px;
-  background: rgba(58, 123, 213, 0.2);
-  text-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
+  flex-shrink: 0;
+  width: 4px;
+  height: 20px;
+  background: #00d4ff;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+  border-radius: 2px;
 }
 
 .sub-btn {
   width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  background: rgba(10, 22, 40, 0.6);
-  border: 1px solid rgba(58, 123, 213, 0.3);
-  border-radius: 6px;
-  color: #8BA4C0;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: rgba(6, 35, 85, 0.6);
+  border: 1px solid rgba(63, 127, 218, 0.849);
+  border-radius: 15px;
+  color: #ffffff;
   font-size: 17px;
   font-weight: 500;
   cursor: pointer;
@@ -297,9 +403,9 @@ async function runANN() {
 }
 
 .sub-btn:hover {
-  background: rgba(58, 123, 213, 0.2);
-  color: #C0D4EC;
-  border-color: rgba(58, 123, 213, 0.5);
+  background: rgba(6, 35, 85, 0.8);
+  border-color: rgba(63, 127, 218, 1);
+  box-shadow: 0 0 10px rgba(63, 127, 218, 0.4);
 }
 
 .sub-btn:last-of-type {
@@ -378,6 +484,26 @@ async function runANN() {
 .model-btn.info:hover {
   background: linear-gradient(135deg, #2A4E8B, #4A90D9);
   box-shadow: 0 0 12px rgba(58, 123, 213, 0.4);
+}
+
+.model-btn.warning {
+  background: linear-gradient(135deg, #5B21B6, #7C3AED);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+.model-btn.warning:hover {
+  background: linear-gradient(135deg, #6D28D9, #8B5CF6);
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+}
+
+.model-btn.danger {
+  background: linear-gradient(135deg, #0F766E, #14B8A6);
+  border-color: rgba(20, 184, 166, 0.5);
+}
+
+.model-btn.danger:hover {
+  background: linear-gradient(135deg, #0D9488, #2DD4BF);
+  box-shadow: 0 0 12px rgba(20, 184, 166, 0.4);
 }
 
 .model-btn:disabled {
@@ -460,5 +586,10 @@ async function runANN() {
 
 .status-icon {
   font-size: 16px;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

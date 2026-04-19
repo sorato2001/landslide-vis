@@ -10,7 +10,10 @@
       <!-- 图例区域 -->
       <div class="legend-section">
         <div class="legend-group">
-          <div class="legend-group-title">实体名称</div>
+          <div class="legend-group-header">
+            <span class="section-bar"></span>
+            <div class="legend-group-title">实体名称</div>
+          </div>
           <div class="legend-items">
             <div class="legend-item">
               <span class="dot" style="background:#2579E8"></span>
@@ -32,7 +35,11 @@
         </div>
 
         <div class="legend-group">
-          <div class="legend-group-title">属性名称</div>
+          <div class="legend-group-header">
+            <span class="section-bar"></span>
+            <div class="legend-group-title">
+              属性名称</div>
+          </div>
           <div class="legend-items">
             <div class="legend-item">
               <span class="dot" style="background:#C76170"></span>
@@ -62,7 +69,10 @@
         </div>
 
         <div class="legend-group">
-          <div class="legend-group-title">关系名称</div>
+          <div class="legend-group-header">
+            <span class="section-bar"></span>
+            <div class="legend-group-title">关系名称</div>
+          </div>
           <div class="legend-items">
             <div class="legend-item relation-item">
               <span class="relation-line">—CONTAINS_OF—</span>
@@ -665,7 +675,7 @@ const handleResize = () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(10, 22, 40, 0.95);
+  background: rgba(10, 22, 40, 0.8);
   color: #E0E8F0;
 }
 
@@ -735,56 +745,105 @@ const handleResize = () => {
 }
 
 /* ============ 图例 ============ */
-.legend-section {
+/* .legend-section {
   border: 1px solid rgba(58, 123, 213, 0.3);
   border-radius: 8px;
   padding: 10px;
-  background: rgba(10, 30, 60, 0.6);
+  background: transparent;
+} */
+
+.legend-section {
+  margin-bottom: 14px;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid rgba(0, 179, 255, 0.342);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  animation: fadein 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.legend-section:hover {
+  border-color: rgba(0, 179, 255, 0.685);
+}
+
+.legend-section:nth-child(1) { animation-delay: 0.05s; }
+.legend-section:nth-child(2) { animation-delay: 0.12s; }
+.legend-section:nth-child(3) { animation-delay: 0.20s; }
+.legend-section:nth-child(4) { animation-delay: 0.28s; }
+
+.legend-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
 }
 
 .legend-group {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 179, 255, 0.2);
 }
 
 .legend-group:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.legend-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.section-bar {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 4px;
+  height: 20px;
+  background: #00d4ff;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+  border-radius: 2px;
 }
 
 .legend-group-title {
   text-align: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  color: #FFFFFF;
-  padding: 3px 12px;
-  border: 1px solid rgba(58, 123, 213, 0.5);
+  color: #ffffff;
   border-radius: 20px;
   display: inline-block;
-  margin-bottom: 8px;
-  background: rgba(58, 123, 213, 0.2);
-  text-shadow: 0 0 6px rgba(58, 123, 213, 0.4);
 }
 
 .legend-items {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
   padding-left: 8px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  color: #C0D4EC;
+  gap: 6px;
+  font-size: 17px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 4px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .legend-text {
@@ -801,54 +860,81 @@ const handleResize = () => {
 
 .relation-line {
   font-size: 16px;
-  color: #8BA4C0;
+  color: #ffffff;
   font-family: 'Consolas', 'Courier New', monospace;
   letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 4px;
 }
 
 /* ============ 筛选器 ============ */
 .filter-area {
+  position: fixed;
+  top: 10%;
+  left: 58%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 10px;
-  background: rgba(10, 30, 60, 0.6);
-  border-radius: 6px;
-  border: 1px solid rgba(58, 123, 213, 0.3);
+  flex-direction: row;
+  gap: 16px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, rgba(15, 35, 65, 0.95), rgba(8, 20, 45, 0.95));
+  border-radius: 10px;
+  border: 1px solid rgba(0, 200, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 200, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.filter-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.5), transparent);
 }
 
 .filter-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .filter-row label {
-  color: #8BA4C0;
-  font-size: 16px;
+  color: #00d4ff;
+  font-size: 18px;
   white-space: nowrap;
-  font-weight: 500;
-  min-width: 60px;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
 }
 
 .filter-row input {
-  flex: 1;
-  padding: 5px 10px;
-  font-size: 16px;
-  background: rgba(10, 22, 40, 0.8);
-  border: 1px solid rgba(58, 123, 213, 0.4);
-  border-radius: 4px;
-  color: #E0E8F0;
+  width: 180px;
+  padding: 6px 14px;
+  font-size: 18px;
+  background: rgba(0, 20, 40, 0.6);
+  border: 1px solid rgba(0, 200, 255, 0.25);
+  border-radius: 6px;
+  color: #ffffff;
   outline: none;
+  transition: all 0.3s ease;
 }
 
 .filter-row input:focus {
-  border-color: #3A7BD5;
-  box-shadow: 0 0 8px rgba(58, 123, 213, 0.3);
+  border-color: rgba(0, 200, 255, 0.6);
+  box-shadow: 
+    0 0 12px rgba(0, 200, 255, 0.3),
+    inset 0 0 8px rgba(0, 200, 255, 0.1);
+  background: rgba(0, 30, 60, 0.8);
 }
 
 .filter-row input::placeholder {
-  color: #5A7A9E;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* ============ 图谱容器 ============ */
@@ -856,10 +942,28 @@ const handleResize = () => {
   position: relative;
   flex: 1;
   min-height: 250px;
-  border: 1px solid rgba(58, 123, 213, 0.3);
-  border-radius: 6px;
+  margin-bottom: 14px;
+  background: rgba(0, 20, 50, 0.6);
+  border: 2px solid rgba(0, 179, 255, 0.342);
+  border-radius: 8px;
+  padding: 14px;
   overflow: hidden;
-  background: rgba(5, 15, 30, 0.8);
+  animation: fadein 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.graph-container-wrapper:hover {
+  border-color: rgba(0, 179, 255, 0.685);
+}
+
+.graph-container-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
 }
 
 #graph-view {
@@ -937,11 +1041,11 @@ const handleResize = () => {
 }
 
 .popup-content {
-  padding: 6px 10px;
-  max-height: 150px;
+  padding: 8px 12px;
+  max-height: 180px;
   overflow-y: auto;
   color: #C0D4EC;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .prop-row {
@@ -954,11 +1058,13 @@ const handleResize = () => {
 .prop-key {
   font-weight: 600;
   color: #4A90D9;
-  margin-right: 10px;
+  margin-right: 12px;
+  font-size: 17px;
 }
 
 .prop-val {
   color: #8BA4C0;
+  font-size: 17px;
 }
 
 /* ============ 全屏图谱弹窗 ============ */
@@ -976,6 +1082,11 @@ const handleResize = () => {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fullscreen-panel {
