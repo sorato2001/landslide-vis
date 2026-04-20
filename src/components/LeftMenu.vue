@@ -13,7 +13,7 @@
       :class="{ active: activeTab === 'input' }"
       @click="handleClick('input')"
     >
-      数据录入
+      数据管理
     </button>
     <span class="nav-sep">◇</span>
     <button 
@@ -29,7 +29,7 @@
       :class="{ active: activeTab === 'decision' }"
       @click="handleClick('decision')"
     >
-      智能决策
+      易发性评估可视化
     </button>
   </nav>
 </template>

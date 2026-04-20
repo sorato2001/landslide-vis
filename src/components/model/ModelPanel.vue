@@ -7,7 +7,8 @@
     </div>
 
     <div class="panel-content">
-      <div class="section-group">
+      <!-- 原始数据信息面板 -->
+      <!-- <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
           <span>数据信息</span>
@@ -15,9 +16,34 @@
         <button class="sub-btn" @click="$emit('close')">地理环境数据</button>
         <button class="sub-btn" @click="$emit('close')">动态触发数据</button>
         <button class="sub-btn" @click="$emit('close')">滑坡编录数据</button>
+      </div> -->
+
+      <!-- 新增数据信息面板 -->
+      <div class="section-group">
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>区域相似度计算</span>
+        </div>
+
+        <div class="data-section">
+          <div class="data-title">连续型因子计算</div>
+          <div class="data-tags">
+            <div class="data-tag orange">Jensen-Shannon散度</div>
+            <div class="data-tag orange">Wasserstein距离</div>
+          </div>
+        </div>
+
+        <div class="data-section">
+          <div class="data-title">离散型因子计算</div>
+          <div class="data-tags">
+            <div class="data-tag purple">Bray-Curtis相异度</div>
+            <div class="data-tag purple">景观格局指数</div>
+          </div>
+        </div>
       </div>
 
-      <div class="section-group">
+      <!-- 原始模型信息面板 -->
+      <!-- <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
           <span>模型信息</span>
@@ -113,6 +139,40 @@
             <span v-if="running" class="loading-spinner"></span>
           </button>
         </div>
+      </div> -->
+
+      <!-- 优化模型信息面板 -->
+      <div class="section-group">
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>滑坡评估模型</span>
+        </div>
+
+        <div
+          v-for="(group, index) in modelGroups"
+          :key="index"
+          class="accordion"
+        >
+          <!-- 分类标题 -->
+          <div class="accordion-header" @click="toggleGroup(index)">
+            <span class="icon">{{ group.icon }}</span>
+            <span class="title">{{ group.name }}</span>
+            <span class="arrow" :class="{ open: activeIndex === index }">▶</span>
+          </div>
+
+          <!-- 子模型 -->
+          <div v-show="activeIndex === index" class="accordion-body">
+            <button
+              v-for="(model, i) in group.models"
+              :key="i"
+              class="model-btn sub"
+              @click="model.action"
+              :disabled="running"
+            >
+              {{ model.name }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div v-if="status" class="status-bar" :class="statusType">
@@ -135,6 +195,53 @@ const status = ref('')
 const statusType = ref('info')
 const cnnInput = ref(null)
 const running = ref(false)
+
+//模型面板新增逻辑
+const activeIndex = ref(null)
+
+function toggleGroup(index) {
+  activeIndex.value = activeIndex.value === index ? null : index
+}
+
+// 模型分类配置
+const modelGroups = [
+  {
+    name: '机器学习',
+    icon: '🤖',
+    models: [
+      { name: 'K近邻算法', action: runANN },
+      { name: '反向传播神经网络模型', action: runANN },
+      { name: '梯度提升决策树', action: runANN },
+      { name: '极端梯度提升模型', action: runANN }
+    ]
+  },
+  {
+    name: '深度学习',
+    icon: '🔀',
+    models: [
+      // { name: 'AHP + 逻辑回归', action: runANN },
+      // { name: 'CNN + LSTM', action: runLSTM }
+    ]
+  },
+  {
+    name: '集成学习',
+    icon: '🌐',
+    models: [
+      { name: 'Bagging', action: runANN },
+      { name: 'Boosting', action: runANN },
+      { name: 'Stacking', action: runTransformer }
+    ]
+  },
+  {
+    name: '迁移学习',
+    icon: '🌐',
+    models: [
+      // { name: 'Bagging', action: runANN },
+      // { name: 'Boosting', action: runANN },
+      // { name: 'Stacking', action: runTransformer }
+    ]
+  }
+]
 
 function openCNNFileDialog() {
   cnnInput.value.click()
@@ -388,6 +495,77 @@ async function runTransformer() {
   border-radius: 2px;
 }
 
+/* 每一块 */
+.data-section {
+  margin-bottom: 14px;
+}
+
+/* 标题 */
+.data-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #4A90D9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 标签容器 */
+.data-tags {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+/* 标签块 */
+.data-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* 小圆点 */
+.data-tag::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* 不同类别颜色 */
+.data-tag.blue::before {
+  background: #4A90D9;
+}
+
+.data-tag.orange::before {
+  background: #F5A623;
+}
+
+.data-tag.purple::before {
+  background: #9B59B6;
+}
+
+/* hover 效果 */
+.data-tag:hover {
+  background: rgba(74, 144, 217, 0.15);
+  border-color: rgba(74, 144, 217, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 空数据 */
+.data-tag.empty {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .sub-btn {
   width: 100%;
   padding: 10px 14px;
@@ -410,6 +588,50 @@ async function runTransformer() {
 
 .sub-btn:last-of-type {
   margin-bottom: 0;
+}
+
+.accordion {
+  border: 1px solid rgba(58, 123, 213, 0.2);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  background: rgba(20, 40, 80, 0.6);
+  transition: all 0.2s;
+}
+
+.accordion-header:hover {
+  background: rgba(40, 70, 120, 0.6);
+}
+
+.accordion-header .title {
+  flex: 1;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+.arrow {
+  transition: transform 0.2s;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.accordion-body {
+  padding: 10px;
+  background: rgba(10, 22, 40, 0.6);
+}
+
+.model-btn.sub {
+  background: rgba(6, 35, 85, 0.6);
+  border: 1px solid rgba(63, 127, 218, 0.5);
 }
 
 /* 模型区域 */

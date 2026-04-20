@@ -79,7 +79,7 @@ watch(graphPanelRef, (panel) => {
     <header class="top-bar">
       <div class="title-box">
         <img class="title-logo" src="./assets/vge.png" alt="logo">
-        <h1 class="system-title">知识引导的滑坡易发性评估智能决策系统</h1>
+        <h1 class="system-title">基于知识图谱的滑坡易发性智能评估原型系统</h1>
       </div>
       <LeftMenu @show="active = $event" :activeTab="active" />
       <div class="header-right">

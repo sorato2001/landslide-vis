@@ -1,17 +1,17 @@
 <template>
   <div class="decision-panel">
-    <div class="panel-header">
+    <!-- <div class="panel-header">
       <span class="header-icon">📈</span>
       <span class="header-title">智能决策</span>
       <button class="close-btn" @click="$emit('close')" title="关闭">&times;</button>
-    </div>
+    </div> -->
 
     <div class="panel-content">
       <!-- 数据输入区域 -->
       <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
-          <span>易发性评估</span>
+          <span>易发性评估制图</span>
         </div>
 
         <InputSection title="区域范围" icon="🗺️">
@@ -25,7 +25,7 @@
               class="file-input"
             />
             <label for="region-shp" class="file-label">
-              <span class="file-icon">📁</span>
+              <!-- <span class="file-icon">📁</span> -->
               <span class="file-text">
                 {{ regionFileName || '选择区域 SHP 文件' }}
               </span>
@@ -48,7 +48,7 @@
               class="file-input"
             />
             <label for="prediction-csv" class="file-label">
-              <span class="file-icon">📊</span>
+              <!-- <span class="file-icon">📊</span> -->
               <span class="file-text">
                 {{ predictionFileName || '选择预测 CSV 文件' }}
               </span>
@@ -68,41 +68,48 @@
       <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
-          <span>易发性分区</span>
+          <span>多维空间渲染</span>
         </div>
 
-        <InputSection title="人口数据" icon="👥">
+        <InputSection title="风险数据" icon="👥">
           <div class="file-upload-wrapper">
             <input 
               type="file" 
-              accept=".tif,.tiff"
-              @change="onPopulationTifSelected"
-              id="population-tif"
+              accept=".shp,.shx,.dbf,.prj"
+              @change="onPopulationShpSelected"
+              id="population-shp"
               class="file-input"
             />
-            <label for="population-tif" class="file-label">
-              <span class="file-icon">🌍</span>
+            <label for="population-shp" class="file-label">
+              <!-- <span class="file-icon">🌍</span> -->
               <span class="file-text">
-                {{ populationFileName || '选择人口 TIF 文件' }}
+                {{ populationFileName || '选择风险 SHP 文件' }}
               </span>
             </label>
           </div>
         </InputSection>
+      </div>
 
-        <InputSection title="建筑物数据" icon="🏢">
+      <div class="section-group">
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>评估结果统计分析</span>
+        </div>
+
+        <InputSection title="评估结果" icon="🏢">
           <div class="file-upload-wrapper">
             <input 
               type="file" 
               multiple
-              accept=".shp,.shx,.dbf,.prj"
-              @change="onBuildingsShpSelected"
-              id="buildings-shp"
+              accept=".csv"
+              @change="onBuildingsCsvSelected"
+              id="results-csv"
               class="file-input"
             />
-            <label for="buildings-shp" class="file-label">
-              <span class="file-icon">🏗️</span>
+            <label for="results-csv" class="file-label">
+              <span class="file-icon"></span>
               <span class="file-text">
-                {{ buildingsFileName || '选择建筑物 SHP 文件' }}
+                {{ buildingsFileName || '选择评估结果 CSV 文件' }}
               </span>
             </label>
           </div>
@@ -117,10 +124,40 @@
       <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
+          <span>SHAP可解释性分析</span>
+        </div>
+
+        <InputSection title="特征重要性分析" icon="🌍">
+          <div class="file-upload-wrapper">
+            <input 
+              type="file" 
+              multiple
+              accept=".shp,.shx,.dbf,.prj"
+              @change="onBuildingsShpSelected"
+              id="buildings-shp"
+              class="file-input"
+            />
+            <label for="buildings-shp" class="file-label">
+              <!-- <span class="file-icon">🏗️</span> -->
+              <span class="file-text">
+                {{ buildingsFileName || '选择待分析文件' }}
+              </span>
+            </label>
+          </div>
+          <div v-if="buildingsFiles.length > 0" class="file-list">
+            <div v-for="(file, index) in buildingsFiles" :key="index" class="file-item">
+              ✓ {{ file.name }}
+            </div>
+          </div>
+        </InputSection>
+      </div>
+
+      <!-- <div class="section-group">
+        <div class="section-label">
+          <span class="section-bar"></span>
           <span>决策建议</span>
         </div>
 
-        <!-- 分析按钮 -->
         <div class="action-section">
           <button 
             class="analysis-btn"
@@ -141,7 +178,7 @@
             <span>{{ showAnalysis ? '隐藏结果' : '显示结果' }}</span>
           </button>
         </div>
-      </div>
+      </div> -->
 
       <!-- 状态信息 -->
       <div v-if="statusMessage" class="status-bar" :class="statusType">
@@ -492,7 +529,8 @@ function toggleVisualization() {
   gap: 8px;
   padding: 10px 14px;
   background: rgba(10, 22, 40, 0.6);
-  color: #4A90D9;
+  /* color: #4A90D9; */
+  color: #fff;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
