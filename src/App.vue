@@ -7,10 +7,54 @@ import LeftMenu from './components/LeftMenu.vue'
 import DataPanel from './components/DataPanel.vue'
 import ModelPanel from './components/model/ModelPanel.vue'
 import DecisionPanel from './components/DecisionPanel.vue'
+import ShapLegend from './components/ShapLegend.vue'
 import { setOnPointClickCallback } from './cesium/miniMapLink'
 
 const active = ref(null)
 const graphPanelRef = ref(null)
+
+// ========== SHAP 图例 ==========
+const shapLegendVisible = ref(false)
+const shapLegendType = ref('importance')
+const shapLegendData = ref([])
+
+const openShapLegend = ({ type, data }) => {
+  shapLegendType.value = type
+  shapLegendData.value = data
+  shapLegendVisible.value = true
+}
+
+const closeShapLegend = () => {
+  shapLegendVisible.value = false
+}
+
+// ========== CNN 模型进度浮层 ==========
+const cnnProgress = ref({
+  active: false,
+  percent: 0,
+  text: '',
+  stage: ''
+})
+
+const CNN_STAGES = [
+  { key: 'upload',  label: '模型调用',  sub: '接收训练请求',  icon: '📱' },
+  { key: 'process', label: '训练中',    sub: '模型训练与调优', icon: '⚙️' },
+  { key: 'render',  label: '结果生成',  sub: '生成训练结果',  icon: '📊' },
+  { key: 'done',    label: '返回结果',  sub: '返回调用方',    icon: '✓' },
+]
+const CNN_STAGE_KEYS = CNN_STAGES.map(s => s.key)
+
+function onCNNProgress(p) {
+  cnnProgress.value = { ...p }
+}
+
+function cnnStageStatus(key) {
+  const idx = CNN_STAGE_KEYS.indexOf(key)
+  const currentIdx = CNN_STAGE_KEYS.indexOf(cnnProgress.value.stage)
+  if (currentIdx > idx) return 'done'
+  if (currentIdx === idx) return 'active'
+  return 'pending'
+}
 
 // ========== 在线数据 Web 预览 ==========
 const webPreviewVisible = ref(false)
@@ -114,8 +158,8 @@ watch(graphPanelRef, (panel) => {
       >
         <GraphPanel v-if="active === 'data'" ref="graphPanelRef" @close="active = null" />
         <DataPanel v-if="active === 'input'" @close="active = null" @openUrl="openWebPreview" />
-        <ModelPanel v-if="active === 'model'" @close="active = null" />
-        <DecisionPanel v-if="active === 'decision'" @close="active = null" />
+        <ModelPanel v-if="active === 'model'" @close="active = null" @cnnProgress="onCNNProgress" />
+        <DecisionPanel v-if="active === 'decision'" @close="active = null" @showLegend="openShapLegend" />
 
         <!-- 拖拽把手 -->
         <div
@@ -151,6 +195,62 @@ watch(graphPanelRef, (panel) => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 allowfullscreen
               ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- SHAP 图例浮层 -->
+        <ShapLegend
+          :visible="shapLegendVisible"
+          :chartType="shapLegendType"
+          :data="shapLegendData"
+          @close="closeShapLegend"
+        />
+
+        <!-- CNN 模型进度浮层 -->
+        <div v-if="cnnProgress.active" class="cnn-progress-overlay">
+          <div class="cnn-progress-card">
+            <!-- 标题栏 -->
+            <div class="cnn-progress-title">
+              <span class="cnn-icon">🧠</span>
+              <span>模型正在训练</span>
+              <span class="cnn-percent">{{ cnnProgress.percent }}%</span>
+            </div>
+
+            <!-- 数据已加载状态 -->
+            <div class="cnn-loaded-hint" v-if="cnnProgress.stage !== 'upload'">
+              <span class="cnn-loaded-check">✓</span>
+              <span>数据已加载</span>
+            </div>
+
+            <!-- 进度条 -->
+            <div class="cnn-progress-track">
+              <div
+                class="cnn-progress-fill"
+                :style="{ width: cnnProgress.percent + '%' }"
+                :class="cnnProgress.percent >= 100 ? 'complete' : ''"
+              >
+                <div class="cnn-progress-shine"></div>
+              </div>
+            </div>
+
+            <!-- 4阶段流程 -->
+            <div class="cnn-flow">
+              <div
+                v-for="(s, i) in CNN_STAGES"
+                :key="s.key"
+                class="cnn-flow-step"
+                :class="cnnStageStatus(s.key)"
+              >
+                <div class="cnn-flow-icon">
+                  <span>{{ s.icon }}</span>
+                </div>
+                <div class="cnn-flow-label">{{ s.label }}</div>
+                <div class="cnn-flow-sub">{{ s.sub }}</div>
+                <div v-if="i < CNN_STAGES.length - 1" class="cnn-flow-arrow">
+                  <span>···</span><span class="arrow-head">›</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -443,5 +543,214 @@ watch(graphPanelRef, (panel) => {
   height: 100%;
   border: none;
   background: #fff;
+}
+
+/* ========== CNN 进度浮层 ========== */
+.cnn-progress-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  pointer-events: none;
+}
+
+.cnn-progress-card {
+  min-width: 560px;
+  padding: 24px 32px 20px;
+  background: rgba(5, 18, 40, 0.95);
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  border-radius: 14px;
+  box-shadow: 0 0 40px rgba(0, 150, 255, 0.25), inset 0 0 30px rgba(0, 100, 200, 0.06);
+  backdrop-filter: blur(12px);
+  animation: cnnFadeIn 0.4s ease;
+}
+
+@keyframes cnnFadeIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cnn-progress-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  letter-spacing: 1px;
+}
+
+.cnn-icon {
+  font-size: 26px;
+}
+
+.cnn-percent {
+  margin-left: auto;
+  font-size: 24px;
+  font-weight: 800;
+  color: #00d4ff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 数据已加载提示 */
+.cnn-loaded-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 16px;
+  color: #34d399;
+  font-weight: 600;
+}
+
+.cnn-loaded-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  font-size: 14px;
+  color: #34d399;
+}
+
+.cnn-progress-track {
+  height: 10px;
+  background: rgba(0, 20, 50, 0.8);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  margin-bottom: 20px;
+}
+
+.cnn-progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #0055aa, #00aaff, #00d4ff);
+  transition: width 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cnn-progress-fill.complete {
+  background: linear-gradient(90deg, #058D49, #0AA85A, #34d399);
+}
+
+.cnn-progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: cnnShine 1.5s infinite;
+}
+
+@keyframes cnnShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* 4阶段流程 */
+.cnn-flow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+.cnn-flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 0 0 auto;
+  width: 100px;
+}
+
+.cnn-flow-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: rgba(0, 40, 80, 0.8);
+  border: 2px solid rgba(93, 138, 170, 0.4);
+  transition: all 0.3s;
+  margin-bottom: 8px;
+}
+
+.cnn-flow-step.active .cnn-flow-icon {
+  background: rgba(0, 150, 255, 0.2);
+  border-color: #00d4ff;
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.5);
+}
+
+.cnn-flow-step.done .cnn-flow-icon {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: #34d399;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
+}
+
+.cnn-flow-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #5d8aaa;
+  transition: color 0.3s;
+  margin-bottom: 2px;
+}
+
+.cnn-flow-step.active .cnn-flow-label {
+  color: #00d4ff;
+}
+
+.cnn-flow-step.done .cnn-flow-label {
+  color: #34d399;
+}
+
+.cnn-flow-sub {
+  font-size: 12px;
+  color: rgba(93, 138, 170, 0.7);
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.cnn-flow-step.active .cnn-flow-sub {
+  color: rgba(0, 212, 255, 0.7);
+}
+
+.cnn-flow-step.done .cnn-flow-sub {
+  color: rgba(52, 211, 153, 0.7);
+}
+
+/* 箭头连接 */
+.cnn-flow-arrow {
+  position: absolute;
+  top: 16px;
+  right: -32px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  color: rgba(93, 138, 170, 0.4);
+  font-size: 14px;
+  letter-spacing: -2px;
+  transition: color 0.3s;
+}
+
+.cnn-flow-step.done .cnn-flow-arrow {
+  color: rgba(52, 211, 153, 0.6);
+}
+
+.arrow-head {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 </style>

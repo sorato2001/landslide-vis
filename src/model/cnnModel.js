@@ -1,8 +1,55 @@
 import * as Cesium from 'cesium'
 import { getViewer } from '@/cesium/viewer'
+import shp from 'shpjs'
 
 let predictionEntities = []
 let legendDiv = null
+let regionBoundaryLoaded = false
+let fallbackRectEntity = null
+
+/* ========== 加载研究区边界 ========== */
+// 立即显示矩形范围框
+function showRegionRect(viewer) {
+  if (regionBoundaryLoaded) return
+  fallbackRectEntity = viewer.entities.add({
+    rectangle: {
+      coordinates: Cesium.Rectangle.fromDegrees(101.7, 29.4, 102.7, 30.3),
+      material: Cesium.Color.fromCssColorString('rgba(0, 150, 255, 0.2)'),
+      outline: true,
+      outlineColor: Cesium.Color.fromCssColorString('#00d4ff'),
+      outlineWidth: 2,
+      classificationType: Cesium.ClassificationType.BOTH,
+    }
+  })
+  regionBoundaryLoaded = true
+  console.log('研究区矩形范围框已显示')
+}
+
+// 异步加载shapefile替换矩形
+async function loadRegionBoundary(viewer) {
+  try {
+    const [shpBuf, dbfBuf] = await Promise.all([
+      fetch('/sun/region/Luding_StudyRegion.shp').then(r => r.arrayBuffer()),
+      fetch('/sun/region/Luding_StudyRegion.dbf').then(r => r.arrayBuffer()),
+    ])
+    const regionGeojson = await shp([shpBuf, dbfBuf])
+    const regionDs = await Cesium.GeoJsonDataSource.load(regionGeojson, {
+      stroke: Cesium.Color.fromCssColorString('#00d4ff'),
+      fill: Cesium.Color.fromCssColorString('rgba(0, 150, 255, 0.15)'),
+      strokeWidth: 2,
+      clampToGround: true
+    })
+    // 移除之前的矩形
+    if (fallbackRectEntity) {
+      viewer.entities.remove(fallbackRectEntity)
+      fallbackRectEntity = null
+    }
+    viewer.dataSources.add(regionDs)
+    console.log('研究区shapefile边界替换成功')
+  } catch (e) {
+    console.warn('研究区shapefile加载失败，保留矩形范围框:', e)
+  }
+}
 
 /* ========== 颜色映射（完全等价 demo6） ========== */
 function getColor(probability) {
@@ -63,11 +110,30 @@ function clearPrediction(viewer) {
 }
 
 /* ========== CNN 预测主函数 ========== */
-export async function runCNNModel(files) {
+export async function runCNNModel(files, { onProgress } = {}) {
   const viewer = getViewer()
   if (!viewer) throw new Error('Viewer 未初始化')
 
   clearPrediction(viewer)
+
+  // 立即飞到研究区范围（泸定地区）
+  viewer.camera.flyTo({
+    destination: Cesium.Rectangle.fromDegrees(101.7, 29.4, 102.7, 30.3),
+    duration: 1.5,
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-50),
+      roll: 0
+    }
+  })
+
+  // 立即显示研究区范围框
+  showRegionRect(viewer)
+  // 后台加载shapefile替换矩形
+  loadRegionBoundary(viewer)
+
+  // 阶段1: 模型调用 - 上传数据
+  onProgress?.({ stage: 'upload', percent: 0, text: '接收训练请求...' })
 
   const formData = new FormData()
   formData.append('csvFile', files.csv)
@@ -76,15 +142,57 @@ export async function runCNNModel(files) {
   formData.append('dbfFile', files.dbf)
   formData.append('prjFile', files.prj)
 
-  const res = await fetch('http://127.0.0.1:5000/process_and_visualize', {
-    method: 'POST',
-    body: formData
+  // 使用 XMLHttpRequest 以追踪上传进度
+  const res = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', 'http://192.168.1.25:5000/process_and_visualize')
+
+    // 上传进度: 0-50%
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 50)
+        onProgress?.({ stage: 'upload', percent: pct, text: '数据上传中...' })
+      }
+    }
+
+    // 上传完成后，等待服务器推理期间缓慢推进进度
+    xhr.upload.onload = () => {
+      onProgress?.({ stage: 'process', percent: 55, text: '数据已上传，模型训练中...' })
+      // 模拟等待期间缓慢递增（60%→64%），让用户知道还在工作
+      let waitPct = 55
+      const waitTimer = setInterval(() => {
+        if (waitPct >= 64) { clearInterval(waitTimer); return }
+        waitPct += 1
+        onProgress?.({ stage: 'process', percent: waitPct, text: '模型训练与调优中...' })
+      }, 2000)
+      // 保存timer以便xhr.onload时清除
+      xhr._waitTimer = waitTimer
+    }
+
+    xhr.onload = () => {
+      if (xhr._waitTimer) clearInterval(xhr._waitTimer)
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.({ stage: 'render', percent: 70, text: '生成训练结果...' })
+        resolve(xhr.responseText)
+      } else {
+        reject(new Error(`服务器错误: ${xhr.status}`))
+      }
+    }
+
+    xhr.onerror = () => reject(new Error('网络错误，无法连接服务器'))
+    xhr.ontimeout = () => reject(new Error('请求超时'))
+
+    xhr.send(formData)
   })
 
-  const data = await res.json()
+  const data = JSON.parse(res)
   if (data.error) throw new Error(data.error)
 
+  // 阶段2: 训练中 → 结果生成
+  onProgress?.({ stage: 'render', percent: 75, text: '生成训练结果...' })
+
   /* ========== Cesium 可视化（等价 demo6） ========== */
+  const totalFeatures = data.geojson.features.length
   data.geojson.features.forEach((feature, index) => {
     const coords = feature.geometry.coordinates[0]
     const hierarchy = coords.map(c =>
@@ -103,23 +211,18 @@ export async function runCNNModel(files) {
     })
 
     predictionEntities.push(entity)
+
+    // 渲染进度: 75-95%
+    if (index % Math.max(1, Math.floor(totalFeatures / 10)) === 0 || index === totalFeatures - 1) {
+      const renderPct = 75 + Math.round((index / totalFeatures) * 20)
+      onProgress?.({ stage: 'render', percent: renderPct, text: `结果生成中 (${index + 1}/${totalFeatures})...` })
+    }
   })
 
+  onProgress?.({ stage: 'render', percent: 96, text: '生成图例...' })
   generateCNNLegend()
 
-  /* ========== 自动对准预测结果 ========== */
-  if (predictionEntities.length > 0) {
-    viewer.flyTo(predictionEntities, {
-      duration: 2.0,
-      offset: new Cesium.HeadingPitchRange(
-        0.0,
-        Cesium.Math.toRadians(-45),
-        0
-      )
-    })
-  }
-
-  /* ========== 下载 CSV（完全保留 demo6 行为） ========== */
+  onProgress?.({ stage: 'render', percent: 98, text: '导出预测结果...' })
   if (data.prediction_csv) {
     const blob = new Blob([data.prediction_csv], {
       type: 'text/csv;charset=utf-8;'
@@ -131,4 +234,6 @@ export async function runCNNModel(files) {
     a.click()
     URL.revokeObjectURL(url)
   }
+
+  onProgress?.({ stage: 'done', percent: 100, text: '训练完成，结果已返回' })
 }

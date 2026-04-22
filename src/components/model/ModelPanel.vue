@@ -43,7 +43,7 @@
       </div>
 
       <!-- 原始模型信息面板 -->
-      <!-- <div class="section-group">
+      <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
           <span>模型信息</span>
@@ -139,9 +139,9 @@
             <span v-if="running" class="loading-spinner"></span>
           </button>
         </div>
-      </div> -->
+      </div>
 
-      <!-- 优化模型信息面板 -->
+      <!-- 滑坡评估模型面板 -->
       <div class="section-group">
         <div class="section-label">
           <span class="section-bar"></span>
@@ -189,12 +189,32 @@ import { runReclassModel } from '@/model/reclassModel'
 import { runCNNModel } from '@/model/cnnModel'
 import { runANNModel } from '@/model/annModel'
 
-defineEmits(['close'])
+const emit = defineEmits(['close', 'cnnProgress'])
 
 const status = ref('')
 const statusType = ref('info')
 const cnnInput = ref(null)
 const running = ref(false)
+
+// CNN 进度状态
+const cnnProgress = ref({
+  active: false,
+  percent: 0,
+  text: '',
+  stage: '',
+})
+
+const STAGE_ORDER = ['upload', 'process', 'render', 'legend', 'download', 'done']
+
+function stageDone(stage) {
+  const idx = STAGE_ORDER.indexOf(stage)
+  const currentIdx = STAGE_ORDER.indexOf(cnnProgress.value.stage)
+  return currentIdx > idx
+}
+
+function stageActive(stage) {
+  return cnnProgress.value.stage === stage
+}
 
 //模型面板新增逻辑
 const activeIndex = ref(null)
@@ -266,24 +286,40 @@ async function onCNNFilesSelected(e) {
 
   try {
     running.value = true
-    status.value = '正在运行 CNN 模型...'
+    status.value = ''
+    cnnProgress.value = { active: true, percent: 0, text: '正在上传数据...', stage: 'upload' }
+    emit('cnnProgress', cnnProgress.value)
     statusType.value = 'info'
     
-    await runCNNModel({
-      csv: fileMap.csv,
-      shp: fileMap.shp,
-      shx: fileMap.shx,
-      dbf: fileMap.dbf,
-      prj: fileMap.prj
-    })
+    await runCNNModel(
+      {
+        csv: fileMap.csv,
+        shp: fileMap.shp,
+        shx: fileMap.shx,
+        dbf: fileMap.dbf,
+        prj: fileMap.prj
+      },
+      {
+        onProgress: (p) => {
+          cnnProgress.value = { ...cnnProgress.value, ...p, active: true }
+          emit('cnnProgress', cnnProgress.value)
+        }
+      }
+    )
     
     status.value = '✅ CNN 预测完成！'
     statusType.value = 'success'
-    setTimeout(() => { status.value = '' }, 3000)
+    setTimeout(() => {
+      status.value = ''
+      cnnProgress.value.active = false
+      emit('cnnProgress', cnnProgress.value)
+    }, 3000)
   } catch (err) {
     console.error(err)
     status.value = '❌ CNN 运行失败'
     statusType.value = 'error'
+    cnnProgress.value.active = false
+    emit('cnnProgress', cnnProgress.value)
   } finally {
     running.value = false
     e.target.value = ''
@@ -837,4 +873,15 @@ async function runXGBoostGBDT() {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ========== CNN 进度条 ========== */
+.progress-section {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: rgba(0, 20, 50, 0.7);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 10px;
+  animation: fadein 0.3s ease;
+}
+
 </style>

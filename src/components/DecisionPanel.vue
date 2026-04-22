@@ -127,29 +127,16 @@
           <span>SHAP可解释性分析</span>
         </div>
 
-        <InputSection title="特征重要性分析" icon="🌍">
-          <div class="file-upload-wrapper">
-            <input 
-              type="file" 
-              multiple
-              accept=".shp,.shx,.dbf,.prj"
-              @change="onBuildingsShpSelected"
-              id="buildings-shp"
-              class="file-input"
-            />
-            <label for="buildings-shp" class="file-label">
-              <!-- <span class="file-icon">🏗️</span> -->
-              <span class="file-text">
-                {{ buildingsFileName || '选择待分析文件' }}
-              </span>
-            </label>
-          </div>
-          <div v-if="buildingsFiles.length > 0" class="file-list">
-            <div v-for="(file, index) in buildingsFiles" :key="index" class="file-item">
-              ✓ {{ file.name }}
-            </div>
-          </div>
-        </InputSection>
+        <ShapChart @showLegend="$emit('showLegend', $event)" />
+      </div>
+
+      <div class="section-group">
+        <div class="section-label">
+          <span class="section-bar"></span>
+          <span>易发性概率可视化</span>
+        </div>
+
+        <SusceptibilityInput />
       </div>
 
       <!-- <div class="section-group">
@@ -198,12 +185,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import InputSection from './data/InputSection.vue'
+import ShapChart from './data/ShapChart.vue'
+import SusceptibilityInput from './data/SusceptibilityInput.vue'
 import { 
   visualizeRescuePriority as visualizeRescuePriorityInCesium,
   toggleRescuePriorityVisibility 
 } from '../cesium/decisionAnalysis'
 
-defineEmits(['close'])
+defineEmits(['close', 'showLegend'])
 
 // 文件数据
 const regionFiles = ref([])
