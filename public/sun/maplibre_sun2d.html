@@ -1,0 +1,1977 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Filter within a Layer</title>
+    <meta
+      property="og:description"
+      content="Filter a layer based on user input using setFilter()."
+    />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="//unpkg.com/3d-force-graph"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+    <script src="https://unpkg.com/neo4j-driver/lib/browser/neo4j-web.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+      }
+
+      html,
+      body,
+      #map {
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: transparent; /* 你可以改为其他背景色 */
+        /* position: relative; */
+        overflow: clip;
+      }
+      #map2 {
+        height: 100vh;
+        width: 100vw;
+        /* position: relative; */
+        overflow: clip;
+      }
+      header {
+        position: absolute;
+        width: 80%;
+        height: 11vh;
+        top: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        padding: 10px 20px;
+        text-align: center;
+        border-radius: 30px;
+        /* background-color: transparent; */
+        /* 毛玻璃效果 */
+        /* background: rgba(10, 10, 20, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); */
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 3vh;
+        font-weight: 700; /* 加粗 */
+        font-family: 'Times New Roman', 'Roboto', sans-serif;
+        color: #0158bb;
+        letter-spacing: 0.5px;
+        line-height: 1.4;
+        /* border-bottom: 1px solid #ccc; */
+        display: inline-block;
+        padding-bottom: 8px;
+        background-color: transparent;
+        /* 发光边框 */
+        text-shadow:
+          0 0 3px #ffffff9a,
+          0 0 6px #ffffff9a,
+          0 0 10px rgba(255, 255, 255, 0.6);
+        letter-spacing: 1px;
+        line-height: 1.4;
+        /* text-shadow:
+          -1px -1px 0 #ffffff,
+          1px -1px 0 #ffffff,
+          -1px 1px 0 #ffffff,
+          1px 1px 0 #ffffff; */
+      }
+      p {
+        position: relative;
+        left: -10px;
+        margin: 0;
+        font-size: 2.3vh;
+        font-weight: 700; /* 加粗 */
+        font-family: 'Times New Roman', 'Roboto', sans-serif;
+        color: #000000;
+      }
+      /* 按钮样式 */
+      #graphControl {
+        height: 32px;
+        width: 32px;
+        position: absolute;
+        top: 145px;
+        right: 8px;
+        z-index: 10;
+        background-color: #ffffff;
+        border: 2px solid rgba(153, 153, 153, 0.89);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; /* 平滑过渡效果 */
+      }
+      /* 鼠标悬停时背景色变化 */
+      #graphControl:hover {
+        background-color: #ffffffd5;
+      }
+
+      /* 按钮点击时样式 */
+      #graphControl:active {
+        background-color: #868686; /* 点击时的背景色 */
+      }
+      /* 筛选图谱按钮 */
+      #filterGraphBtn {
+        height: 32px;
+        width: 32px;
+        position: absolute;
+        top: 182px;
+        right: 8px;
+        z-index: 10;
+        background-color: #ffffff;
+        border: 2px solid rgba(153, 153, 153, 0.89);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 10px;
+        font-weight: 700;
+        color: #0158bb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #filterGraphBtn:hover {
+        background-color: #ffffffd5;
+      }
+      #filterGraphBtn:active {
+        background-color: #868686;
+      }
+      imgcontainer {
+        position: absolute;
+        width: 100%;
+        height: 13vh;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 8;
+        text-align: center;
+      }
+      imgcontainer img {
+        width: auto; /* 或百分比，例如 50% */
+        height: 7vh; /* 保持比例缩放 */
+        object-fit: contain; /* 保证完整显示图像 */
+      }
+      imgcontainer1 {
+        position: absolute;
+        width: 100%;
+        height: 11vh;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 8;
+        text-align: center;
+      }
+      imgcontainer1 img {
+        width: 80vw; /* 或百分比，例如 50% */
+        height: 7vh; /* 保持比例缩放 */
+        object-fit: contain; /* 保证完整显示图像 */
+        opacity: 0.8;
+      }
+
+      /* 筛选结果提示框 */
+      #filter-toast {
+        position: absolute;
+        top: 14vh;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 12;
+        background: rgba(1, 88, 187, 0.9);
+        color: #fff;
+        padding: 8px 24px;
+        border-radius: 20px;
+        font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 2vh;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      #filter-toast.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+      }
+
+      .map-overlay {
+        font:
+          12px/20px 'Times New Roman',
+          Arial,
+          Helvetica,
+          sans-serif;
+        position: absolute;
+        width: 31.8%;
+        top: 0;
+        left: 0;
+        padding: 10px;
+      }
+
+      .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .map-overlay input {
+        margin: 2px;
+      }
+
+      input[type='number'] {
+        width: 25%;
+      }
+
+      #filter-result {
+        font-size: 2vh;
+        font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .filter-ctrl {
+        position: absolute;
+        top: 8vh;
+        z-index: 11;
+        display: flex;
+        align-items: center; /* 垂直居中对齐 */
+        gap: 10px; /* 元素之间的间距 */
+      }
+      #filter1 {
+        left: 25vw;
+        transform: translateX(-50%);
+      }
+      #filter2 {
+        left: 50vw;
+        transform: translateX(-50%);
+      }
+      #filter3 {
+        left: 75vw;
+        transform: translateX(-50%);
+      }
+
+      #filter-search-btn {
+        position: absolute;
+        top: 8vh;
+        left: 92vw;
+        transform: translateX(-50%);
+        z-index: 11;
+        height: 50px;
+        padding: 0 18px;
+        background-color: #0158bb;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font:
+          2vh 'Times New Roman',
+          Tahoma,
+          Geneva,
+          Verdana,
+          sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.2s ease;
+      }
+      #filter-search-btn:hover {
+        background-color: #014799;
+      }
+      #filter-search-btn:active {
+        background-color: #013677;
+      }
+
+      .filter-ctrl input[type='text'] {
+        font:
+          2vh 'Times New Roman',
+          Tahoma,
+          Geneva,
+          Verdana,
+          sans-serif;
+        width: 10vw;
+        border: 0;
+        background-color: #d6d6d6cc;
+        margin: 0;
+        color: rgb(0, 0, 0);
+        padding: 10px;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.747);
+        border-radius: 10px;
+      }
+      .filter-ctrl input[type='text']:focus {
+        background-color: #d6d6d6cc; /* 保持一致 */
+        color: rgb(0, 0, 0); /* 保持一致 */
+        outline: 2px solid #8d8d8d; /* 去除默认高亮轮廓 */
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.747); /* 保持一致 */
+      }
+    </style>
+    <header>
+      <h1 style="color: #0158bb">滑坡易发性评估知识图谱系统</h1>
+    </header>
+    <div id="filter-toast"></div>
+    <imgcontainer><img id="u11_img" class="img" src="images/page_1/u11.png" /></imgcontainer>
+    <imgcontainer1><img id="u2_img" class="img" src="images/page_1/u2.svg" /></imgcontainer1>
+    <div
+      id="3dgraph"
+      v-show="graphStatus"
+      style="
+        height: 100%;
+        width: 100vw;
+        position: absolute;
+        /* bottom: 0.5%;
+        right: 0.5%; */
+        z-index: 6;
+        /* border: 2px solid black; */
+        /* border-radius: 8px; */
+        background-color: rgba(0, 0, 0, 0);
+      "
+    ></div>
+    <div
+      id="propertyWindow"
+      style="
+        height: 42vh;
+        min-height: 100px;
+        width: 42vh;
+        max-width: 90vw;
+        position: absolute;
+        bottom: 1%;
+        right: 1%;
+        z-index: 999;
+        border-radius: 12px;
+        background: rgba(30, 30, 30, 0.85);
+        color: #f1f1f1;
+        font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        padding: 16px;
+        display: none;
+      "
+    ></div>
+    <div id="map" style="height: 100%; width: 100%; position: absolute; z-index: 3"></div>
+    <div
+      id="map2"
+      style="
+        height: 42%;
+        width: 42vh;
+        position: absolute;
+        bottom: 0.5%;
+        left: 0.5%;
+        z-index: 4;
+        border: 2px solid black;
+        border-radius: 8px;
+      "
+    ></div>
+    <button id="graphControl">G</button>
+    <button id="filterGraphBtn">KG</button>
+    <div class="filter-ctrl" id="filter1">
+      <p>区域查询:</p>
+      <input id="filter-input-region" type="text" name="filter" placeholder="输入区域名称" />
+    </div>
+    <div class="filter-ctrl" id="filter2">
+      <p>因子查询:</p>
+      <input
+        id="filter-input-factor"
+        type="text"
+        name="filter"
+        placeholder="如: earthquake/slope/rainfall"
+      />
+    </div>
+    <div class="filter-ctrl" id="filter3">
+      <p>方法查询:</p>
+      <input
+        id="filter-input-method"
+        type="text"
+        name="filter"
+        placeholder="如: 机器学习/专家评价/数学统计/启发式"
+      />
+    </div>
+    <button id="filter-search-btn">查询</button>
+
+    <script type="module">
+      import * as THREE from 'https://esm.sh/three'
+      import { csvParse } from 'https://esm.sh/d3-dsv'
+      import { forceCollide } from 'https://esm.sh/d3-force-3d'
+      import {
+        CSS2DRenderer,
+        CSS2DObject,
+      } from 'https://esm.sh/three/examples/jsm/renderers/CSS2DRenderer.js'
+      import {
+        CSS3DRenderer,
+        CSS3DObject,
+      } from 'https://esm.sh/three/examples/jsm/renderers/CSS3DRenderer.js'
+      import ForceGraph3D from 'https://esm.sh/3d-force-graph'
+      import ForceGraph from 'https://esm.sh/force-graph'
+      import { UnrealBloomPass } from 'https://esm.sh/three/examples/jsm/postprocessing/UnrealBloomPass.js'
+      import { GUI } from 'https://esm.sh/dat.gui'
+      // import neo4j from 'https://esm.sh/neo4j-driver'
+
+      let graphStatus = false
+
+      const cssRenderer = new CSS3DRenderer()
+      cssRenderer.setSize(window.innerWidth, window.innerHeight)
+      cssRenderer.domElement.style.position = 'absolute'
+      cssRenderer.domElement.style.top = '1'
+      cssRenderer.domElement.style.zIndex = '2'
+      document.body.appendChild(cssRenderer.domElement)
+
+      const data = {}
+      const maptilerKey = 'ycORim2UMOdY1xFgUl1e'
+
+      // 创建第二个 MapLibre 地图（作为小地图）
+      const map2 = new maplibregl.Map({
+        container: 'map2', // 小地图容器
+        style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${maptilerKey}`,
+        center: [9, 0],
+        zoom: -0.74,
+      })
+      const colorNameToHex = {
+        MOD: '#058D49',
+        PaperID: '#C76170',
+        INF: '#2579E8',
+        Coordinate: '#ED7D31',
+        Title: '#ED7D31',
+        aliceblue: '#F0F8FF',
+        antiquewhite: '#FAEBD7',
+        aqua: '#00FFFF',
+        aquamarine: '#7FFFD4',
+        azure: '#F0FFFF',
+        beige: '#F5F5DC',
+        bisque: '#FFE4C4',
+        black: '#000000',
+        blue: '#0000FF',
+        brown: '#A52A2A',
+        coral: '#FF7F50',
+        cyan: '#00FFFF',
+        gold: '#FFD700',
+        green: '#008000',
+        grey: '#808080',
+        orange: '#FFA500',
+        pink: '#FFC0CB',
+        purple: '#800080',
+        red: '#FF0000',
+        white: '#FFFFFF',
+        yellow: '#FFFF00',
+        // 可补充更多颜色...
+      }
+
+      map2.on('load', () => {
+        // 你可以在这里配置第二个地图的层、样式等
+        // 添加四川省行政区划数据源
+        map2.addSource('sichuan', {
+          type: 'geojson',
+          data: './sichuan_WGS/sichuan.geojson',
+        })
+
+        // 四川省行政区划填充图层
+        map2.addLayer({
+          id: 'sichuan-fill',
+          type: 'fill',
+          source: 'sichuan',
+          paint: {
+            'fill-color': '#088',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        // 四川省行政区划边界线图层
+        map2.addLayer({
+          id: 'sichuan-border',
+          type: 'line',
+          source: 'sichuan',
+          paint: {
+            'line-color': '#0158bb',
+            'line-width': 2,
+            'line-opacity': 0.8,
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+        })
+
+        map2.addSource('landslide', {
+          type: 'geojson',
+          data: './sun/output1.geojson',
+        })
+
+        map2.addLayer({
+          id: 'landslide',
+          type: 'circle',
+          source: 'landslide',
+          paint: {
+            'circle-color': '#ff0000',
+            'circle-radius': [
+              'interpolate', // 使用插值函数来根据 zoom 设置大小
+              ['linear'], // 使用线性插值
+              ['zoom'], // 根据 zoom 级别调整
+              0,
+              1, // zoom 为 0 时，圆半径为 5
+              2,
+              3,
+              3,
+              4,
+              4,
+              6,
+              5,
+              8, // zoom 为 5 时，圆半径为 10
+            ],
+            'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+            'circle-stroke-width': [
+              'interpolate', // 使用插值函数来根据 zoom 设置大小
+              ['linear'], // 使用线性插值
+              ['zoom'], // 根据 zoom 级别调整
+              0,
+              0.1, // zoom 为 0 时，圆半径为 5
+              2,
+              0.5,
+              3,
+              1,
+              4,
+              2,
+              5,
+              3, // zoom 为 5 时，圆半径为 10
+            ], // 圆的边缘宽度
+          },
+        })
+      })
+
+      const map1 = new maplibregl.Map({
+        container: 'map',
+        center: [9, 0],
+        zoom: 1.9,
+        style: `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${maptilerKey}`,
+        // 		style: {
+        // 			version: 8,
+        // 			sources: {
+        // 						osm: {
+        // 								type: 'raster',
+        // 								tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        // 								tileSize: 256,
+        // 								attribution: '&copy; OpenStreetMap Contributors',
+        // 								maxzoom: 19
+        // 						},
+        // 						terrainSource: {
+        // 								type: "raster-dem",
+        // 								url: `https://api.maptiler.com/tiles/terrain-rgb/tiles.json?key=${maptilerKey}`,
+        // 								tileSize: 256
+        // 						},
+        // 						hillshadeSource: {
+        // 								type: "raster-dem",
+        // 								url: `https://api.maptiler.com/tiles/terrain-rgb/tiles.json?key=${maptilerKey}`,
+        // 								tileSize: 256
+        // 						}
+        // 			},
+        // 			layers: [
+        // 					{
+        // 							id: 'osm',
+        // 							type: 'raster',
+        // 							source: 'osm'
+        // 					},
+        // 					{
+        // 							id: 'hills',
+        // 							type: 'hillshade',
+        // 							source: 'hillshadeSource',
+        // 							layout: {visibility: 'visible'},
+        // 							paint: {'hillshade-shadow-color': '#473B24'}
+        // 					}
+        // 			],
+        // 			terrain: {
+        // 					source: 'terrainSource',
+        // 					exaggeration: 1
+        // 			},
+        // 			sky: {}
+        // },
+        // maxZoom: 18,
+        // maxPitch: 85
+      })
+
+      const layerIDs = [] // Will contain a list used to filter against.
+      const layerLocFilters = {} // 存储每个图层的原始 LOC filter
+      let selectedId
+      const filterInputRegion = document.getElementById('filter-input-region')
+      const filterInputFactor = document.getElementById('filter-input-factor')
+      const filterInputMethod = document.getElementById('filter-input-method')
+
+      // 方法类别映射: class4值 -> class1缩写
+      // 支持中文别名、英文缩写、数字输入，以及模糊匹配
+      const methodAliases = {
+        EE: {
+          class4: ['1'],
+          names: ['专家评价', 'Expert Evaluation', 'EE', 'ee', '1', '专家', '评价'],
+        },
+        MS: {
+          class4: ['2'],
+          names: ['数学统计', 'Mathematical Statistics', 'MS', 'ms', 'Ms', '2', '数学', '统计'],
+        },
+        MM: { class4: ['3'], names: ['机器学习模型', 'MM', 'mm', 'Mm', '3', '模型'] },
+        ML: {
+          class4: ['4'],
+          names: ['机器学习', 'Machine Learning', 'ML', 'ml', 'Ml', '4', '机器'],
+        },
+        HM: {
+          class4: ['5', '6'],
+          names: ['启发式方法', 'Heuristic Method', 'HM', 'hm', 'Hm', '5', '6', '启发', '启发式'],
+        },
+      }
+
+      // 方法查询: 将用户输入转换为 class4 值列表，支持模糊匹配
+      function getMethodClass4Values(input) {
+        const value = input.trim()
+        if (!value) return null // 无输入时不筛选
+        const words = value.split(/[,，\s]+/).filter((w) => w.length > 0)
+        const class4Set = new Set()
+
+        for (const word of words) {
+          for (const [, info] of Object.entries(methodAliases)) {
+            // 精确匹配或包含匹配
+            const matched = info.names.some(
+              (name) =>
+                name.toLowerCase() === word.toLowerCase() || // 精确匹配
+                (name.length >= 2 && word.length >= 2 && name.includes(word)), // 模糊匹配: 输入是别名的子串
+            )
+            if (matched) {
+              info.class4.forEach((v) => class4Set.add(v))
+              break // 匹配到一个类别即可，避免重复
+            }
+          }
+        }
+        return class4Set.size > 0 ? Array.from(class4Set) : null
+      }
+
+      // 统一筛选函数: 组合三个筛选条件
+      let factorLocs = null // 因子筛选结果: Set<loc> 或 null(未筛选)
+
+      // 查询 Neo4j 获取包含指定因子的 LOC 列表
+      async function getFactorLocs(terms) {
+        if (!terms || terms.trim() === '') return null
+        const neo4j = window.neo4j
+        if (!neo4j) {
+          console.warn('neo4j driver not loaded')
+          return null
+        }
+
+        const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', '21151211'))
+        const session = driver.session()
+        try {
+          // 将用户输入拆分为搜索词列表
+          const searchTerms = terms
+            .split(/[,，]+/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+          const query = `
+            MATCH (i:INF)-[]-(p:PaperID)-[]-(f:FAC)
+            WHERE i.loc IS NOT NULL
+              AND f.content IS NOT NULL
+              AND ANY(term IN $terms WHERE toLower(toString(f.content)) CONTAINS toLower(term))
+            RETURN DISTINCT i.loc AS Location
+            ORDER BY Location
+          `
+          const result = await session.run(query, { terms: searchTerms })
+          const locSet = new Set()
+          result.records.forEach((record) => {
+            const loc = record.get('Location')
+            if (loc) locSet.add(loc)
+          })
+          console.log(`因子查询: "${terms}" 匹配到 ${locSet.size} 个区域`)
+          return locSet.size > 0 ? locSet : new Set() // 空Set表示无匹配, null表示未筛选
+        } catch (err) {
+          console.error('因子查询失败:', err)
+          return null
+        } finally {
+          await session.close()
+          await driver.close()
+        }
+      }
+
+      // 筛选结果提示
+      const filterToast = document.getElementById('filter-toast')
+      let toastTimer = null
+
+      function showFilterToast(count) {
+        filterToast.textContent = `筛选结果: 共 ${count} 个点`
+        filterToast.classList.add('show')
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => {
+          filterToast.classList.remove('show')
+        }, 3000)
+      }
+
+      function applyFilters() {
+        const regionValue = filterInputRegion.value.trim().toLowerCase()
+        const regionWords = regionValue ? regionValue.split(/\s+/) : []
+        const methodClass4Values = getMethodClass4Values(filterInputMethod.value)
+
+        // 图层尚未创建时跳过
+        if (layerIDs.length === 0) return
+
+        layerIDs.forEach((layerID) => {
+          // 从 layerID 中提取 LOC 名称: "poi-{LOC}" -> LOC
+          const locName = layerID.replace(/^poi-/, '')
+
+          // 1. 区域筛选 (基于 LOC 字段，layerID 格式为 poi-{LOC})
+          let regionMatch = true
+          if (regionWords.length > 0) {
+            const lowerLayerID = layerID.toLowerCase()
+            regionMatch = regionWords.some((word) => lowerLayerID.includes(word))
+          }
+
+          // 2. 因子筛选 (基于 Neo4j 查询结果)
+          let factorMatch = true
+          if (factorLocs !== null) {
+            // factorLocs 为 Set 时，检查 LOC 是否在结果集中
+            factorMatch = factorLocs.has(locName)
+          }
+
+          // 3. 方法筛选 (基于 class4 字段)
+          //    必须保留图层原始的 LOC filter，在此基础上追加方法筛选
+          //    MapLibre setFilter 只支持: ==, !=, >, >=, <, <=, in, !in, all, any, none, has, !has
+          const locFilter = layerLocFilters[layerID]
+          if (methodClass4Values && locFilter) {
+            // 使用 "in" 操作符: ["all", ["==","LOC",symbol], ["in","class4","5","6"]]
+            const inFilter = ['in', 'class4', ...methodClass4Values]
+            map1.setFilter(layerID, ['all', locFilter, inFilter])
+          } else {
+            // 无方法筛选时恢复原始 LOC filter
+            map1.setFilter(layerID, locFilter || null)
+          }
+
+          // 组合区域筛选和因子筛选控制可见性
+          const visible = regionMatch && factorMatch
+          map1.setLayoutProperty(layerID, 'visibility', visible ? 'visible' : 'none')
+        })
+
+        // 统计筛选后的可见点数
+        let visiblePointCount = 0
+        layerIDs.forEach((layerID) => {
+          if (map1.getLayoutProperty(layerID, 'visibility') !== 'none') {
+            // 查询该图层当前满足 filter 的要素数
+            const features = map1.queryRenderedFeatures({ layers: [layerID] })
+            visiblePointCount += features.length
+          }
+        })
+        showFilterToast(visiblePointCount)
+      }
+
+      map1.on('load', async () => {
+        // 添加四川省行政区划数据源
+        map1.addSource('sichuan', {
+          type: 'geojson',
+          data: './sichuan_WGS/sichuan.geojson',
+        })
+
+        // 四川省行政区划填充图层
+        map1.addLayer({
+          id: 'sichuan-fill',
+          type: 'fill',
+          source: 'sichuan',
+          paint: {
+            'fill-color': '#088',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        // 四川省行政区划边界线图层
+        map1.addLayer({
+          id: 'sichuan-border',
+          type: 'line',
+          source: 'sichuan',
+          paint: {
+            'line-color': '#0158bb',
+            'line-width': 3,
+            'line-opacity': 0.8,
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+        })
+
+        // add a clustered GeoJSON source for a sample set of earthquakes
+        map1.addSource('landslide', {
+          type: 'geojson',
+          data: './sun/output1.geojson',
+        })
+        // Basic circle and symbol layers earthquakes
+        // map1.addLayer({
+        //     'id': 'landslide',
+        //     'type': 'circle',
+        //     'source': 'landslide',
+        //     'paint': {
+        // 			'circle-color': '#ff0000',
+        // 			'circle-radius': [
+        // 				'interpolate', // 使用插值函数来根据 zoom 设置大小
+        // 				['linear'],    // 使用线性插值
+        // 				['zoom'],      // 根据 zoom 级别调整
+        // 				0, 0.5,          // zoom 为 0 时，圆半径为 5
+        // 				5, 5         // zoom 为 5 时，圆半径为 10
+        // 			],
+        // 		'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+        // 		'circle-stroke-width': [
+        // 				'interpolate', // 使用插值函数来根据 zoom 设置大小
+        // 				['linear'],    // 使用线性插值
+        // 				['zoom'],      // 根据 zoom 级别调整
+        // 				0, 0.5,          // zoom 为 0 时，圆半径为 5
+        // 				3, 0.8,
+        // 				5, 1         // zoom 为 5 时，圆半径为 10
+        // 			],          // 圆的边缘宽度
+        // 		'circle-translate': [0, 0],        // 保持点在平面上
+        // 		'circle-translate-anchor': 'viewport', // 设置坐标系统为 viewport，这样可以模拟高度效果
+        //     }
+        // });
+
+        map1.addSource('highlight-point', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: [],
+          },
+        })
+
+        map1.addLayer({
+          id: 'highlight-point',
+          type: 'circle',
+          source: 'highlight-point',
+          paint: {
+            'circle-radius': [
+              'interpolate', // 使用插值函数来根据 zoom 设置大小
+              ['linear'], // 使用线性插值
+              ['zoom'], // 根据 zoom 级别调整
+              5,
+              10,
+              20,
+              40,
+            ],
+            'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+            'circle-stroke-width': [
+              'interpolate', // 使用插值函数来根据 zoom 设置大小
+              ['linear'], // 使用线性插值
+              ['zoom'], // 根据 zoom 级别调整
+              0,
+              0.1, // zoom 为 0 时，圆半径为 5
+              2,
+              0.5,
+              3,
+              1,
+              4,
+              2,
+              5,
+              3, // zoom 为 5 时，圆半径为 10
+            ],
+            'circle-color': '#ff0000',
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#fff',
+          },
+        })
+
+        const image = await map1.loadImage('./svg/LOC.png')
+        map1.addImage('custom-marker', image.data)
+        // Add layers after ensuring the image is loaded
+        fetch('./sun/output1.geojson')
+          .then((response) => response.json())
+          .then((data) => {
+            data.features.forEach((feature) => {
+              const symbol = feature.properties['LOC']
+              const layerID = `poi-${symbol}`
+              // Add a symbol layer
+              // Add a layer for this symbol type if it hasn't been added already.
+              if (!map1.getLayer(layerID)) {
+                // map1.addLayer({
+                //   id: layerID,
+                //   type: 'symbol',
+                //   source: 'landslide',
+                //   layout: {
+                //     'icon-image': 'custom-marker',
+                //     'icon-overlap': 'always',
+                //     'icon-size': [
+                //       'interpolate',
+                //       ['linear'],
+                //       ['zoom'],
+                //       0,
+                //       0.1, // At zoom level 0, the icon size is 0.5
+                //       10,
+                //       0.2, // At zoom level 10, the icon size is 1.5
+                //     ],
+                //     // get the year from the source's "year" property
+                //     // 'text-field': "landslide",
+                //     // 'text-font': [
+                //     // 		'Open Sans Semibold',
+                //     // 		'Arial Unicode MS Bold'
+                //     // ],
+                //     // 'text-offset': [0, 1.25],
+                //     // 'text-anchor': 'top'
+                //   },
+                //   filter: ['==', 'description', symbol],
+                // })
+
+                map1.addLayer({
+                  id: layerID,
+                  type: 'circle',
+                  source: 'landslide',
+                  paint: {
+                    'circle-color': '#ff0000',
+                    'circle-radius': [
+                      'interpolate', // 使用插值函数来根据 zoom 设置大小
+                      ['linear'], // 使用线性插值
+                      ['zoom'], // 根据 zoom 级别调整
+                      3,
+                      4, // zoom 为 0 时，圆半径为 5
+                      5,
+                      6,
+                      7,
+                      10,
+                    ],
+                    'circle-stroke-color': '#ffffff', // 圆的边缘颜色
+                    'circle-stroke-width': [
+                      'interpolate', // 使用插值函数来根据 zoom 设置大小
+                      ['linear'], // 使用线性插值
+                      ['zoom'], // 根据 zoom 级别调整
+                      0,
+                      0.1, // zoom 为 0 时，圆半径为 5
+                      2,
+                      0.5,
+                      3,
+                      1,
+                      4,
+                      2,
+                      5,
+                      3, // zoom 为 5 时，圆半径为 10
+                    ], // 圆的边缘宽度
+                  },
+                  filter: ['==', 'LOC', symbol],
+                })
+                layerIDs.push(layerID)
+                // 保存图层的原始 LOC filter，避免被 setFilter 覆盖
+                layerLocFilters[layerID] = ['==', 'LOC', symbol]
+              }
+              map1.on('click', layerID, (e) => {
+                const features = e.features
+                if (e.features && e.features.length > 0) {
+                  // highlightSource.setData({
+                  //   type: 'FeatureCollection',
+                  //   features: [],
+                  // })
+                  const feature = e.features[0]
+                  if (selectedId) map1.setPaintProperty(selectedId, 'circle-color', '#ff0000') // 设置为红色
+                  map1.setPaintProperty(layerID, 'circle-color', 'rgb(255, 153, 0)') // 设置为红色
+                  selectedId = layerID
+                  // const allLayers = map1.getStyle().layers
+                  // const lastLayerId = allLayers[allLayers.length - 1].id
+                  // const highlightSource = map1.getSource('highlight-point')
+                  // if (highlightSource) {
+                  //   highlightSource.setData({
+                  //     type: 'FeatureCollection',
+                  //     features: [feature], // 把当前点击的 feature 设置为高亮显示
+                  //   })
+                  // }
+                  async function handleNodeJump(feature) {
+                    const name = feature.properties.LOC
+                    await getCypherResult(100, name)
+                    const node = graph
+                      .graphData()
+                      .nodes.find((n) => n.name === feature.properties.LOC)
+                    if (node) {
+                      // Aim at node from outside it
+                      // Center/zoom on node
+                      graphStatus = true
+                      showGraph(graphStatus)
+                      // highlightNodes.clear()
+                      // if (node) {
+                      //   console.log(node)
+                      //   highlightNodes.add(node)
+                      // }
+                      // hoverNode = node || null
+                      // updateHighlight()
+
+                      graph.centerAt(node.x, node.y, 1000)
+                      graph.zoom(4.5, 200)
+                    }
+                    const coordinates = feature.geometry.coordinates.slice()
+                    const zoomLevel = 8 // 设置为点击后的缩放级别
+                    map1.flyTo({
+                      center: coordinates,
+                      zoom: zoomLevel,
+                      essential: true,
+                    })
+                  }
+                  handleNodeJump(feature)
+                }
+                const feature = features[0]
+                const properties = feature.properties
+
+                // Generate table rows dynamically from properties
+                const tableRows = Object.entries(properties)
+                  .map(
+                    ([key, value]) => `
+                                  <tr>
+                                    <td style="padding: 8px; border-bottom: 1px solid #555;"><strong>${key}</strong></td>
+                                    <td style="padding: 8px; border-bottom: 1px solid #555;">${value}</td>
+                                  </tr>
+                                `,
+                  )
+                  .join('')
+
+                const content = `
+                              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <strong style="font-size: 25px;">滑坡信息</strong>
+                                <button id="closeBtn" style="
+                                  background: transparent;
+                                  color: white;
+                                  border: none;
+                                  font-size: 18px;
+                                  cursor: pointer;
+                                " title="关闭">&times;</button>
+                              </div>
+
+                              <table style="
+                                width: 100%;
+                                border-collapse: collapse;
+                                font-size: 20px;
+                                color: white;
+                              ">
+                                ${tableRows}
+                              </table>
+                            `
+
+                const propertyWindow = document.getElementById('propertyWindow')
+                propertyWindow.innerHTML = content
+                propertyWindow.style.display = 'block'
+
+                // 关闭按钮功能
+                document.getElementById('closeBtn').onclick = () => {
+                  propertyWindow.style.display = 'none'
+                }
+
+                // const x = e.point.x
+                // const y = e.point.y
+                // const panelWidth = infoPanel.offsetWidth
+                // const panelHeight = infoPanel.offsetHeight
+                // const left = x - panelWidth / 2 // Center horizontally
+                // const top = y + 10 // Place 10px below the click position
+
+                // // Apply the position
+                // infoPanel.style.left = `${left}px`
+                // infoPanel.style.top = `${top}px`
+
+                // arrow.style.left = `${left + panelWidth / 2 - 5}px` // Center the arrow horizontally
+                // arrow.style.top = `${top - 10}px` // Position the arrow above the panel
+              })
+            })
+          })
+          .catch((error) => console.error('Error loading GeoJSON data:', error))
+
+        // 查询按钮点击: 统一执行三个筛选
+        document.getElementById('filter-search-btn').addEventListener('click', async () => {
+          const factorValue = filterInputFactor.value.trim()
+          // 先执行因子查询(异步)
+          if (factorValue) {
+            factorLocs = await getFactorLocs(factorValue)
+          } else {
+            factorLocs = null
+          }
+          applyFilters()
+        })
+
+        // 回车键也触发查询
+        const filterInputs = [filterInputRegion, filterInputFactor, filterInputMethod]
+        filterInputs.forEach((input) => {
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              document.getElementById('filter-search-btn').click()
+            }
+          })
+        })
+      })
+
+      let graph
+
+      //从neo4j读取图谱数据
+      async function getCypherResult(limit_items = 100, name = null) {
+        const start = new Date()
+        const neo4j = window.neo4j
+        const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', '21151211'))
+        const session = driver.session()
+        let query
+
+        // try {
+        //   if (name == null) {
+        //     query = `
+        //     MATCH p=(n)-[r:use_of]->(m)
+        //     RETURN n, r, m
+        //     LIMIT $limit
+        //   `
+        //   } else {
+        //     query = `
+        //       MATCH p=(n:INF{loc:$name})-[r]->(m)
+        //       RETURN n, r, m
+        //       LIMIT $limit
+        //     `
+        //   }
+        try {
+          let query
+
+          if (name == null) {
+            query = `
+                  MATCH (n)-[r:use_of]->(m)
+                  RETURN n, r, m
+                  LIMIT $limit
+                `
+          } else {
+            //         query = `
+            //   MATCH (n:INF)
+            //   WHERE n.loc = $name
+
+            //   OPTIONAL MATCH (n)-[r_fac]-(fac:FAC)
+            //   OPTIONAL MATCH (n)-[r_mod]-(mod:MOD)
+            //   OPTIONAL MATCH (n)-[r_coord]-(coord:Coordinate)
+            //   OPTIONAL MATCH (n)-[r_paper]-(paper:PaperID)
+            //   OPTIONAL MATCH (paper)-[r_title]-(title:Title)
+            //   OPTIONAL MATCH (paper)-[r_dat]-(dat:DAT)
+
+            //   RETURN n, r_fac, fac, r_mod, mod, r_coord, coord, r_paper, paper, r_title, title, r_dat, dat
+            // `
+            query = `
+                              MATCH (n:INF)
+                          WHERE n.loc = $name
+
+                          OPTIONAL MATCH (n)-[r_fac]-(fac:FAC)
+                          OPTIONAL MATCH (n)-[r_mod]-(mod:MOD)
+                          OPTIONAL MATCH (n)-[r_coord]-(coord:Coordinate)
+
+                          OPTIONAL MATCH (n)-[r_paper]-(paper:PaperID)
+
+                          OPTIONAL MATCH (paper)-[r_title]-(title:Title)
+                          OPTIONAL MATCH (paper)-[r_link]-(link:Link)
+                          OPTIONAL MATCH (paper)-[r_dat]-(dat:DAT)
+
+                          OPTIONAL MATCH (fac)-[r_fac_dat]-(dat)
+
+                          OPTIONAL MATCH (mod)-[r_mod_dat]-(dat)
+
+                          RETURN
+                              n,
+                              r_fac, fac,
+                              r_mod, mod,
+                              r_coord, coord,
+                              r_paper, paper,
+                              r_title, title,
+                              r_link, link,
+                              r_dat, dat,
+                              r_fac_dat,
+                              r_mod_dat
+                              `
+          }
+
+          const result = await session.run(query, { name: name, limit: neo4j.int(limit_items) })
+
+          const nodes = new Map()
+          const links = []
+
+          result.records.forEach((record) => {
+            for (const key of record.keys) {
+              const item = record.get(key)
+
+              if (!item || !item.identity) continue
+
+              if (item.labels) {
+                // 节点处理
+                const nodeId = item.identity.toNumber()
+                if (!nodes.has(nodeId)) {
+                  nodes.set(nodeId, {
+                    id: nodeId,
+                    elementId: item.elementId,
+                    labels: item.labels,
+                    properties_ID: item.properties?.ID,
+                    name:
+                      item.properties?.loc ||
+                      item.properties?.content ||
+                      item.properties?.value ||
+                      item.properties?.text ||
+                      item.properties?.url ||
+                      item.properties?.id,
+                    properties: item.properties,
+                    color: getNodeColor(item.labels),
+                  })
+                }
+              } else if (item.type) {
+                // 关系处理
+                links.push({
+                  source: item.start.toNumber(),
+                  target: item.end.toNumber(),
+                  id: item.identity.toNumber(),
+                  elementId: item.elementId,
+                  properties: item.type,
+                })
+              }
+            }
+          })
+
+          const graphData = {
+            nodes: Array.from(nodes.values()),
+            links,
+          }
+
+          loadGraph(graphData)
+        } finally {
+          await Promise.all([session.close(), driver.close()])
+        }
+      }
+
+      // 批量查询筛选结果的图谱数据
+      async function getFilteredGraphData(locNames) {
+        if (!locNames || locNames.length === 0) {
+          console.warn('无可查询的LOC')
+          return
+        }
+        const neo4j = window.neo4j
+        if (!neo4j) {
+          console.warn('neo4j driver not loaded')
+          return
+        }
+
+        const driver = neo4j.driver('bolt://localhost:7687', neo4j.auth.basic('neo4j', '21151211'))
+        const session = driver.session()
+        try {
+          const query = `
+            MATCH (n:INF)
+            WHERE n.loc IN $locs
+
+            OPTIONAL MATCH (n)-[r_fac]-(fac:FAC)
+            OPTIONAL MATCH (n)-[r_mod]-(mod:MOD)
+            OPTIONAL MATCH (n)-[r_coord]-(coord:Coordinate)
+
+            OPTIONAL MATCH (n)-[r_paper]-(paper:PaperID)
+
+            OPTIONAL MATCH (paper)-[r_title]-(title:Title)
+            OPTIONAL MATCH (paper)-[r_link]-(link:Link)
+            OPTIONAL MATCH (paper)-[r_dat]-(dat:DAT)
+
+            OPTIONAL MATCH (fac)-[r_fac_dat]-(dat)
+            OPTIONAL MATCH (mod)-[r_mod_dat]-(dat)
+
+            RETURN
+                n,
+                r_mod, mod,
+                r_mod_dat, dat
+          `
+          const result = await session.run(query, { locs: locNames })
+
+          const nodes = new Map()
+          const links = []
+
+          result.records.forEach((record) => {
+            for (const key of record.keys) {
+              const item = record.get(key)
+              if (!item || !item.identity) continue
+
+              if (item.labels) {
+                const nodeId = item.identity.toNumber()
+                if (!nodes.has(nodeId)) {
+                  nodes.set(nodeId, {
+                    id: nodeId,
+                    elementId: item.elementId,
+                    labels: item.labels,
+                    properties_ID: item.properties?.ID,
+                    name:
+                      item.properties?.loc ||
+                      item.properties?.content ||
+                      item.properties?.value ||
+                      item.properties?.text ||
+                      item.properties?.url ||
+                      item.properties?.id,
+                    properties: item.properties,
+                    color: getNodeColor(item.labels),
+                  })
+                }
+              } else if (item.type) {
+                links.push({
+                  source: item.start.toNumber(),
+                  target: item.end.toNumber(),
+                  id: item.identity.toNumber(),
+                  elementId: item.elementId,
+                  properties: item.type,
+                })
+              }
+            }
+          })
+
+          const graphData = {
+            nodes: Array.from(nodes.values()),
+            links,
+          }
+
+          console.log(
+            `筛选图谱: ${locNames.length} 个LOC, ${graphData.nodes.length} 个节点, ${graphData.links.length} 条边`,
+          )
+          loadGraph(graphData)
+          graphStatus = true
+          showGraph(graphStatus)
+        } catch (err) {
+          console.error('筛选图谱查询失败:', err)
+        } finally {
+          await session.close()
+          await driver.close()
+        }
+      }
+
+      // 获取当前筛选后可见的 LOC 列表
+      function getVisibleLocs() {
+        const visibleLocs = []
+        layerIDs.forEach((layerID) => {
+          if (map1.getLayoutProperty(layerID, 'visibility') !== 'none') {
+            const features = map1.queryRenderedFeatures({ layers: [layerID] })
+            if (features.length > 0) {
+              const locName = layerID.replace(/^poi-/, '')
+              if (!visibleLocs.includes(locName)) {
+                visibleLocs.push(locName)
+              }
+            }
+          }
+        })
+        return visibleLocs
+      }
+
+      // 图谱
+      const highlightNodes = new Set()
+      const highlightLinks = new Set()
+      let hoverNode = null
+      const NODE_REL_SIZE = 1
+      let isRotationActive = true
+      const container = document.getElementById('3dgraph')
+
+      function resizeGraphToContainer() {
+        const container = document.getElementById('3dgraph')
+        if (!container) return
+
+        const { clientWidth, clientHeight } = container
+        graph.width(clientWidth)
+        graph.height(clientHeight)
+      }
+
+      // 监听页面大小变化
+      window.addEventListener('resize', resizeGraphToContainer)
+
+      const { clientWidth, clientHeight } = container
+
+      function loadGraph(data) {
+        showGraph(graphStatus)
+        graph = ForceGraph()(document.getElementById('3dgraph'))
+          // .numDimensions(3) // 确保使用三维布局
+          // .enableNodeDrag(false)
+          .graphData(data)
+          .width(clientWidth) // 画布宽度(充满父级容器)
+          .height(clientHeight)
+          .nodeLabel('name')
+          // .nodeRelSize('size')
+          .nodeColor((node) =>
+            highlightNodes.has(node)
+              ? node === hoverNode
+                ? 'rgb(255,0,0,1)'
+                : 'rgba(255,160,0,0.8)'
+              : node.color,
+          )
+          .nodeCanvasObject((node, ctx, globalScale) => {
+            // const label = node.name || ''
+            // const fontSize = 12 / globalScale
+            // ctx.font = `${fontSize}px Sans-Serif`
+            // const textWidth = ctx.measureText(label).width
+            // const bckgDimensions = [textWidth, fontSize].map((n) => n + fontSize * 0.2) // some padding
+
+            // ctx.textAlign = 'center'
+            // ctx.textAlign = 'center'
+            // ctx.textBaseline = 'middle'
+            // const getContrastColor = (inputColor) => {
+            //   if (!inputColor) return '#000000'
+            //   // 统一转换为小写并移除首尾空格
+            //   const color = inputColor.trim().toLowerCase()
+            //   // 1. 处理颜色名称
+            //   let hex = colorNameToHex[color]
+            //   // 2. 如果输入是颜色名称，直接使用映射值；否则尝试处理为十六进制
+            //   if (!hex) {
+            //     // 添加#前缀（如果缺失）
+            //     hex = color.startsWith('#') ? color : `#${color}`
+            //     // 验证是否为有效的十六进制颜色格式
+            //     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+            //     if (!hexRegex.test(hex)) {
+            //       return '#000000' // 无效格式返回默认黑色
+            //     }
+            //     // 处理3位缩写（如 #F00 → #FF0000）
+            //     if (hex.length === 4) {
+            //       hex =
+            //         '#' +
+            //         hex
+            //           .slice(1)
+            //           .split('')
+            //           .map((c) => c + c)
+            //           .join('')
+            //     }
+            //   }
+            //   // 3. 解析RGB分量
+            //   const r = parseInt(hex.slice(1, 3), 16)
+            //   const g = parseInt(hex.slice(3, 5), 16)
+            //   const b = parseInt(hex.slice(5, 7), 16)
+            //   // 4. 计算亮度（YIQ公式）
+            //   const brightness = (r * 299 + g * 587 + b * 114) / 1000
+            //   // 返回对比色
+            //   return brightness > 128 ? '#000000' : '#FFFFFF'
+            // }
+            // // 取出节点颜色
+            // const nodeColor = node.color || '#6495ED'
+            // const textColor = getContrastColor(nodeColor)
+            // ctx.fillStyle = textColor
+            // ctx.fillText(label, node.x, node.y)
+
+            // node.__bckgDimensions = bckgDimensions // to re-use in nodePointerAreaPaint
+
+            // const label = node.name || ''
+            // // 定义节点的大小（使用 node.value 或固定值）
+            // const radius = node.value ? Math.sqrt(node.size) * 3 : 12
+
+            // const paddingRatio = 0.85
+            // const maxTextWidth = radius * 2 * paddingRatio
+            // const maxTextHeight = radius * 2 * paddingRatio
+            // // 计算合适的字体大小，最大不超过节点半径
+
+            // // 获取合适字号和行数组
+            // const getFittingFontSize = (ctx, text, maxWidth, maxHeight) => {
+            //   let fontSize = 20
+            //   let lines = []
+            //   const words = text.split(/,|，|\s+/)
+            //   while (fontSize > 4) {
+            //     ctx.font = `${fontSize}px Sans-Serif`
+            //     lines = []
+            //     let currentLine = ''
+            //     for (const word of words) {
+            //       const testLine = currentLine ? `${currentLine} ${word}` : word
+            //       const testWidth = ctx.measureText(testLine).width
+            //       if (testWidth <= maxWidth) {
+            //         currentLine = testLine
+            //       } else {
+            //         lines.push(currentLine)
+            //         currentLine = word
+            //       }
+            //     }
+            //     if (currentLine) lines.push(currentLine)
+            //     const totalHeight = lines.length * fontSize * 1.2
+            //     if (totalHeight <= maxHeight * 0.95) break
+            //     fontSize -= 1
+            //   }
+            //   return { fontSize, lines }
+            // }
+
+            // // const { fontSize, lines } = getFittingFontSize(ctx, label, maxTextWidth, maxTextHeight)
+
+            // let fontSize = Math.min((radius * globalScale) / 10)
+
+            // // ---- ① 先绘制节点圆形 ----
+            // ctx.beginPath()
+            // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            // ctx.fillStyle = node.color || 'rgba(100, 150, 255, 0.8)' // 默认节点颜色
+            // ctx.fill()
+            // if (highlightNodes.has(node)) {
+            //   ctx.strokeStyle = 'rgba(255, 0, 0, 0.9)' // 高亮边框颜色
+            //   ctx.lineWidth = 2
+            //   ctx.stroke()
+            //   // (可选) 高亮时放大节点
+            //   ctx.beginPath()
+            //   ctx.arc(node.x, node.y, radius + 2, 0, 2 * Math.PI)
+            //   ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)'
+            //   ctx.lineWidth = 2
+            //   ctx.stroke()
+            // } else {
+            //   ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)' // 默认边框
+            //   ctx.lineWidth = 1
+            //   ctx.stroke()
+            // }
+            // // ---- ② 裁剪文字到节点内 ----
+            // ctx.save() // 保存当前 canvas 状态
+            // ctx.beginPath()
+            // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            // // ctx.clip()
+            // // 自动换行处理
+            // let lines = []
+            // while (fontSize > 0) {
+            //   ctx.font = `${fontSize}px Sans-Serif`
+            //   let currentLine = ''
+            //   lines = []
+            //   let maxtestWidth = 0
+            //   const words = label.split(/,|，|\s+/)
+            //   for (let i = 0; i < words.length; i++) {
+            //     const testLine = currentLine + (currentLine ? ' ' : '') + words[i]
+            //     const testWidth = ctx.measureText(testLine).width
+            //     if (testWidth <= maxTextWidth) {
+            //       currentLine = testLine
+            //     } else {
+            //       if (currentLine != '') {
+            //         lines.push(currentLine)
+            //         maxtestWidth =
+            //           ctx.measureText(currentLine).width > maxtestWidth
+            //             ? ctx.measureText(currentLine).width
+            //             : maxtestWidth
+            //       }
+            //       currentLine = words[i]
+            //     }
+            //   }
+            //   if (currentLine) {
+            //     lines.push(currentLine)
+            //     ctx.measureText(currentLine).width > maxtestWidth
+            //       ? ctx.measureText(currentLine).width
+            //       : maxtestWidth
+            //   }
+            //   const totalHeight = lines.length * fontSize * 1.2
+            //   if (totalHeight <= maxTextHeight && maxtestWidth <= maxTextWidth) break
+            //   fontSize -= 1
+            //   if (fontSize < 0) {
+            //     fontSize += 1
+            //     break
+            //   }
+            // }
+            // ctx.font = `${fontSize}px Sans-Serif`
+            // // 将颜色转换为相对色
+            // const getContrastColor = (inputColor) => {
+            //   if (!inputColor) return '#000000'
+            //   // 统一转换为小写并移除首尾空格
+            //   const color = inputColor.trim().toLowerCase()
+            //   // 1. 处理颜色名称
+            //   let hex = colorNameToHex[color]
+            //   // 2. 如果输入是颜色名称，直接使用映射值；否则尝试处理为十六进制
+            //   if (!hex) {
+            //     // 添加#前缀（如果缺失）
+            //     hex = color.startsWith('#') ? color : `#${color}`
+            //     // 验证是否为有效的十六进制颜色格式
+            //     const hexRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/
+            //     if (!hexRegex.test(hex)) {
+            //       return '#000000' // 无效格式返回默认黑色
+            //     }
+            //     // 处理3位缩写（如 #F00 → #FF0000）
+            //     if (hex.length === 4) {
+            //       hex =
+            //         '#' +
+            //         hex
+            //           .slice(1)
+            //           .split('')
+            //           .map((c) => c + c)
+            //           .join('')
+            //     }
+            //   }
+            //   // 3. 解析RGB分量
+            //   const r = parseInt(hex.slice(1, 3), 16)
+            //   const g = parseInt(hex.slice(3, 5), 16)
+            //   const b = parseInt(hex.slice(5, 7), 16)
+            //   // 4. 计算亮度（YIQ公式）
+            //   const brightness = (r * 299 + g * 587 + b * 114) / 1000
+            //   // 返回对比色
+            //   return brightness > 128 ? '#000000' : '#FFFFFF'
+            // }
+            // // 取出节点颜色
+            // const nodeColor = node.color || '#6495ED'
+            // const textColor = getContrastColor(nodeColor)
+            // ctx.textAlign = 'center'
+            // ctx.textBaseline = 'middle'
+            // ctx.fillStyle = textColor
+            // // 垂直居中多行文本
+            // const lineHeight = fontSize * 1.2
+            // const totalHeight = lines.length * lineHeight
+            // let yOffset = node.y - totalHeight / 2 + lineHeight / 2
+            // for (const line of lines) {
+            //   if (line != '') {
+            //     ctx.fillText(line, node.x, yOffset)
+            //     yOffset += lineHeight
+            //   }
+            // }
+            // ctx.restore() // 恢复 canvas 状态
+            // // ---- ③ (可选) 重新绘制节点边框，增强视觉效果 ----
+            // ctx.beginPath()
+            // ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            // ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)' // 节点边框颜色
+            // ctx.lineWidth = 1
+            // ctx.stroke()
+
+            const label = node.name || ''
+            const radius = node.value ? Math.sqrt(node.size) * 3 : 12
+            const paddingRatio = 0.85
+            const maxTextWidth = radius * 2 * paddingRatio
+
+            // 字号随着缩放变化
+            let fontSize = Math.min((radius * globalScale) / 10, 20)
+            fontSize = Math.max(fontSize, 4) // 最小字号保护
+
+            // ---- ① 绘制节点圆 ----
+            ctx.beginPath()
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            ctx.fillStyle = node.color || 'rgba(100, 150, 255, 0.8)'
+            ctx.fill()
+            ctx.strokeStyle = highlightNodes.has(node)
+              ? 'rgba(255, 0, 0, 0.9)'
+              : 'rgba(0, 0, 0, 0.2)'
+            ctx.lineWidth = highlightNodes.has(node) ? 2 : 1
+            ctx.stroke()
+
+            // ---- ② 绘制文字 ----
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            ctx.clip()
+
+            // 设置字体
+            ctx.font = `${fontSize}px Times New Roman`
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+
+            // 计算对比色
+            const getContrastColor = (inputColor) => {
+              if (!inputColor) return '#000000'
+              let hex = colorNameToHex[inputColor.trim().toLowerCase()] || inputColor
+              if (!hex.startsWith('#')) hex = `#${hex}`
+              if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3]
+              const r = parseInt(hex.slice(1, 3), 16)
+              const g = parseInt(hex.slice(3, 5), 16)
+              const b = parseInt(hex.slice(5, 7), 16)
+              const brightness = (r * 299 + g * 587 + b * 114) / 1000
+              return brightness > 128 ? '#000000' : '#FFFFFF'
+            }
+            const nodeColor = node.color || '#6495ED'
+            ctx.fillStyle = getContrastColor(nodeColor)
+
+            // 处理超长文字
+            let displayText = label
+            let textWidth = ctx.measureText(displayText).width
+            if (textWidth > maxTextWidth) {
+              while (
+                displayText.length > 0 &&
+                ctx.measureText(displayText + '...').width > maxTextWidth
+              ) {
+                displayText = displayText.slice(0, -1)
+              }
+              displayText += '...'
+            }
+
+            // 画文字
+            ctx.fillText(displayText, node.x, node.y)
+
+            ctx.restore()
+
+            // ---- ③ （可选）重新描边增强节点视觉 ----
+            ctx.beginPath()
+            ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)'
+            ctx.lineWidth = 1
+            ctx.stroke()
+          })
+          .nodeCanvasObjectMode(() => 'after')
+          .linkCanvasObjectMode(() => 'after')
+          .linkCanvasObject((link, ctx) => {
+            const MAX_FONT_SIZE = 4
+            const LABEL_NODE_MARGIN = graph.nodeRelSize() * 1.5
+
+            const start = link.source
+            const end = link.target
+
+            // ignore unbound links
+            if (typeof start !== 'object' || typeof end !== 'object') return
+
+            // calculate label positioning
+            const textPos = Object.assign(
+              ...['x', 'y'].map((c) => ({
+                [c]: start[c] + (end[c] - start[c]) / 2, // calc middle point
+              })),
+            )
+
+            const relLink = { x: end.x - start.x, y: end.y - start.y }
+
+            const maxTextLength =
+              Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2
+
+            let textAngle = Math.atan2(relLink.y, relLink.x)
+            // maintain label vertical orientation for legibility
+            if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle)
+            if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle)
+
+            const label = `${link.properties}`
+
+            // estimate fontSize to fit in link length
+            ctx.font = '1px Times New Roman'
+            const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width)
+            ctx.font = `${fontSize}px Times New Roman`
+            const textWidth = ctx.measureText(label).width
+            const bckgDimensions = [textWidth, fontSize].map((n) => n + fontSize * 0.2) // some padding
+
+            // draw text label (with background rect)
+            ctx.save()
+            ctx.translate(textPos.x, textPos.y)
+            ctx.rotate(textAngle)
+
+            // ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+            // ctx.fillRect(-bckgDimensions[0] / 2, -bckgDimensions[1] / 2, ...bckgDimensions)
+
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillStyle = '#515353'
+            ctx.fillText(label, 0, 0)
+            ctx.restore()
+          })
+          // .linkDirectionalParticles(2)
+          // .linkDirectionalParticleWidth(1.4)
+          .linkWidth(5)
+          .onNodeRightClick(async (node) => {
+            // Aim at node from outside it
+            // Center/zoom on node
+            highlightNodes.clear()
+            if (node) {
+              console.log(node)
+              highlightNodes.add(node)
+            }
+            hoverNode = node || null
+            updateHighlight()
+
+            graph.centerAt(node.x, node.y, 1000)
+            graph.zoom(4.5, 200)
+          })
+        const nodeCount = data.nodes.length
+        const nodeRadius = 20 // 设置你的节点视觉半径
+        graph.d3Force('charge', d3.forceManyBody().strength(-Math.max(300, nodeCount)))
+        graph
+          .d3Force('link')
+          .distance((link) => 20)
+          .strength(0.105)
+        graph.d3Force(
+          'collision',
+          d3
+            .forceCollide()
+            .radius((node) => {
+              return node.value ? Math.sqrt(node.size) * 3 : nodeRadius
+            })
+            .strength(0.5),
+        )
+        graph.d3Force('center', d3.forceCenter(0, 0, 0))
+
+        // // ---- ① 增加节点之间的排斥力 ----
+        // graph.d3Force('charge', d3.forceManyBody().strength(-600)) // 越负，节点间距离越大
+
+        // // ---- ② 设置链接距离 ----
+        // graph.d3Force('link').distance(() => 50) // 100px 连接距离
+
+        // // ---- ③ 调整中心引力 ----
+        // graph.d3Force('center', d3.forceCenter(0, 0, 0)) // 保持图形在视口中心
+      }
+
+      fetch('./sun/outputRel.geojson')
+        .then((res) => res.json())
+        .then((data) => {
+          // loadGraph(data)
+          getCypherResult()
+          // fit to canvas when engine stops
+          // graph.onEngineStop(() => graph.zoomToFit(4000));
+        })
+
+      function updateHighlight() {
+        // trigger update of highlighted objects in scene
+        graph
+          .nodeColor(graph.nodeColor())
+          .linkWidth(graph.linkWidth())
+          .linkDirectionalParticles(graph.linkDirectionalParticles())
+      }
+
+      function getNodeColor(labels) {
+        // 根据标签设置颜色
+        if (labels.includes('INF')) return '#2579E8'
+        if (labels.includes('MOD')) return '#058D49'
+        if (labels.includes('FAC')) return '#F1A537'
+        if (labels.includes('DAT')) return 'purple'
+        if (labels.includes('PaperID')) return '#C76170'
+        if (labels.includes('Title')) return '#D8929C'
+        if (labels.includes('Coordinate')) return '#7FAEE1'
+        return 'gray'
+      }
+
+      // 创建坐标轴对象
+      var axes = new THREE.AxesHelper(20000)
+      //将坐标轴添加进场景
+      // graph.scene().add(axes);
+
+      map1.addControl(
+        new maplibregl.NavigationControl({
+          visualizePitch: true,
+          showZoom: true,
+          showCompass: true,
+        }),
+      )
+
+      map1.addControl(
+        new maplibregl.TerrainControl({
+          source: 'terrainSource',
+          exaggeration: 1,
+        }),
+      )
+
+      map2.addControl(
+        new maplibregl.NavigationControl({
+          visualizePitch: true,
+          showZoom: true,
+          showCompass: true,
+        }),
+      )
+
+      map2.addControl(
+        new maplibregl.TerrainControl({
+          source: 'terrainSource',
+          exaggeration: 1,
+        }),
+      )
+
+      // 监听小地图的旋转事件
+      map2.on('rotate', () => {
+        infoPanel.style.display = 'none'
+        const bearing = map2.getBearing() // 获取小地图的旋转角度
+        map1.rotateTo(bearing, { duration: 0 }) // 设置主地图的旋转角度，使其与小地图同步
+      })
+
+      map2.on('pitch', () => {
+        const pitch = map2.getPitch() // 获取小地图的旋转角度
+        map1.setPitch(pitch) // 设置主地图的旋转角度，使其与小地图同步
+      })
+
+      map1.on('move', () => {
+        const center = map1.getCenter()
+        const zoom = map1.getZoom()
+        // 同步 map1 的位置和缩放
+        map2.setCenter(center)
+      })
+
+      // map1.on('zoom', () => {
+      //   infoPanel.style.display = 'none'
+      //   const zoom = map1.getZoom()
+      //   const center = map1.getCenter()
+      //   // 同步 map1 的缩放
+      //   map2.setCenter(center)
+      //   map2.setZoom(zoom - 3.5)
+      // })
+
+      function showGraph(graphStatus) {
+        if (graphStatus) {
+          container.style.display = 'block'
+          graph.zoom(4.5, 200) // 如果重新显示，您可以控制缩放
+        } else {
+          container.style.display = 'none'
+        }
+      }
+
+      document.getElementById('graphControl').addEventListener('click', () => {
+        graphStatus = !graphStatus
+        showGraph(graphStatus)
+      })
+
+      // 筛选图谱按钮: 加载当前筛选结果的所有关联图谱
+      document.getElementById('filterGraphBtn').addEventListener('click', async () => {
+        const visibleLocs = getVisibleLocs()
+        if (visibleLocs.length === 0) {
+          console.warn('当前无可筛选的点')
+          filterToast.textContent = '当前无可筛选的点'
+          filterToast.classList.add('show')
+          clearTimeout(toastTimer)
+          toastTimer = setTimeout(() => filterToast.classList.remove('show'), 3000)
+          return
+        }
+        filterToast.textContent = `正在加载 ${visibleLocs.length} 个区域的图谱...`
+        filterToast.classList.add('show')
+        await getFilteredGraphData(visibleLocs)
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => filterToast.classList.remove('show'), 3000)
+      })
+
+      // Create a div element for the information panel
+      const infoPanel = document.createElement('div')
+      infoPanel.id = 'info-panel'
+      infoPanel.style.position = 'absolute'
+      // infoPanel.style.bottom = '10px';
+      infoPanel.style.left = '10px'
+      infoPanel.style.backgroundColor = '#5491b8'
+      infoPanel.style.color = 'white'
+      infoPanel.style.padding = '10px'
+      infoPanel.style.borderRadius = '5px'
+      infoPanel.style.display = 'none' // Initially hidden
+      infoPanel.style.zIndex = '11'
+
+      // Create the header section
+      const header = document.createElement('div')
+      header.style.height = '20px' // Fixed height for the header
+      header.style.backgroundColor = '#467a96' // Darker blue for the header
+      header.style.padding = '5px'
+      header.style.textAlign = 'center'
+      header.style.fontWeight = 'bold'
+      header.textContent = 'Landslide Information' // Header title
+
+      // Create the body section
+      const body = document.createElement('div')
+      body.style.padding = '10px' // Padding for the body content area
+      body.style.overflowY = 'auto' // Scrollable content if it's too long
+      body.style.backgroundColor = '#f7f7f7'
+      body.style.color = 'black'
+      infoPanel.appendChild(header)
+      infoPanel.appendChild(body)
+      const infocontainer = document.getElementById('propertyWindow')
+      infocontainer.appendChild(infoPanel)
+      // infocontainer.appendChild(header)
+      // infocontainer.appendChild(body)
+
+      function updatePanelContent(htmldiv, content) {
+        htmldiv.innerHTML = content // Dynamically update the body content
+      }
+
+      // Create the arrow element
+      const arrow = document.createElement('div')
+      arrow.style.position = 'absolute'
+      arrow.style.width = '0'
+      arrow.style.height = '0'
+      arrow.style.borderLeft = '5px solid transparent'
+      arrow.style.borderRight = '5px solid transparent'
+      arrow.style.borderBottom = '10px solid #5491b8' // Blue arrow pointing upwards
+
+      document.body.appendChild(infoPanel)
+      document.body.appendChild(arrow)
+
+      // Handle the click event on the map
+      map2.on('click', 'landslide', (e) => {
+        // Get the first feature (if there are multiple)
+        const features = e.features
+        if (features.length > 0) {
+          const feature = features[0]
+          const properties = feature.properties
+
+          // Update the information panel with the feature properties
+          const content = `
+                                <strong>Place description:</strong> ${properties.LOC}<br>
+                                <strong>Number of occurrences: 2</strong>
+                            `
+          updatePanelContent(body, content)
+
+          // Show the information panel
+          infoPanel.style.display = 'block'
+
+          //   const x = e.point.x
+          //   const y = e.point.y
+          //   const panelWidth = infoPanel.offsetWidth
+          //   const panelHeight = infoPanel.offsetHeight
+          //   const left = x - panelWidth / 2 // Center horizontally
+          //   const top = y + 10 // Place 10px below the click position
+
+          //   // Apply the position
+          //   infoPanel.style.left = `${left}px`
+          //   infoPanel.style.top = `${top}px`
+
+          //   arrow.style.left = `${left + panelWidth / 2 - 5}px` // Center the arrow horizontally
+          //   arrow.style.top = `${top - 10}px` // Position the arrow above the panel
+        }
+      })
+    </script>
+  </body>
+</html>

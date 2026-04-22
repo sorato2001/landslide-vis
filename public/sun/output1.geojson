@@ -4029,38 +4029,6 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [94.0, 29.0]
-      },
-      "properties": {
-        "label": "1042",
-        "pub_Time": "2021",
-        "class4": "5",
-        "LOC": "Sichuan - Tibet Railway, Nyingchi, China",
-        "NAME": "China",
-        "classSun": "5",
-        "class1": "HM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [105.6, 33.6]
-      },
-      "properties": {
-        "label": "202",
-        "pub_Time": "2015",
-        "class4": "4",
-        "LOC": "Youfang catchment, Youfang catchment of Longnan mountain region, Sichuan Basin, loess Plateau, Qinghai - Tibet Plateau, China",
-        "NAME": "China",
-        "classSun": "4",
-        "class1": "ML"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
         "coordinates": [109.0, 34.1]
       },
       "properties": {
@@ -4410,38 +4378,6 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [95.0, 29.0]
-      },
-      "properties": {
-        "label": "1043",
-        "pub_Time": "2023",
-        "class4": "5",
-        "LOC": "Sichuan - Tibet transportation corridor, China",
-        "NAME": "China",
-        "classSun": "5",
-        "class1": "HM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [108.5, 32.0]
-      },
-      "properties": {
-        "label": "376",
-        "pub_Time": "2021",
-        "class4": "5",
-        "LOC": "Gufenping landslide in Nanjiang, Sichuan, China",
-        "NAME": "China",
-        "classSun": "5",
-        "class1": "HM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
         "coordinates": [103.0, 30.0]
       },
       "properties": {
@@ -4497,22 +4433,6 @@
         "pub_Time": "2019",
         "class4": "3",
         "LOC": "Xinmo village of Maoxian County, Sichuan, China",
-        "NAME": "China",
-        "classSun": "3",
-        "class1": "MM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [101.0, 33.0]
-      },
-      "properties": {
-        "label": "247",
-        "pub_Time": "2023",
-        "class4": "3",
-        "LOC": "edge of Qinghai-Tibet Plateau, Dadu River Basin, Sichuan Plain, China",
         "NAME": "China",
         "classSun": "3",
         "class1": "MM"
@@ -5711,38 +5631,6 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [94.0, 29.0]
-      },
-      "properties": {
-        "label": "1039",
-        "pub_Time": "2023",
-        "class4": "4",
-        "LOC": "Changdu and Nyingchi Cities, western STEC, Sichuan - Tibet Engineering Corridor, STEC, southeastern margins of the Tibetan Plateau, Tibet, China",
-        "NAME": "China",
-        "classSun": "4",
-        "class1": "ML"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [97.0, 29.0]
-      },
-      "properties": {
-        "label": "1039",
-        "pub_Time": "2023",
-        "class4": "4",
-        "LOC": "Lancang  Nu  and Yarlung Tsangpo, western STEC, Sichuan - Tibet Engineering Corridor, STEC, southeastern margins of the Tibetan Plateau, Tibet, China",
-        "NAME": "China",
-        "classSun": "4",
-        "class1": "ML"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
         "coordinates": [88.0, 28.5]
       },
       "properties": {
@@ -5750,22 +5638,6 @@
         "pub_Time": "2023",
         "class4": "5",
         "LOC": "Himalayan areas, Yadong County, Tibet, China",
-        "NAME": "China",
-        "classSun": "5",
-        "class1": "HM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [95.0, 29.0]
-      },
-      "properties": {
-        "label": "1041",
-        "pub_Time": "2021",
-        "class4": "5",
-        "LOC": "east of the Tibetan Plateau, Sichuan - Tibet Highway, Tibetan Plateau, China",
         "NAME": "China",
         "classSun": "5",
         "class1": "HM"
@@ -20445,22 +20317,6 @@
         "pub_Time": "2009",
         "class4": "5",
         "LOC": "Shunxi segment of Zhongwu gas pipeline in Zhong County",
-        "NAME": "China",
-        "classSun": "5",
-        "class1": "HM"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [92.0, 29.0]
-      },
-      "properties": {
-        "label": "1040",
-        "pub_Time": "2022",
-        "class4": "5",
-        "LOC": "Sichuan - Tibet Highway",
         "NAME": "China",
         "classSun": "5",
         "class1": "HM"

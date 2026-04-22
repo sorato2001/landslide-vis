@@ -12,6 +12,23 @@ import { setOnPointClickCallback } from './cesium/miniMapLink'
 const active = ref(null)
 const graphPanelRef = ref(null)
 
+// ========== 在线数据 Web 预览 ==========
+const webPreviewVisible = ref(false)
+const webPreviewUrl = ref('')
+const webPreviewName = ref('')
+
+const openWebPreview = ({ name, url }) => {
+  webPreviewName.value = name
+  webPreviewUrl.value = url
+  webPreviewVisible.value = true
+}
+
+const closeWebPreview = () => {
+  webPreviewVisible.value = false
+  webPreviewUrl.value = ''
+  webPreviewName.value = ''
+}
+
 // ========== 侧栏拖拽调整宽度 ==========
 const sidebarWidth = ref(360)
 const isDragging = ref(false)
@@ -96,7 +113,7 @@ watch(graphPanelRef, (panel) => {
         :style="{ width: sidebarWidth + 'px', minWidth: sidebarWidth + 'px' }"
       >
         <GraphPanel v-if="active === 'data'" ref="graphPanelRef" @close="active = null" />
-        <DataPanel v-if="active === 'input'" @close="active = null" />
+        <DataPanel v-if="active === 'input'" @close="active = null" @openUrl="openWebPreview" />
         <ModelPanel v-if="active === 'model'" @close="active = null" />
         <DecisionPanel v-if="active === 'decision'" @close="active = null" />
 
@@ -113,6 +130,30 @@ watch(graphPanelRef, (panel) => {
       <!-- Cesium 地球 -->
       <div class="cesium-wrapper">
         <CesiumViewer />
+
+        <!-- 在线数据 Web 预览浮层 -->
+        <div class="web-preview-overlay" v-if="webPreviewVisible">
+          <div class="web-preview-container">
+            <div class="web-preview-header">
+              <span class="preview-title">🌐 {{ webPreviewName }}</span>
+              <div class="preview-actions">
+                <a class="preview-external" :href="webPreviewUrl" target="_blank" rel="noopener noreferrer" title="在新标签页打开">
+                  ↗
+                </a>
+                <button class="preview-close" @click="closeWebPreview" title="关闭">✕</button>
+              </div>
+            </div>
+            <div class="web-preview-body">
+              <iframe
+                :src="webPreviewUrl"
+                class="preview-iframe"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -292,5 +333,115 @@ watch(graphPanelRef, (panel) => {
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+/* ========== Web 预览浮层 ========== */
+.web-preview-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.web-preview-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(5, 15, 30, 0.98);
+  overflow: hidden;
+}
+
+.web-preview-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.4);
+  flex-shrink: 0;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.preview-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-external {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background: rgba(0, 180, 255, 0.15);
+  border: 1px solid rgba(0, 180, 255, 0.4);
+  color: #00d4ff;
+  font-size: 18px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.preview-external:hover {
+  background: rgba(0, 180, 255, 0.3);
+  box-shadow: 0 0 8px rgba(0, 180, 255, 0.4);
+}
+
+.preview-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  color: #E74C3C;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.preview-close:hover {
+  background: rgba(231, 76, 60, 0.35);
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+  color: #fff;
+}
+
+.web-preview-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
 }
 </style>

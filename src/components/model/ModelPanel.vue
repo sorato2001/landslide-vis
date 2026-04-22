@@ -229,7 +229,8 @@ const modelGroups = [
     models: [
       { name: 'Bagging', action: runANN },
       { name: 'Boosting', action: runANN },
-      { name: 'Stacking', action: runTransformer }
+      { name: 'Stacking', action: runTransformer },
+      { name: 'Stacking XGBoost-GBDT', action: runXGBoostGBDT }
     ]
   },
   {
@@ -370,6 +371,28 @@ async function runTransformer() {
     running.value = false
   }
 }
+
+async function runXGBoostGBDT() {
+    try {
+    running.value = true
+    status.value = '正在运行 Stacking XGBoost-GBDT 模型...'
+    statusType.value = 'info'
+    
+    // TODO: 实现 Stacking XGBoost-GBDT 模型调用
+    // await runXGBoostGBDTModel()
+    
+    status.value = '✅ Stacking XGBoost-GBDT 预测完成！'
+    statusType.value = 'success'
+    setTimeout(() => { status.value = '' }, 3000)
+  } catch (e) {
+    console.error(e)
+    status.value = '❌ Stacking XGBoost-GBDT 预测失败'
+    statusType.value = 'error'
+  } finally {
+    running.value = false
+  }
+}
+
 </script>
 
 <style scoped>

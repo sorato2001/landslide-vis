@@ -113,38 +113,94 @@ function setupClickHandler(viewer) {
 }
 
 /**
- * 根据筛选条件显示/隐藏 Cesium 中的点
- * @param {string} filterText - 筛选文本
- * @param {string[]} allLocValues - 所有的 LOC 值列表
+ * 根据筛选条件显示/隐藏 Cesium 中的点（支持区域+因子+方法三重筛选）
+ * @param {Object} options - 筛选选项
+ * @param {string} options.regionText - 区域筛选文本
+ * @param {Set<string>|null} options.factorLocs - 因子筛选结果的 LOC 集合，null 表示未筛选
+ * @param {string[]|null} options.methodClass4Values - 方法筛选的 class4 值列表，null 表示未筛选
+ * @returns {number} 可见点数量
  */
-export function filterCesiumPoints(filterText, allLocValues) {
+export function filterCesiumPointsAdvanced({ regionText, factorLocs, methodClass4Values }) {
   const viewer = getViewer()
-  if (!viewer || landslideEntities.length === 0) return
+  if (!viewer || landslideEntities.length === 0) return 0
 
-  if (!filterText || filterText.trim() === '') {
-    landslideEntities.forEach((entity) => {
+  const regionWords = regionText && regionText.trim() !== ''
+    ? regionText.trim().toLowerCase().split(/\s+/)
+    : []
+
+  const hasNoFilter = regionWords.length === 0 && factorLocs === null && (!methodClass4Values || methodClass4Values.length === 0)
+
+  let visibleCount = 0
+
+  landslideEntities.forEach((entity) => {
+    // 无任何筛选时恢复默认
+    if (hasNoFilter) {
       entity.show = true
       entity.point = entity.point || {}
       entity.point.pixelSize = 10
       entity.point.color = Cesium.Color.RED.withAlpha(0.85)
-    })
-    return
-  }
+      entity.point.outlineColor = Cesium.Color.WHITE.withAlpha(0.8)
+      entity.point.outlineWidth = 1
+      return
+    }
 
-  const searchWords = filterText.trim().toLowerCase().split(/\s+/)
-
-  landslideEntities.forEach((entity) => {
     const loc = (entity._customLoc || '').toLowerCase()
-    const matches = searchWords.some((word) => loc.includes(word))
-    entity.show = matches
-    if (matches) {
+    const locName = entity._customLoc || ''
+
+    // 1. 区域筛选
+    let regionMatch = true
+    if (regionWords.length > 0) {
+      regionMatch = regionWords.some((word) => loc.includes(word))
+    }
+
+    // 2. 因子筛选
+    let factorMatch = true
+    if (factorLocs !== null) {
+      factorMatch = factorLocs.has(locName)
+    }
+
+    // 3. 方法筛选（基于 class4 属性）
+    let methodMatch = true
+    if (methodClass4Values && methodClass4Values.length > 0) {
+      const class4Val = entity.properties?.class4?.getValue()
+      if (class4Val != null) {
+        methodMatch = methodClass4Values.includes(String(class4Val))
+      } else {
+        methodMatch = false
+      }
+    }
+
+    const visible = regionMatch && factorMatch && methodMatch
+    entity.show = visible
+
+    if (visible) {
       entity.point = entity.point || {}
       entity.point.pixelSize = 14
       entity.point.color = Cesium.Color.YELLOW.withAlpha(0.95)
       entity.point.outlineColor = Cesium.Color.WHITE
       entity.point.outlineWidth = 2
       entity.point.disableDepthTestDistance = 10000
+      visibleCount++
+    } else {
+      entity.point = entity.point || {}
+      entity.point.pixelSize = 10
+      entity.point.color = Cesium.Color.RED.withAlpha(0.3)
+      entity.point.outlineColor = Cesium.Color.WHITE.withAlpha(0.3)
+      entity.point.outlineWidth = 1
     }
+  })
+
+  return visibleCount
+}
+
+/**
+ * 根据筛选条件显示/隐藏 Cesium 中的点（简单文本筛选，兼容旧接口）
+ */
+export function filterCesiumPoints(filterText, allLocValues) {
+  return filterCesiumPointsAdvanced({
+    regionText: filterText,
+    factorLocs: null,
+    methodClass4Values: null,
   })
 }
 
@@ -227,6 +283,82 @@ export function highlightAndFlyToCesiumPoint(lng, lat, loc) {
       viewer.entities.remove(tempEntity)
     }, 8000)
   }
+}
+
+let adminBoundaryDataSource = null  // 行政区划边界数据源
+
+/**
+ * 在 Cesium 中加载四川省行政区划边界
+ * @param {string} geoJsonUrl - GeoJSON 文件路径
+ * @returns {Cesium.GeoJsonDataSource|null}
+ */
+export async function loadAdminBoundary(geoJsonUrl) {
+  const viewer = getViewer()
+  if (!viewer) return null
+
+  // 如果已加载，直接返回
+  if (adminBoundaryDataSource) {
+    return adminBoundaryDataSource
+  }
+
+  try {
+    const dataSource = await Cesium.GeoJsonDataSource.load(geoJsonUrl, {
+      clampToGround: true,
+    })
+
+    const entities = dataSource.entities.values
+    entities.forEach((entity) => {
+      // 多边形填充
+      if (entity.polygon) {
+        entity.polygon.material = Cesium.Color.CYAN.withAlpha(0.12)
+        entity.polygon.outline = true
+        entity.polygon.outlineColor = Cesium.Color.fromCssColorString('#00d4ff').withAlpha(0.8)
+        entity.polygon.outlineWidth = 2
+        entity.polygon.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
+      }
+      // 如果是线实体
+      if (entity.polyline) {
+        entity.polyline.material = Cesium.Color.fromCssColorString('#00d4ff').withAlpha(0.8)
+        entity.polyline.width = 2
+        entity.polyline.clampToGround = true
+      }
+    })
+
+    viewer.dataSources.add(dataSource)
+    adminBoundaryDataSource = dataSource
+
+    console.log('四川省行政区划边界已加载')
+    return dataSource
+  } catch (error) {
+    console.warn('加载行政区划边界失败:', error.message)
+    return null
+  }
+}
+
+/**
+ * 设置行政区划边界的可见性
+ * @param {boolean} visible
+ */
+export function setAdminBoundaryVisible(visible) {
+  if (adminBoundaryDataSource) {
+    adminBoundaryDataSource.show = visible
+  }
+}
+
+/**
+ * 获取行政区划边界是否已加载
+ * @returns {boolean}
+ */
+export function isAdminBoundaryLoaded() {
+  return adminBoundaryDataSource !== null
+}
+
+/**
+ * 获取行政区划边界是否可见
+ * @returns {boolean}
+ */
+export function isAdminBoundaryVisible() {
+  return adminBoundaryDataSource ? adminBoundaryDataSource.show : false
 }
 
 /**

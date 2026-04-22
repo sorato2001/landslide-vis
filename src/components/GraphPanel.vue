@@ -91,16 +91,24 @@
       <div class="filter-area">
         <div class="filter-row">
           <label>区域查询:</label>
-          <input v-model="filters.region" @input="applyFilters" placeholder="输入区域" />
+          <input v-model="filters.region" placeholder="输入区域名称" @keydown.enter="handleSearch" />
         </div>
         <div class="filter-row">
           <label>因子查询:</label>
-          <input v-model="filters.factor" @input="applyFilters" placeholder="输入因子" />
+          <input v-model="filters.factor" placeholder="如: earthquake/slope/rainfall" @keydown.enter="handleSearch" />
         </div>
         <div class="filter-row">
           <label>方法查询:</label>
-          <input v-model="filters.method" @input="applyFilters" placeholder="输入方法" />
+          <input v-model="filters.method" placeholder="如: 机器学习/专家评价/数学统计/启发式" @keydown.enter="handleSearch" />
         </div>
+        <button class="search-btn" @click="handleSearch" :disabled="searching">
+          {{ searching ? '查询中...' : '查询' }}
+        </button>
+      </div>
+
+      <!-- 筛选结果提示 -->
+      <div class="filter-toast" :class="{ show: toastVisible }">
+        {{ toastMessage }}
       </div>
 
       <!-- 图谱容器（侧栏内嵌） -->
@@ -131,7 +139,7 @@
       <div class="fullscreen-overlay" v-if="fullscreenVisible" @keydown.esc="closeFullscreen">
         <div class="fullscreen-panel">
           <div class="fullscreen-header">
-            <span class="fullscreen-title">知识图谱 — 全屏视图</span>
+            <span class="fullscreen-title"></span>
             <div class="fullscreen-btns">
               <button class="fullscreen-action" @click="closeFullscreen">退出全屏</button>
               <button class="fullscreen-close" @click="closeFullscreen">&times;</button>
@@ -161,7 +169,7 @@ import * as d3 from 'd3'
 import neo4j from 'neo4j-driver'
 import {
   loadLandslidePointsInCesium,
-  filterCesiumPoints,
+  filterCesiumPointsAdvanced,
   highlightAndFlyToCesiumPoint,
 } from '../cesium/miniMapLink'
 
@@ -185,10 +193,143 @@ const filters = ref({
   method: '',
 })
 
+const searching = ref(false)
+const toastVisible = ref(false)
+const toastMessage = ref('')
+
 let inlineGraph = null    // 侧栏内嵌图谱
 let fullGraph = null      // 全屏图谱
 let geoJsonData = null
 let currentGraphData = null  // 缓存当前图谱数据，全屏时复用
+
+// ============ 方法类别映射 ============
+// 支持中文别名、英文缩写、数字输入，以及模糊匹配
+const methodAliases = {
+  EE: {
+    class4: ['1'],
+    names: ['专家评价', 'Expert Evaluation', 'EE', 'ee', '1', '专家', '评价'],
+  },
+  MS: {
+    class4: ['2'],
+    names: ['数学统计', 'Mathematical Statistics', 'MS', 'ms', 'Ms', '2', '数学', '统计'],
+  },
+  MM: { class4: ['3'], names: ['机器学习模型', 'MM', 'mm', 'Mm', '3', '模型'] },
+  ML: {
+    class4: ['4'],
+    names: ['机器学习', 'Machine Learning', 'ML', 'ml', 'Ml', '4', '机器'],
+  },
+  HM: {
+    class4: ['5', '6'],
+    names: ['启发式方法', 'Heuristic Method', 'HM', 'hm', 'Hm', '5', '6', '启发', '启发式'],
+  },
+}
+
+// 方法查询: 将用户输入转换为 class4 值列表，支持模糊匹配
+function getMethodClass4Values(input) {
+  const value = input.trim()
+  if (!value) return null
+  const words = value.split(/[,，\s]+/).filter((w) => w.length > 0)
+  const class4Set = new Set()
+
+  for (const word of words) {
+    for (const [, info] of Object.entries(methodAliases)) {
+      const matched = info.names.some(
+        (name) =>
+          name.toLowerCase() === word.toLowerCase() ||
+          (name.length >= 2 && word.length >= 2 && name.includes(word))
+      )
+      if (matched) {
+        info.class4.forEach((v) => class4Set.add(v))
+        break
+      }
+    }
+  }
+  return class4Set.size > 0 ? Array.from(class4Set) : null
+}
+
+// 因子筛选结果缓存: Set<loc> 或 null(未筛选)
+let cachedFactorLocs = null
+
+// 查询 Neo4j 获取包含指定因子的 LOC 列表
+async function getFactorLocs(terms) {
+  if (!terms || terms.trim() === '') return null
+  try {
+    const driver = neo4j.driver(
+      'bolt://localhost:7687',
+      neo4j.auth.basic('neo4j', '21151211')
+    )
+    const session = driver.session()
+    try {
+      const searchTerms = terms
+        .split(/[,，]+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+      const query = `
+        MATCH (i:INF)-[]-(p:PaperID)-[]-(f:FAC)
+        WHERE i.loc IS NOT NULL
+          AND f.content IS NOT NULL
+          AND ANY(term IN $terms WHERE toLower(toString(f.content)) CONTAINS toLower(term))
+        RETURN DISTINCT i.loc AS Location
+        ORDER BY Location
+      `
+      const result = await session.run(query, { terms: searchTerms })
+      const locSet = new Set()
+      result.records.forEach((record) => {
+        const loc = record.get('Location')
+        if (loc) locSet.add(loc)
+      })
+      console.log(`因子查询: "${terms}" 匹配到 ${locSet.size} 个区域`)
+      return locSet.size > 0 ? locSet : new Set()
+    } finally {
+      await Promise.all([session.close(), driver.close()])
+    }
+  } catch (err) {
+    console.error('因子查询失败:', err)
+    return null
+  }
+}
+
+// Toast 提示
+let toastTimer = null
+function showToast(message) {
+  toastMessage.value = message
+  toastVisible.value = true
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toastVisible.value = false
+  }, 3000)
+}
+
+// 统一查询: 组合三个筛选条件
+const handleSearch = async () => {
+  searching.value = true
+  try {
+    const factorValue = filters.value.factor.trim()
+    // 先执行因子查询(异步)
+    if (factorValue) {
+      cachedFactorLocs = await getFactorLocs(factorValue)
+    } else {
+      cachedFactorLocs = null
+    }
+
+    const regionText = filters.value.region.trim()
+    const methodClass4Values = getMethodClass4Values(filters.value.method)
+
+    // 调用 Cesium 高级筛选
+    const visibleCount = filterCesiumPointsAdvanced({
+      regionText,
+      factorLocs: cachedFactorLocs,
+      methodClass4Values,
+    })
+
+    showToast(`筛选结果: 共 ${visibleCount} 个点`)
+  } catch (err) {
+    console.error('查询失败:', err)
+    showToast('查询失败，请检查输入')
+  } finally {
+    searching.value = false
+  }
+}
 
 // ResizeObserver 监听侧栏图谱容器大小变化
 let resizeObserver = null
@@ -603,11 +744,7 @@ const resizeInlineGraph = () => {
   inlineGraph.height(el.clientHeight)
 }
 
-// ============ 筛选 ============
-const applyFilters = () => {
-  const regionVal = filters.value.region.trim().toLowerCase()
-  filterCesiumPoints(regionVal, [])
-}
+// ============ 筛选（已迁移到 handleSearch 统一查询） ============
 
 // ============ 初始化 ============
 const initGraphPanel = async () => {
@@ -937,6 +1074,64 @@ const handleResize = () => {
   color: rgba(255, 255, 255, 0.4);
 }
 
+/* ============ 查询按钮 ============ */
+.search-btn {
+  padding: 6px 22px;
+  font-size: 17px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0D5BBE, #3A7BD5);
+  color: #fff;
+  border: 1px solid rgba(58, 123, 213, 0.6);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(58, 123, 213, 0.3);
+  white-space: nowrap;
+}
+
+.search-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1A6BD5, #4A90D9);
+  box-shadow: 0 0 16px rgba(58, 123, 213, 0.6);
+  transform: translateY(-1px);
+}
+
+.search-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============ 筛选结果提示 ============ */
+.filter-toast {
+  position: fixed;
+  top: calc(10% + 70px);
+  left: 58%;
+  transform: translateX(-50%) translateY(-10px);
+  padding: 10px 24px;
+  background: linear-gradient(135deg, rgba(15, 35, 65, 0.95), rgba(8, 20, 45, 0.95));
+  color: #00d4ff;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 200, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 200, 255, 0.15);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(8px);
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+}
+
+.filter-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
 /* ============ 图谱容器 ============ */
 .graph-container-wrapper {
   position: relative;
@@ -1072,7 +1267,7 @@ const handleResize = () => {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1092,7 +1287,7 @@ const handleResize = () => {
 .fullscreen-panel {
   width: 100vw;
   height: 100vh;
-  background: rgba(5, 15, 30, 0.95);
+  background: #050f1e00;
   border-radius: 12px;
   border: 1px solid rgba(58, 123, 213, 0.4);
   overflow: hidden;
@@ -1102,10 +1297,11 @@ const handleResize = () => {
 }
 
 .fullscreen-header {
+  top: 10vh;
   display: flex;
   align-items: center;
   padding: 12px 18px;
-  background: linear-gradient(135deg, #0A2E5C, #1A3A6B);
+  background: linear-gradient(135deg, #0a2e5c00, #1A3A6B);
   border-bottom: 1px solid rgba(58, 123, 213, 0.4);
   flex-shrink: 0;
   gap: 12px;
@@ -1166,7 +1362,7 @@ const handleResize = () => {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: rgba(5, 15, 30, 0.8);
+  background: rgba(5, 15, 30, 0.2);
 }
 
 #fullscreen-graph {

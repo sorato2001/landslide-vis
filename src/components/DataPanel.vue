@@ -91,6 +91,8 @@
       </div>
       
       <!-- <AreaInput /> -->
+      <AdminDivision />
+      <OnlineData @openUrl="$emit('openUrl', $event)" />
       <ElevationInput />
       <SoilInput />
       <RoadInput />
@@ -101,11 +103,13 @@
 <script setup>
 import DataPre from './data/DataPre.vue'
 import AreaInput from './data/AreaInput.vue'
+import AdminDivision from './data/AdminDivision.vue'
+import OnlineData from './data/OnlineData.vue'
 import ElevationInput from './data/ElevationInput.vue'
 import SoilInput from './data/SoilInput.vue'
 import RoadInput from './data/RoadInput.vue'
 
-defineEmits(['close'])
+defineEmits(['close', 'openUrl'])
 
 const dataGroups = [
   {
