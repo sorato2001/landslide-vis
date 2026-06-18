@@ -1,5 +1,6 @@
 import * as Cesium from 'cesium'
 import { getViewer } from './viewer'
+import shp from 'shpjs'
 
 /**
  * Cesium 滑坡点与图谱联动模块
@@ -375,4 +376,76 @@ export function clearLandslidePoints() {
 
   landslideEntities = []
   highlightedEntity = null
+}
+
+/* ========== 芦山地震滑坡点加载 ========== */
+let lushanDataSource = null
+
+/**
+ * 加载芦山地震滑坡 shapefile，用灰色点显示
+ */
+export async function loadLushanLandslide() {
+  const viewer = getViewer()
+  if (!viewer) return
+
+  // 如果已加载，切换可见性
+  if (lushanDataSource) {
+    lushanDataSource.show = !lushanDataSource.show
+    return lushanDataSource.show
+  }
+
+  try {
+    const [shpBuf, dbfBuf] = await Promise.all([
+      fetch('/sun/lushan_landslide/lushan_shape.shp').then(r => r.arrayBuffer()),
+      fetch('/sun/lushan_landslide/lushan_shape.dbf').then(r => r.arrayBuffer()),
+    ])
+    const geojson = await shp({ shp: shpBuf, dbf: dbfBuf })
+
+    lushanDataSource = await Cesium.GeoJsonDataSource.load(geojson, {
+      clampToGround: true,
+    })
+
+    const entities = lushanDataSource.entities.values
+    entities.forEach((entity) => {
+      if (entity.billboard) entity.billboard = undefined
+      if (entity.polygon) {
+        // 多边形转质心点
+        const positions = entity.polygon.hierarchy?.getValue(Cesium.JulianDate.now())?.positions
+        if (positions && positions.length > 0) {
+          const center = Cesium.BoundingSphere.fromPoints(positions).center
+          const carto = Cesium.Cartographic.fromCartesian(center)
+          entity.position = Cesium.Cartesian3.fromDegrees(
+            Cesium.Math.toDegrees(carto.longitude),
+            Cesium.Math.toDegrees(carto.latitude)
+          )
+          entity.polygon = undefined
+          entity.point = {
+            pixelSize: 5,
+            color: Cesium.Color.fromCssColorString('#888888').withAlpha(0.85),
+            outlineColor: Cesium.Color.WHITE.withAlpha(0.5),
+            outlineWidth: 1,
+            heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+            disableDepthTestDistance: 10000,
+          }
+        }
+      } else {
+        // 已有点数据
+        entity.point = {
+          pixelSize: 5,
+          color: Cesium.Color.fromCssColorString('#888888').withAlpha(0.85),
+          outlineColor: Cesium.Color.WHITE.withAlpha(0.5),
+          outlineWidth: 1,
+          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+          disableDepthTestDistance: 10000,
+        }
+      }
+    })
+
+    viewer.dataSources.add(lushanDataSource)
+    console.log(`芦山地震滑坡点已加载: ${entities.length} 个`)
+    return true
+  } catch (e) {
+    console.warn('芦山滑坡shapefile加载失败:', e)
+    return false
+  }
 }

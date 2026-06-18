@@ -8,7 +8,7 @@
 
     <div class="panel-content">
 
-      <DataPre />
+      <!-- <DataPre /> -->
       
       <!-- <div class="section-group">
         <div class="section-label">
@@ -91,12 +91,12 @@
       </div>
       
       <!-- <AreaInput /> -->
-      <AdminDivision />
       <OnlineData @openUrl="$emit('openUrl', $event)" />
       <SusceptibilityInput />
       <ElevationInput />
       <SoilInput />
       <RoadInput />
+      <AdminDivision />
     </div>
   </div>
 </template>
@@ -110,6 +110,7 @@ import SusceptibilityInput from './data/SusceptibilityInput.vue'
 import ElevationInput from './data/ElevationInput.vue'
 import SoilInput from './data/SoilInput.vue'
 import RoadInput from './data/RoadInput.vue'
+import { loadLushanLandslide } from '@/cesium/miniMapLink'
 
 defineEmits(['close', 'openUrl'])
 
@@ -137,13 +138,18 @@ const dataGroups = [
     title: '滑坡编录数据',
     color: 'purple',
     list: [
-      
+      { name: '芦山地震滑坡数据', key: 'lushan' },
+      { name: '泸定地震滑坡数据', key: 'luding' },
+      { name: '九寨沟地震滑坡数据', key: 'jiuzaigou' }
     ]
   }
 ]
 
-const handleInput = (key) => {
+const handleInput = async (key) => {
   console.log('点击输入：', key)
+  if (key === 'lushan') {
+    await loadLushanLandslide()
+  }
 }
 </script>
 

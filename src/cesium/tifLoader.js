@@ -2,7 +2,6 @@ import { fromArrayBuffer } from 'geotiff'
 import * as Cesium from 'cesium'
 import { getViewer } from './viewer'
 import proj4 from 'proj4'
-import shp from 'shpjs'
 
 let elevationLayer = null
 let grayCanvas = null
@@ -246,21 +245,30 @@ function getGeoBounds(image) {
     // 尝试从 GeoTIFF 元数据获取 CRS
     const geoKeys = image.getGeoKeys?.() || null
     let sourceProj = null
+    let epsgCode = null
 
     if (geoKeys) {
       const projectedCSType = geoKeys.ProjectedCSType || geoKeys.GeographicType
       if (projectedCSType) {
-        const epsg = `EPSG:${projectedCSType}`
-        sourceProj = proj4(epsg)
-        console.log('从 GeoKeys 获取 CRS:', epsg)
+        epsgCode = `EPSG:${projectedCSType}`
+        try {
+          sourceProj = proj4(epsgCode)
+          console.log('从 GeoKeys 获取 CRS:', epsgCode)
+        } catch (e) {
+          console.warn('proj4 不支持', epsgCode, ', 尝试候选列表')
+          sourceProj = null
+        }
       }
     }
 
     // 如果没有 GeoKeys 或无法解析，尝试常见 EPSG
     if (!sourceProj) {
       // 中国常见投影: CGCS2000 / 3-degree Gauss-Kruger
-      const candidates = ['EPSG:4527', 'EPSG:4528', 'EPSG:4529', 'EPSG:4530',
-                          'EPSG:32648', 'EPSG:32649', 'EPSG:4490']
+      // 泸定在 34 带（EPSG:4527=3度带34, EPSG:4534=6度带18）
+      const candidates = ['EPSG:32647', 'EPSG:32648', 'EPSG:32649',
+                          'EPSG:4527', 'EPSG:4528', 'EPSG:4529', 'EPSG:4530',
+                          'EPSG:4531', 'EPSG:4532', 'EPSG:4533', 'EPSG:4534',
+                          'EPSG:4490']
       for (const epsg of candidates) {
         try {
           sourceProj = proj4(epsg)
@@ -269,6 +277,7 @@ function getGeoBounds(image) {
           const cy = (south + north) / 2
           const test = proj4(epsg, 'EPSG:4326', [cx, cy])
           if (test[0] >= 70 && test[0] <= 140 && test[1] >= 15 && test[1] <= 55) {
+            epsgCode = epsg
             console.log('匹配到 CRS:', epsg, '转换中心:', test)
             break
           }
@@ -280,13 +289,21 @@ function getGeoBounds(image) {
     }
 
     if (sourceProj) {
-      const sw = proj4(sourceProj, 'EPSG:4326', [west, south])
-      const ne = proj4(sourceProj, 'EPSG:4326', [east, north])
-      west = sw[0]
-      south = sw[1]
-      east = ne[0]
-      north = ne[1]
-      console.log('转换为 WGS84:', { west, south, east, north })
+      // 转换四个角点以获得精确的 WGS84 范围
+      // 投影坐标 bbox 的 SW/NE 不一定是地理范围的 SW/NE
+      const corners = [
+        proj4(sourceProj, 'EPSG:4326', [west, south]),
+        proj4(sourceProj, 'EPSG:4326', [west, north]),
+        proj4(sourceProj, 'EPSG:4326', [east, south]),
+        proj4(sourceProj, 'EPSG:4326', [east, north]),
+      ]
+      const lons = corners.map(c => c[0])
+      const lats = corners.map(c => c[1])
+      west  = Math.min(...lons)
+      east  = Math.max(...lons)
+      south = Math.min(...lats)
+      north = Math.max(...lats)
+      console.log(`CRS ${epsgCode} -> WGS84:`, { west, south, east, north })
     } else {
       console.warn('无法识别 TIFF 坐标系，将直接使用 bbox 值作为经纬度')
     }
@@ -406,35 +423,16 @@ export async function loadSusceptibilityTif(source) {
   // 创建图例
   createSusceptibilityLegend(viewer)
 
-  // 加载研究区边界并缩放
-  try {
-    const [shpBuf, dbfBuf] = await Promise.all([
-      fetch('/sun/region/Luding_StudyRegion.shp').then(r => r.arrayBuffer()),
-      fetch('/sun/region/Luding_StudyRegion.dbf').then(r => r.arrayBuffer()),
-    ])
-    const regionGeojson = await shp([shpBuf, dbfBuf])
-    const regionDs = await Cesium.GeoJsonDataSource.load(regionGeojson, {
-      stroke: Cesium.Color.fromCssColorString('#00d4ff'),
-      fill: Cesium.Color.fromCssColorString('rgba(0, 150, 255, 0.15)'),
-      strokeWidth: 2,
-      clampToGround: true
-    })
-    viewer.dataSources.add(regionDs)
-    viewer.flyTo(regionDs, {
-      duration: 2.0,
-      offset: new Cesium.HeadingPitchRange(
-        0.0,
-        Cesium.Math.toRadians(-50),
-        0
-      )
-    })
-  } catch (e) {
-    console.warn('研究区shp加载失败，回退到TIFF范围:', e)
-    viewer.camera.flyTo({
-      destination: Cesium.Rectangle.fromDegrees(west, south, east, north),
-      duration: 2,
-    })
-  }
+  // 缩放到TIFF范围
+  viewer.camera.flyTo({
+    destination: Cesium.Rectangle.fromDegrees(west, south, east, north),
+    duration: 2,
+    orientation: {
+      heading: 0,
+      pitch: Cesium.Math.toRadians(-50),
+      roll: 0
+    }
+  })
 
   return { width, height, minVal, maxVal, validCount }
 }

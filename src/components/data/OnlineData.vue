@@ -42,6 +42,7 @@ const categories = [
       { name: 'SRTM', url: 'https://glovis.usgs.gov/app' },
       { name: 'ASTER GDEM', url: 'https://asterweb.jpl.nasa.gov/gdem.asp' },
       { name: 'TanDEM-X DEM', url: 'https://data.europa.eu/data/datasets/5eecdf4c-de57-4624-99e9-60086b032aea?locale=en' },
+      { name: 'resdc', url: 'https://www.resdc.cn/DOI/DOI.aspx?DOIID=54' },
     ],
   },
   {

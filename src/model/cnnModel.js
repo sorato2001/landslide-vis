@@ -32,7 +32,7 @@ async function loadRegionBoundary(viewer) {
       fetch('/sun/region/Luding_StudyRegion.shp').then(r => r.arrayBuffer()),
       fetch('/sun/region/Luding_StudyRegion.dbf').then(r => r.arrayBuffer()),
     ])
-    const regionGeojson = await shp([shpBuf, dbfBuf])
+    const regionGeojson = await shp({ shp: shpBuf, dbf: dbfBuf })
     const regionDs = await Cesium.GeoJsonDataSource.load(regionGeojson, {
       stroke: Cesium.Color.fromCssColorString('#00d4ff'),
       fill: Cesium.Color.fromCssColorString('rgba(0, 150, 255, 0.15)'),

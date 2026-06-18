@@ -55,7 +55,7 @@
             </div>
             <div class="legend-item">
               <span class="dot" style="background:#71717A"></span>
-              <span class="legend-text underline">PubTime</span>
+              <span class="legend-text">PubTime</span>
             </div>
             <div class="legend-item">
               <span class="dot" style="background:#71717A"></span>
@@ -958,9 +958,9 @@ const handleResize = () => {
 }
 
 .legend-items {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding-left: 8px;
 }
 

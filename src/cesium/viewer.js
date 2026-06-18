@@ -13,8 +13,13 @@ export function initCesium(containerId) {
     imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
     animation: false,
     Clock: false,
-    timeline: false
+    timeline: false,
+    selectionIndicator: false,
+    infoBox: false
   })
+
+  // 隐藏 Cesium logo 和版权信息
+  viewer.cesiumWidget.creditContainer.style.display = 'none'
 
   return viewer
 }
